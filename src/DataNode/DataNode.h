@@ -2,11 +2,9 @@
 
 #include "DataNodeConfig.h"
 
-
 namespace efs {
-    class DataNode {
-        public:
-        DataNodeConfig config;
-
-    };
+class DataNode {
+public:
+    DataNodeConfig config;
+};
 }

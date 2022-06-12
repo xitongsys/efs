@@ -12,7 +12,7 @@
 #include "Error.h"
 
 namespace efs {
-    namespace serialize {
+namespace serialize {
     // size/////////////////////////////////////////////////////
     template <class T>
     typename std::enable_if<std::is_class<T>::value, int32_t>::type size(const T& a)
@@ -49,7 +49,7 @@ namespace efs {
         }
         return size;
     }
-    
+
     // serialize/////////////////////////////////////////////////////
     template <class T>
     typename std::enable_if<std::is_class<T>::value, int32_t>::type serialize(const T& a, char* buf, int32_t bufsize)
@@ -132,7 +132,7 @@ namespace efs {
         int32_t len = 0;
 
         int32_t size1 = deserialize(len, buf + size, bufsize - size);
-        if(size1 < 0){
+        if (size1 < 0) {
             return -1;
         }
         size += size1;
@@ -151,7 +151,7 @@ namespace efs {
         int32_t size = 0;
         int32_t cnt = 0;
         int32_t size1 = deserialize(cnt, buf + size, bufsize - size);
-        if(size1 < 0){
+        if (size1 < 0) {
             return -1;
         }
         size += size1;
@@ -160,7 +160,7 @@ namespace efs {
         for (int i = 0; i < cnt; i++) {
             T v;
             size1 = deserialize(v, buf + size, bufsize - size);
-            if(size1 < 0){
+            if (size1 < 0) {
                 return -1;
             }
             size += size1;

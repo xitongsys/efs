@@ -3,19 +3,21 @@
 #include "Msg/Msg.h"
 
 namespace efs {
-    struct MsgClose : Msg {
-        int64_t fd;
+struct MsgClose : Msg {
+    int64_t fd;
 
-        MsgClose() {
-            fd = -1;
-        }
-    };
+    MsgClose()
+    {
+        fd = -1;
+    }
+};
 
-    struct MsgCloseResp : Msg {
-        int8_t ec;
+struct MsgCloseResp : Msg {
+    int8_t ec;
 
-        MsgCloseResp() {
-            ec = 0;
-        }
-    };
+    MsgCloseResp()
+    {
+        ec = 0;
+    }
+};
 }
