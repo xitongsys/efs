@@ -16,9 +16,11 @@ public:
     void write(const char* data, int32_t size);
     void read(char* data, int32_t size);
 
+    const char* read_raw_buffer();
+    char* write_raw_buffer();
+
 public:
     Buffer(int32_t size);
-
     ~Buffer();
 };
 }

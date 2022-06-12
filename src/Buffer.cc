@@ -55,4 +55,14 @@ void Buffer::write(const char* data, int32_t size)
     write_consume(size);
 }
 
+const char* Buffer::read_raw_buffer()
+{
+    return buffer + read_pos;
+}
+
+char* Buffer::write_raw_buffer()
+{
+    return buffer + write_pos;
+}
+
 }
