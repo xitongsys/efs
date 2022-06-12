@@ -9,8 +9,6 @@ class SessionBase : public std::enable_shared_from_this<SessionBase> {
 public:
     std::unique_ptr<Buffer> p_in_buffer, p_out_buffer;
 
-    std::shared_ptr<Msg> p_in_msg, p_out_msg;
-
     boost::asio::ip::tcp::socket socket;
 
 public:

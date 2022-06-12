@@ -1,11 +1,12 @@
 #include <boost/asio.hpp>
 #include <queue>
 
-#include "DataNodeConfig.h"
-#include "DataNodeSession.h"
+#include "DataNode/DataNodeConfig.h"
+#include "DataNode/DataNodeSession.h"
+#include "ServerBase.h"
 
 namespace efs {
-class DataNode {
+class DataNode : public ServerBase<DataNodeSession> {
 public:
     DataNodeConfig config;
 
@@ -15,8 +16,5 @@ private:
 
 public:
     DataNode(const std::string& config_file);
-
-    void do_accept();
-    void run();
 };
 }
