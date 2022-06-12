@@ -14,6 +14,7 @@ public:
     std::string name_node_ip;
     uint16_t name_node_port;
 
+    DataNodeConfig();
     DataNodeConfig(const std::string& file_);
     DataNodeConfig(const DataNodeConfig& config_);
 };

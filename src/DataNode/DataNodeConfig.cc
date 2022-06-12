@@ -3,6 +3,8 @@
 #include "DataNodeConfig.h"
 
 namespace efs {
+DataNodeConfig::DataNodeConfig() { }
+
 DataNodeConfig::DataNodeConfig(const std::string& file_)
 {
     YAML::Node node = YAML::LoadFile(file_);

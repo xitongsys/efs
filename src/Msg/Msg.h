@@ -15,5 +15,7 @@ enum MsgType {
 
 struct Msg {
     MsgType msg_type;
+
+    MsgType getType();
 };
 }
