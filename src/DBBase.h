@@ -1,5 +1,5 @@
 #include <cstring>
-#include <sqlite3.h>
+#include <rocksdb/db.h>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -10,35 +10,13 @@ namespace efs {
 
 class DBBase {
 public:
-    sqlite3* db;
-
-    static const char* SQLS;
+    rocksdb::DB* db;
 
 public:
-    template <int SQL_INDEX, class... COL_TYPES>
-    std::vector<std::tuple<COL_TYPES...>> select()
-    {
-        const char* sql = SQLS[SQL_INDEX];
-    }
+    ErrorCode put(const std::string& key, const std::string& value);
+    ErrorCode get(const std::string& key, std::string& value);
+    ErrorCode del(const std::string& key);
 
-public:
-    template <class T>
-    ErrorCode parse(std::string& s, T& value)
-    {
-        if (s.size() != sizeof(T)) {
-            return ErrorCode::E_DB_PARSE;
-        }
-        memcpy(s.c_str(), &value, sizeof(T));
-        return ErrorCode::NONE;
-    }
-
-    ErrorCode parse(std::string& s, std::string& value)
-    {
-        value = std::move(s);
-        return ErrorCode::NONE;
-    }
-
-public:
     DBBase(const std::string& db_path);
     ~DBBase();
 };

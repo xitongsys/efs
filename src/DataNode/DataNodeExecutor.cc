@@ -5,9 +5,9 @@
 
 namespace efs {
 DataNodeExecutor::DataNodeExecutor(const DataNodeConfig& config)
+    : db(config.log_path)
 {
     this->config = config;
-    auto db_path = std::filesystem::path(config.log_path) / "efs.db";
 }
 
 DataNodeExecutor::~DataNodeExecutor()
@@ -23,6 +23,7 @@ std::string DataNodeExecutor::absolutePath(const std::string& path)
 Permission DataNodeExecutor::permission(const std::string& path, int64_t uid, int64_t gid)
 {
     std::string path_f = formatPath(path);
+    
     std::string absolute_path = absolutePath(path_f);
 }
 

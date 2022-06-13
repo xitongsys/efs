@@ -1,7 +1,7 @@
 #include <memory>
-#include <sqlite3.h>
 #include <unordered_map>
 
+#include "DBBase.h"
 #include "DataNode/DataNodeConfig.h"
 #include "FileDesc.h"
 #include "Msg/MsgLogin.h"
@@ -11,11 +11,13 @@
 namespace efs {
 class DataNodeExecutor {
 public:
+    DBBase db;
+    std::unordered_map<std::string, UserDesc> users;
+
+public:
     DataNodeExecutor(const DataNodeConfig& config);
     ~DataNodeExecutor();
     DataNodeConfig config;
-
-    std::unordered_map<std::string, UserDesc> users;
 
     std::string absolutePath(const std::string& path);
     Permission permission(const std::string& path, int64_t uid, int64_t gid);
