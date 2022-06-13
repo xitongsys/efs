@@ -20,32 +20,60 @@ std::string DataNodeExecutor::absolutePath(const std::string& path)
     return absolute_path.string();
 }
 
-Permission DataNodeExecutor::permission(const std::string& path, int64_t uid, int64_t gid)
+std::string DataNodeExecutor::relativePath(const std::string& path)
 {
-    std::string path_f = formatPath(path);
-    
-    std::string absolute_path = absolutePath(path_f);
 }
 
-std::shared_ptr<MsgLoginResp> DataNodeExecutor::login(std::shared_ptr<MsgLogin> p_msg_login)
+ErrorCode DataNodeExecutor::fileDesc(const std::string& path, FileDesc& fdesc)
 {
-    std::shared_ptr<MsgLoginResp> p_msg_login_resp = std::make_shared<MsgLoginResp>();
-    const std::string& user = p_msg_login->user;
-    if (users.count(user) == 0) {
-        p_msg_login_resp->error_code = ErrorCode::E_LOGIN_ACCOUNT_NOT_FOUND;
-
-    } else if (users[user].password != p_msg_login->password) {
-        p_msg_login_resp->error_code = ErrorCode::E_LOGIN_WRONG_PASSWORD;
-
-    } else {
-        p_msg_login_resp->uid = users[user].uid;
-        p_msg_login_resp->gid = users[user].gid;
+    std::string value;
+    if (db.get(path, value)) {
+        return E_DB_GET;
     }
 
-    return p_msg_login_resp;
+    if (fdesc.deserialize(value.c_str(), value.size()) < 0) {
+        return E_DESERIALIZE;
+    }
+
+    return ErrorCode::NONE;
 }
 
-std::shared_ptr<MsgLsResp> DataNodeExecutor::ls(std::shared_ptr<MsgLs> p_msg_ls)
+ErrorCode DataNodeExecutor::permission(const std::string& path, int64_t uid, int64_t gid, Permission& perm)
+{
+    FileDesc fdesc;
+    ErrorCode ec;
+
+    if ((ec = fileDesc(path, fdesc))) {
+        return ec;
+    }
+
+    if (fdesc.uid == uid) {
+        perm = Permission((fdesc.mod >> 6) & 0b111);
+
+    } else if (fdesc.gid == gid) {
+        perm = Permission((fdesc.mod >> 3) & 0b111);
+
+    } else {
+        perm = Permission(fdesc.mod & 0b111);
+    }
+
+    return ErrorCode::NONE;
+}
+
+ErrorCode DataNodeExecutor::login(const std::string& user, const std::string& password)
+{
+    if (users.count(user) == 0) {
+        return ErrorCode::E_LOGIN_USER_NOT_FOUND;
+
+    } else if (users[user].password != password) {
+        return ErrorCode::E_LOGIN_WRONG_PASSWORD;
+
+    } else {
+        return ErrorCode::NONE;
+    }
+}
+
+ErrorCode DataNodeExecutor::ls(const std::string& path, std::vector<FileDesc>& fs)
 {
 }
 

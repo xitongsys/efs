@@ -20,9 +20,12 @@ public:
     DataNodeConfig config;
 
     std::string absolutePath(const std::string& path);
-    Permission permission(const std::string& path, int64_t uid, int64_t gid);
+    std::string relativePath(const std::string& path);
 
-    std::shared_ptr<MsgLoginResp> login(std::shared_ptr<MsgLogin> p_msg_login);
-    std::shared_ptr<MsgLsResp> ls(std::shared_ptr<MsgLs> p_msg_ls);
+    ErrorCode permission(const std::string& path, int64_t uid, int64_t gid, Permission& perm);
+    ErrorCode fileDesc(const std::string& path, FileDesc& fdesc);
+
+    ErrorCode login(const std::string& user, const std::string& password);
+    ErrorCode ls(const std::string& path, std::vector<FileDesc>& fs);
 };
 }

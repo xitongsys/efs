@@ -15,12 +15,12 @@ struct MsgLs : Msg {
         path = "";
     }
 
-    int32_t size()
+    inline int32_t size()
     {
         return Msg::size() + serialize::size(path);
     }
 
-    int32_t serialize(char* buf, int32_t buf_size)
+    inline int32_t serialize(char* buf, int32_t buf_size)
     {
         if (this->size() > buf_size) {
             return -1;
@@ -31,7 +31,7 @@ struct MsgLs : Msg {
         return size;
     }
 
-    int32_t deserialize(const char* buf, int32_t buf_size)
+    inline int32_t deserialize(const char* buf, int32_t buf_size)
     {
         int size = 0, size1 = 0;
         size1 = Msg::deserialize(buf + size, buf_size - size);
@@ -58,14 +58,14 @@ struct MsgLsResp : Msg {
         msg_type = MsgType::LS_RESP;
     }
 
-    int32_t size()
+    inline int32_t size()
     {
         int32_t size = Msg::size();
         size += serialize::size(files);
         return size;
     }
 
-    int32_t serialize(char* buf, int32_t buf_size)
+    inline int32_t serialize(char* buf, int32_t buf_size)
     {
         int32_t size = 0;
         if (this->size() > buf_size) {
@@ -76,7 +76,7 @@ struct MsgLsResp : Msg {
         return size;
     }
 
-    int32_t deserialize(char* buf, int32_t buf_size)
+    inline int32_t deserialize(char* buf, int32_t buf_size)
     {
         int32_t size = 0, size1 = 0;
         size1 = Msg::deserialize(buf + size, buf_size - size);
