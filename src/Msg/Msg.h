@@ -5,15 +5,35 @@
 namespace efs {
 enum MsgType : uint8_t {
     NONE,
+    LOGIN,
+    LOGIN_RESP,
+
     OPEN,
+    OPEN_RESP,
+
     CLOSE,
+    CLOSE_RESP,
+
     WRITE,
+    WRITE_RESP,
+
     READ,
+    READ_RESP,
+
     LS,
+    LS_RESP,
+
     MKDIR,
+    MKDIR_RESP,
+
     RM,
+    RM_RESP,
+
     CHMOD,
+    CHMOD_RESP,
+
     CHOWN,
+    CHOWN_RESP,
 };
 
 struct Msg {

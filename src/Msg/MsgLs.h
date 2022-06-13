@@ -9,11 +9,9 @@ namespace efs {
 struct MsgLs : Msg {
     std::string path;
 
-    // control block, don't serialize
-    bool is_done;
-
     MsgLs()
     {
+        msg_type = MsgType::LS;
         path = "";
     }
 
@@ -42,7 +40,12 @@ struct MsgLs : Msg {
         }
         size += size1;
 
-        size += serialize::deserialize(path, buf + size, buf_size - size);
+        size1 = serialize::deserialize(path, buf + size, buf_size - size);
+        if (size1 < 0) {
+            return -1;
+        }
+        size += size1;
+
         return size;
     }
 };
@@ -52,6 +55,7 @@ struct MsgLsResp : Msg {
 
     MsgLsResp()
     {
+        msg_type = MsgType::LS_RESP;
     }
 
     int32_t size()
