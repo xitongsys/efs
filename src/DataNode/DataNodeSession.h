@@ -14,5 +14,8 @@ public:
 
     void readHandler();
     void writeHandler();
+
+    void lsHandler();
+    void openHandler();
 };
 }

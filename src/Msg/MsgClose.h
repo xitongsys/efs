@@ -13,11 +13,9 @@ struct MsgClose : Msg {
 };
 
 struct MsgCloseResp : Msg {
-    int8_t ec;
 
     MsgCloseResp()
     {
-        ec = 0;
     }
 };
 }
