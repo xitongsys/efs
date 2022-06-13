@@ -2,7 +2,7 @@
 
 namespace efs {
 
-enum FileType {
+enum FileType : uint8_t {
     FILE,
     DIR
 };
