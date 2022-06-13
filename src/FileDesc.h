@@ -4,12 +4,7 @@
 
 namespace efs {
 
-enum FileType : uint8_t {
-    FILE,
-    DIR
-};
-
-enum Permission {
+enum Permission : uint8_t {
     NONE = 0x0,
     R = 0x1,
     W = 0x2,

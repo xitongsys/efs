@@ -27,5 +27,6 @@ public:
 
     ErrorCode login(const std::string& user, const std::string& password);
     ErrorCode ls(const std::string& path, std::vector<FileDesc>& fs);
+    ErrorCode open(const std::string& path, const std::string& mod, FILE** fp);
 };
 }

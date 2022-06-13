@@ -1,5 +1,4 @@
 #include <boost/asio.hpp>
-#include <queue>
 
 #include "DataNode/DataNodeConfig.h"
 #include "DataNode/DataNodeExecutor.h"

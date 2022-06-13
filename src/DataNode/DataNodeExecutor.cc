@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <filesystem>
 
 #include "DataNodeExecutor.h"
@@ -22,6 +23,8 @@ std::string DataNodeExecutor::absolutePath(const std::string& path)
 
 std::string DataNodeExecutor::relativePath(const std::string& path)
 {
+    int n = path.size();
+    return path.substr(config.root_path.size(), n - config.root_path.size());
 }
 
 ErrorCode DataNodeExecutor::fileDesc(const std::string& path, FileDesc& fdesc)
@@ -75,6 +78,26 @@ ErrorCode DataNodeExecutor::login(const std::string& user, const std::string& pa
 
 ErrorCode DataNodeExecutor::ls(const std::string& path, std::vector<FileDesc>& fs)
 {
+    std::string absolute_path = absolutePath(path);
+    for (const auto& entry : std::filesystem::directory_iterator(absolute_path)) {
+        std::string relative_path = relativePath(entry.path());
+        FileDesc fdesc;
+        ErrorCode ec;
+        if ((ec = fileDesc(relative_path, fdesc))) {
+            return ec;
+        }
+        fs.push_back(fdesc);
+    }
+
+    return ErrorCode::NONE;
+}
+
+ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod, FILE** fp)
+{
+    if (((*fp) = fopen(path.c_str(), mod.c_str())) == NULL) {
+        return ErrorCode::E_FILE_OPEN;
+    }
+    return ErrorCode::NONE;
 }
 
 }

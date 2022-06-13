@@ -11,6 +11,8 @@ enum ErrorCode : int8_t {
     E_SERIALIZE,
     E_DESERIALIZE,
 
+    E_FILE_OPEN,
+
     E_DB_OPEN,
     E_DB_GET,
     E_DB_PUT,

@@ -3,31 +3,29 @@
 #include "Msg/Msg.h"
 
 namespace efs {
-enum OpenMod {
-    R = 0x1,
-    W = 0x2,
-    RW = 0x3,
-    A = 0x4,
-};
 
 struct MsgOpen : Msg {
-    OpenMod mod;
-    std::string file_path;
+    std::string path;
+    std::string open_mod;
 
     MsgOpen()
     {
         msg_type = OPEN;
-        mod = R;
-        file_path = "";
+        error_code = ErrorCode::NONE;
+
+        path = "";
+        open_mod = "r";
     }
 };
 
 struct MsgOpenResp : Msg {
-    uint64_t fd;
-    int8_t ec;
+    int32_t fd;
 
     MsgOpenResp()
     {
+        msg_type = OPEN_RESP;
+        error_code = ErrorCode::NONE;
+
         fd = -1;
     }
 };
