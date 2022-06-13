@@ -9,13 +9,14 @@ public:
     std::string ip;
     uint16_t port;
     std::string log_path;
+    std::string root_path;
     uint64_t disk_size;
 
     std::string name_node_ip;
     uint16_t name_node_port;
 
     DataNodeConfig();
-    DataNodeConfig(const std::string& file_);
-    DataNodeConfig(const DataNodeConfig& config_);
+    DataNodeConfig(const std::string& file);
+    DataNodeConfig(const DataNodeConfig& config);
 };
 }

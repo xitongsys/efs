@@ -1,9 +1,16 @@
 #include <string>
 
 namespace efs {
+
 enum FileType {
     FILE,
     DIR
+};
+
+enum Permission {
+    R = 0x1,
+    W = 0x2,
+    X = 0x4,
 };
 
 struct FileDesc {
