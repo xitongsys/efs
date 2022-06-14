@@ -13,11 +13,15 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
     YAML::Node node = YAML::LoadFile(file);
 
     name = node["name"].as<std::string>();
+    password = node["password"].as<std::string>();
+
     ip = node["ip"].as<std::string>();
     port = node["port"].as<uint16_t>();
+
     root_path = fs::formatPath(node["root_path"].as<std::string>());
     log_path = fs::formatPath(node["log_path"].as<std::string>());
     disk_size = node["disk_size"].as<uint64_t>();
+
     buffer_size = node["buffer_size"].as<int32_t>();
     max_msg_size = node["max_msg_size"].as<int32_t>();
 
@@ -31,6 +35,8 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
 
     name_node_ip = node["name_node_ip"].as<std::string>();
     name_node_port = node["name_node_port"].as<uint16_t>();
+
+    users = node["users"].as<std::vector<std::string>>();
 }
 
 DataNodeConfig::DataNodeConfig(const DataNodeConfig& config)

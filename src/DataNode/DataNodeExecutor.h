@@ -5,8 +5,6 @@
 #include "DataNode/DataNodeConfig.h"
 #include "DataNode/OpenFileHandler.h"
 #include "FileDesc.h"
-#include "Msg/MsgLogin.h"
-#include "Msg/MsgLs.h"
 #include "UserDesc.h"
 
 namespace efs {

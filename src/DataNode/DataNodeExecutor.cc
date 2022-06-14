@@ -11,6 +11,11 @@ DataNodeExecutor::DataNodeExecutor(const DataNodeConfig& config)
     : db(config.log_path)
 {
     this->config = config;
+
+    for (const std::string& csv : config.users) {
+        UserDesc udesc(csv);
+        this->users[udesc.user] = udesc;
+    }
 }
 
 DataNodeExecutor::~DataNodeExecutor()

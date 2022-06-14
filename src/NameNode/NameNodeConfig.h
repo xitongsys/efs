@@ -1,11 +1,17 @@
 #include <string>
+#include <vector>
+
+#include "UserDesc.h"
 
 namespace efs {
-class DataNodeConfig {
+class NameNodeConfig {
 public:
-    std::string _name;
-    std::string _addr;
+    std::string name;
+    std::string ip;
+    int16_t port;
 
-    std::string _log_path;
+    std::vector<UserDesc> users;
+
+    std::string log_path;
 };
 }

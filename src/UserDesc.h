@@ -11,6 +11,8 @@ struct UserDesc {
 
     UserDesc();
 
+    UserDesc(const std::string& csv);
+
     UserDesc(const UserDesc& udesc);
 
     UserDesc(UserDesc&& udesc);
