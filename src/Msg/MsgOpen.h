@@ -10,11 +10,11 @@ struct MsgOpen : Msg {
 
     MsgOpen()
     {
-        msg_type = OPEN;
+        msg_type = MsgType::OPEN;
         error_code = ErrorCode::NONE;
 
         path = "";
-        open_mod = "r";
+        open_mod = "";
     }
 };
 
@@ -23,7 +23,7 @@ struct MsgOpenResp : Msg {
 
     MsgOpenResp()
     {
-        msg_type = OPEN_RESP;
+        msg_type = MsgType::OPEN_RESP;
         error_code = ErrorCode::NONE;
 
         fd = -1;

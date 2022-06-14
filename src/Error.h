@@ -17,6 +17,9 @@ enum ErrorCode : int8_t {
     E_FILE_WRITE,
     E_FILE_READ,
     E_FILE_EOF,
+    E_FILE_PERMISSION,
+    E_FILE_NOT_FOUND,
+    E_FILE_TOO_MANY,
 
     E_DB_OPEN = -7,
     E_DB_GET = -8,

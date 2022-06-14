@@ -33,6 +33,19 @@ struct FileDesc {
         modified_time = util::now();
     }
 
+    inline Permission perm(int32_t uid, int64_t gid)
+    {
+        if (this->uid == uid) {
+            return Permission((this->mod >> 6) & (0b111));
+        }
+
+        if (this->gid == gid) {
+            return Permission((this->mod >> 3) & (0b111));
+        }
+
+        return Permission(this->mod & 0b111);
+    }
+
     inline int32_t size()
     {
         int32_t res = 0;

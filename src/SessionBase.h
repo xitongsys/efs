@@ -12,8 +12,8 @@ public:
     boost::asio::ip::tcp::socket socket;
 
 public:
-    void writeHandler();
-    void readHandler();
+    void writeMsgHandler();
+    void readMsgHandler();
     void start();
 
 private:

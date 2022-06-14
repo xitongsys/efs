@@ -14,7 +14,7 @@ DataNodeSession::DataNodeSession(int32_t buffer_size,
     this->p_executor = p_executor;
 }
 
-void DataNodeSession::readHandler()
+void DataNodeSession::readMsgHandler()
 {
     int32_t size = p_in_buffer->read_size();
     if (size == 0 || p_in_msg != nullptr) {
@@ -41,7 +41,7 @@ void DataNodeSession::readHandler()
     if (p_in_msg && p_out_msg == nullptr) {
         switch (p_in_msg->msg_type) {
         case MsgType::LS: {
-            lsHandler();
+            ls();
             break;
         }
         default:
@@ -62,7 +62,7 @@ void DataNodeSession::readHandler()
     }
 }
 
-void DataNodeSession::writeHandler()
+void DataNodeSession::writeMsgHandler()
 {
 }
 

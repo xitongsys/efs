@@ -8,9 +8,9 @@ SessionBase::SessionBase(int32_t buffer_size, boost::asio::ip::tcp::socket socke
     p_out_buffer = std::make_unique<Buffer>(buffer_size);
 }
 
-void SessionBase::readHandler() { }
+void SessionBase::readMsgHandler() { }
 
-void SessionBase::writeHandler() { }
+void SessionBase::writeMsgHandler() { }
 
 void SessionBase::start()
 {
@@ -23,7 +23,7 @@ void SessionBase::do_read()
     socket.async_read_some(boost::asio::buffer(p_in_buffer->write_raw_buffer(), p_in_buffer->write_size()),
         [this, self](boost::system::error_code ec, int32_t size) {
             if (!ec) {
-                readHandler();
+                readMsgHandler();
                 do_write();
             }
         });
@@ -35,7 +35,7 @@ void SessionBase::do_write()
     boost::asio::async_write(socket, boost::asio::buffer(p_out_buffer->read_raw_buffer(), p_in_buffer->read_size()),
         [this, self](boost::system::error_code ec, int32_t size) {
             if (!ec) {
-                writeHandler();
+                writeMsgHandler();
                 do_read();
             }
         });
