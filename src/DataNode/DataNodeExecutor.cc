@@ -19,19 +19,37 @@ DataNodeExecutor::~DataNodeExecutor()
 
 ErrorCode DataNodeExecutor::absolutePath(const std::string& path, std::string& absolute_path)
 {
-    absolute_path = std::filesystem::path(config.root_path) / path;
+    absolute_path = fs::formatPath(config.root_path + "/" + path);
     return ErrorCode::NONE;
 }
 
 ErrorCode DataNodeExecutor::relativePath(const std::string& path, std::string& relative_path)
 {
-    int n = path.size();
-    relative_path = path.substr(config.root_path.size(), n - config.root_path.size());
+    int n = config.root_path.size();
+
+    relative_path = fs::formatPath(path);
+    if (relative_path.size() < n) {
+        return ErrorCode::E_FILE_PATH;
+    }
+
+    if (relative_path.substr(0, n) != config.root_path) {
+        return ErrorCode::E_FILE_PATH;
+    }
+    relative_path = fs::formatPath(relative_path.substr(n, relative_path.size() - n));
+
     return ErrorCode::NONE;
 }
 
 ErrorCode DataNodeExecutor::parentPath(const std::string& path, std::string& parent_path)
 {
+    parent_path = fs::formatPath(path);
+    while (parent_path.size() > 0 && (*parent_path.rbegin()) != '/') {
+        parent_path.pop_back();
+    }
+
+    if (parent_path.size() == 0) {
+        return ErrorCode::E_FILE_PATH;
+    }
     return ErrorCode::NONE;
 }
 

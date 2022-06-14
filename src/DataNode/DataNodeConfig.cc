@@ -2,6 +2,7 @@
 
 #include "DataNodeConfig.h"
 #include "Error.h"
+#include "FS.h"
 #include "Util.h"
 
 namespace efs {
@@ -14,8 +15,8 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
     name = node["name"].as<std::string>();
     ip = node["ip"].as<std::string>();
     port = node["port"].as<uint16_t>();
-    root_path = node["root_path"].as<std::string>();
-    log_path = node["log_path"].as<std::string>();
+    root_path = fs::formatPath(node["root_path"].as<std::string>());
+    log_path = fs::formatPath(node["log_path"].as<std::string>());
     disk_size = node["disk_size"].as<uint64_t>();
     buffer_size = node["buffer_size"].as<int32_t>();
     max_msg_size = node["max_msg_size"].as<int32_t>();
