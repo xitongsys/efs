@@ -29,8 +29,8 @@ FileDesc::FileDesc(const FileDesc& fdesc)
 }
 
 FileDesc::FileDesc(FileDesc&& fdesc)
+    : path(std::move(fdesc.path))
 {
-    path = std::move(fdesc.path);
     fsize = fdesc.fsize;
     uid = fdesc.uid;
     gid = fdesc.gid;
