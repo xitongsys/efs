@@ -17,20 +17,22 @@ DataNodeExecutor::~DataNodeExecutor()
 {
 }
 
-std::string DataNodeExecutor::absolutePath(const std::string& path)
+ErrorCode DataNodeExecutor::absolutePath(const std::string& path, std::string& absolute_path)
 {
-    auto absolute_path = std::filesystem::path(config.root_path) / path;
-    return absolute_path.string();
+    absolute_path = std::filesystem::path(config.root_path) / path;
+    return ErrorCode::NONE;
 }
 
-std::string DataNodeExecutor::relativePath(const std::string& path)
+ErrorCode DataNodeExecutor::relativePath(const std::string& path, std::string& relative_path)
 {
     int n = path.size();
-    return path.substr(config.root_path.size(), n - config.root_path.size());
+    relative_path = path.substr(config.root_path.size(), n - config.root_path.size());
+    return ErrorCode::NONE;
 }
 
-std::string DataNodeExecutor::parentPath(const std::string& path)
+ErrorCode DataNodeExecutor::parentPath(const std::string& path, std::string& parent_path)
 {
+    return ErrorCode::NONE;
 }
 
 ErrorCode DataNodeExecutor::getFileDesc(const std::string& path, FileDesc& fdesc)
@@ -80,7 +82,7 @@ ErrorCode DataNodeExecutor::permission(const std::string& path, int32_t uid, int
     return ErrorCode::NONE;
 }
 
-ErrorCode DataNodeExecutor::login(const std::string& user, const std::string& password)
+ErrorCode DataNodeExecutor::login(const std::string& user, const std::string& password, UserDesc& udesc)
 {
     if (users.count(user) == 0) {
         return ErrorCode::E_LOGIN_USER_NOT_FOUND;
@@ -89,17 +91,25 @@ ErrorCode DataNodeExecutor::login(const std::string& user, const std::string& pa
         return ErrorCode::E_LOGIN_WRONG_PASSWORD;
 
     } else {
+        udesc = users[user];
         return ErrorCode::NONE;
     }
 }
 
 ErrorCode DataNodeExecutor::ls(const std::string& path, std::vector<FileDesc>& fs)
 {
-    std::string absolute_path = absolutePath(path);
+    ErrorCode ec = ErrorCode::NONE;
+    std::string absolute_path;
+    if (ec = absolutePath(path, absolute_path)) {
+        return ec;
+    }
+
     for (const auto& entry : std::filesystem::directory_iterator(absolute_path)) {
-        std::string relative_path = relativePath(entry.path());
+        std::string relative_path;
+        if (ec = relativePath(entry.path(), relative_path)) {
+            return ec;
+        }
         FileDesc fdesc;
-        ErrorCode ec;
         if ((ec = getFileDesc(relative_path, fdesc))) {
             return ec;
         }
@@ -168,7 +178,10 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t 
         return ec;
     }
 
-    std::string absolute_path = absolutePath(path);
+    std::string absolute_path;
+    if (ec = absolutePath(path, absolute_path)) {
+        return ec;
+    }
     if (!std::filesystem::create_directory(absolute_path)) {
         ec = ErrorCode::E_FILE_MKDIR;
     }
@@ -178,7 +191,11 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t 
 ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod, int32_t uid, int32_t gid, OpenFileHandler& fh)
 {
     ErrorCode ec = ErrorCode::NONE;
-    std::string parent_path = parentPath(path);
+    std::string parent_path;
+    if (ec = parentPath(path, parent_path)) {
+        return ec;
+    }
+
     FileDesc fdesc;
 
     if ((ec = getFileDesc(parent_path, fdesc))) {

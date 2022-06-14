@@ -21,9 +21,9 @@ public:
     ~DataNodeExecutor();
     DataNodeConfig config;
 
-    std::string absolutePath(const std::string& path);
-    std::string relativePath(const std::string& path);
-    std::string parentPath(const std::string& path);
+    ErrorCode absolutePath(const std::string& path, std::string& absolute_path);
+    ErrorCode relativePath(const std::string& path, std::string& relative_path);
+    ErrorCode parentPath(const std::string& path, std::string& parent_path);
 
     ErrorCode permission(const std::string& path, int32_t uid, int32_t gid, Permission& perm);
 
@@ -31,7 +31,7 @@ public:
     ErrorCode setFileDesc(const std::string& path, const FileDesc& fdesc);
     ErrorCode getFileDescFromDisk(const std::string& path, FileDesc& fdesc);
 
-    ErrorCode login(const std::string& user, const std::string& password);
+    ErrorCode login(const std::string& user, const std::string& password, UserDesc& udesc);
     ErrorCode ls(const std::string& path, std::vector<FileDesc>& fs);
     ErrorCode rm(const std::string& path);
     ErrorCode chown(const std::string& path, int32_t uid, int32_t gid);

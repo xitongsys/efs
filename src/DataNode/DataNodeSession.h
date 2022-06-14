@@ -2,6 +2,7 @@
 
 #include "DataNode/DataNodeExecutor.h"
 #include "SessionBase.h"
+#include "UserDesc.h"
 
 namespace efs {
 
@@ -16,7 +17,7 @@ public:
 
     std::unordered_map<int32_t, OpenFileHandler> open_files;
 
-    int64_t uid, gid;
+    UserDesc udesc;
 
 public:
     DataNodeSession(int32_t buffer_size,
