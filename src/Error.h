@@ -3,19 +3,24 @@
 namespace efs {
 enum ErrorCode : int8_t {
     NONE = 0,
-    E_OVERFLOW,
+    E_OVERFLOW = -1,
 
-    E_LOGIN_USER_NOT_FOUND,
-    E_LOGIN_WRONG_PASSWORD,
+    E_LOGIN_USER_NOT_FOUND = -2,
+    E_LOGIN_WRONG_PASSWORD = -3,
 
-    E_SERIALIZE,
-    E_DESERIALIZE,
+    E_SERIALIZE = -4,
+    E_DESERIALIZE = -5,
 
-    E_FILE_OPEN,
+    E_FILE_OPEN = -6,
+    E_FILE_RM,
+    E_FILE_MKDIR,
+    E_FILE_WRITE,
+    E_FILE_READ,
+    E_FILE_EOF,
 
-    E_DB_OPEN,
-    E_DB_GET,
-    E_DB_PUT,
-    E_DB_DEL,
+    E_DB_OPEN = -7,
+    E_DB_GET = -8,
+    E_DB_PUT = -9,
+    E_DB_DEL = -10,
 };
 }

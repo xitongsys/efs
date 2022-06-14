@@ -1,6 +1,7 @@
 #include <string>
 
 #include "Serialize.h"
+#include "Util.h"
 
 namespace efs {
 
@@ -13,11 +14,24 @@ enum Permission : uint8_t {
 
 struct FileDesc {
     std::string path;
-    uint64_t fsize;
+    int64_t fsize;
 
-    uint64_t uid;
-    uint64_t gid;
+    int32_t uid;
+    int32_t gid;
     uint16_t mod;
+    int64_t create_time;
+    int64_t modified_time;
+
+    FileDesc()
+    {
+        path = "";
+        fsize = 0;
+        uid = -1;
+        gid = -1;
+        mod = 0b0111000000;
+        create_time = util::now();
+        modified_time = util::now();
+    }
 
     inline int32_t size()
     {
@@ -27,6 +41,8 @@ struct FileDesc {
         res += serialize::size(uid);
         res += serialize::size(gid);
         res += serialize::size(mod);
+        res += serialize::size(create_time);
+        res += serialize::size(modified_time);
         return res;
     }
 
@@ -41,6 +57,8 @@ struct FileDesc {
         size += serialize::serialize(uid, buf + size, buf_size - size);
         size += serialize::serialize(gid, buf + size, buf_size - size);
         size += serialize::serialize(mod, buf + size, buf_size - size);
+        size += serialize::serialize(create_time, buf + size, buf_size - size);
+        size += serialize::serialize(modified_time, buf + size, buf_size - size);
         return size;
     }
 
@@ -69,6 +87,16 @@ struct FileDesc {
         size += size1;
 
         if ((size1 = serialize::deserialize(mod, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(create_time, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(modified_time, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
