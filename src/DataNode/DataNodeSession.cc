@@ -16,8 +16,6 @@ DataNodeSession::DataNodeSession(int32_t buffer_size,
     std::shared_ptr<DataNodeExecutor> p_executor)
     : SessionBase(buffer_size, std::move(socket))
 {
-    uid = -1;
-    gid = -1;
     p_in_msg = nullptr;
     p_out_msg = nullptr;
     this->p_executor = p_executor;
