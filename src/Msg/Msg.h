@@ -47,12 +47,12 @@ struct Msg {
         error_code = 0;
     }
 
-    int32_t size()
+    int32_t size() const
     {
         return sizeof(MsgType) + sizeof(int8_t);
     }
 
-    int32_t serialize(char* buf, int32_t buf_size)
+    int32_t serialize(char* buf, int32_t buf_size) const
     {
         if (this->size() > buf_size) {
             return -1;

@@ -15,12 +15,12 @@ struct MsgLs : Msg {
         path = "";
     }
 
-    inline int32_t size()
+    inline int32_t size() const
     {
         return Msg::size() + serialize::size(path);
     }
 
-    inline int32_t serialize(char* buf, int32_t buf_size)
+    inline int32_t serialize(char* buf, int32_t buf_size) const
     {
         if (this->size() > buf_size) {
             return -1;
@@ -58,14 +58,14 @@ struct MsgLsResp : Msg {
         msg_type = MsgType::LS_RESP;
     }
 
-    inline int32_t size()
+    inline int32_t size() const
     {
         int32_t size = Msg::size();
         size += serialize::size(files);
         return size;
     }
 
-    inline int32_t serialize(char* buf, int32_t buf_size)
+    inline int32_t serialize(char* buf, int32_t buf_size) const
     {
         int32_t size = 0;
         if (this->size() > buf_size) {

@@ -22,29 +22,11 @@ struct FileDesc {
     int64_t create_time;
     int64_t modified_time;
 
-    FileDesc()
-    {
-        path = "";
-        fsize = 0;
-        uid = -1;
-        gid = -1;
-        mod = 0b0111000000;
-        create_time = util::now();
-        modified_time = util::now();
-    }
-
-    inline Permission perm(int32_t uid, int64_t gid) const
-    {
-        if (this->uid == uid) {
-            return Permission((this->mod >> 6) & (0b111));
-        }
-
-        if (this->gid == gid) {
-            return Permission((this->mod >> 3) & (0b111));
-        }
-
-        return Permission(this->mod & 0b111);
-    }
+    FileDesc();
+    FileDesc(const FileDesc& fdesc);
+    FileDesc(FileDesc&& fdesc);
+    FileDesc& operator=(const FileDesc& fdesc);
+    Permission perm(int32_t uid, int64_t gid) const;
 
     inline int32_t size() const
     {
