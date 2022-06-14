@@ -38,13 +38,12 @@ enum MsgType : uint8_t {
 
 struct Msg {
     MsgType msg_type;
-
     int8_t error_code;
 
     Msg()
     {
         msg_type = MsgType::NONE;
-        error_code = 0;
+        error_code = ErrorCode::NONE;
     }
 
     int32_t size() const
@@ -67,14 +66,12 @@ struct Msg {
     int32_t deserialize(const char* buf, int32_t buf_size)
     {
         int32_t size = 0, size1 = 0;
-        size1 = serialize::deserialize(msg_type, buf + size, buf_size - size);
-        if (size1 < 0) {
+        if ((size1 = serialize::deserialize(msg_type, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
 
-        size1 = serialize::deserialize(error_code, buf + size, buf_size - size);
-        if (size1 < 0) {
+        if ((size1 = serialize::deserialize(error_code, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;

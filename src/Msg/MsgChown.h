@@ -6,19 +6,21 @@
 #include "Serialize.h"
 
 namespace efs {
-struct MsgClose : Msg {
-    int32_t fd;
+struct MsgChown : Msg {
+    std::string path;
+    std::string user;
 
-    MsgClose()
+    MsgChown()
     {
-        msg_type = MsgType::CLOSE;
+        msg_type = MsgType::CHOWN;
         error_code = ErrorCode::NONE;
-        fd = 0;
+        path = "";
+        user = "";
     }
 
     inline int32_t size() const
     {
-        return Msg::size() + serialize::size(fd);
+        return Msg::size() + serialize::size(path) + serialize::size(user);
     }
 
     inline int32_t serialize(char* buf, int32_t buf_size) const
@@ -28,7 +30,8 @@ struct MsgClose : Msg {
         }
         int32_t size = 0;
         size += Msg::serialize(buf + size, buf_size - size);
-        size += serialize::serialize(fd, buf + size, buf_size - size);
+        size += serialize::serialize(path, buf + size, buf_size - size);
+        size += serialize::serialize(user, buf + size, buf_size - size);
         return size;
     }
 
@@ -40,7 +43,12 @@ struct MsgClose : Msg {
         }
         size += size1;
 
-        if ((size1 = serialize::deserialize(fd, buf + size, buf_size - size)) < 0) {
+        if ((size1 = serialize::deserialize(path, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(user, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
@@ -49,11 +57,11 @@ struct MsgClose : Msg {
     }
 };
 
-struct MsgCloseResp : Msg {
+struct MsgChownResp : Msg {
 
-    MsgCloseResp()
+    MsgChownResp()
     {
-        msg_type = MsgType::ClOSE_RESP;
+        msg_type = MsgType::CHOWN_RESP;
         error_code = ErrorCode::NONE;
     }
 };

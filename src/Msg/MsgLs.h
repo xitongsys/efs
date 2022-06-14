@@ -34,14 +34,12 @@ struct MsgLs : Msg {
     inline int32_t deserialize(const char* buf, int32_t buf_size)
     {
         int size = 0, size1 = 0;
-        size1 = Msg::deserialize(buf + size, buf_size - size);
-        if (size1 < 0) {
+        if ((size1 = Msg::deserialize(buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
 
-        size1 = serialize::deserialize(path, buf + size, buf_size - size);
-        if (size1 < 0) {
+        if ((size1 = serialize::deserialize(path, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
@@ -79,14 +77,12 @@ struct MsgLsResp : Msg {
     inline int32_t deserialize(char* buf, int32_t buf_size)
     {
         int32_t size = 0, size1 = 0;
-        size1 = Msg::deserialize(buf + size, buf_size - size);
-        if (size1 < 0) {
+        if ((size1 = Msg::deserialize(buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
 
-        size1 = serialize::deserialize(files, buf + size, buf_size - size);
-        if (size1 < 0) {
+        if ((size1 = serialize::deserialize(files, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;

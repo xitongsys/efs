@@ -4,6 +4,7 @@ namespace efs {
 enum ErrorCode : int8_t {
     NONE = 0,
     E_OVERFLOW = -1,
+    E_BUFFER_SIZE,
 
     E_LOGIN_USER_NOT_FOUND = -2,
     E_LOGIN_WRONG_PASSWORD = -3,

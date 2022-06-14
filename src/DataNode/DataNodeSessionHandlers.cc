@@ -38,10 +38,10 @@ void DataNodeSession::open()
         }
 
         FileDesc fdesc;
-        if ((ec = p_executor->fileDesc(path, fdesc))) {
+        if ((ec = p_executor->getFileDesc(path, fdesc))) {
             std::string parent_path = p_executor->parentPath(path);
             FileDesc parent_fdesc;
-            if ((ec = p_executor->fileDesc(parent_path, parent_fdesc))) {
+            if ((ec = p_executor->getFileDesc(parent_path, parent_fdesc))) {
                 p_out_msg->error_code = ec;
                 break;
             }
@@ -80,7 +80,37 @@ void DataNodeSession::close()
 
     int32_t fd = p_in_msg->fd;
     if (this->open_files.count(fd)) {
-        p_executor->close(&(this->open_files[fd]));
+        p_executor->close(this->open_files[fd]);
+        this->open_files.erase(fd);
+    }
+
+    this->p_out_msg = p_out_msg;
+}
+
+void DataNodeSession::read()
+{
+    ErrorCode ec = ErrorCode::NONE;
+    std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
+    std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
+
+    int32_t fd = p_in_msg->fd;
+    if (this->open_files.count(fd)) {
+        p_executor->close(this->open_files[fd]);
+        this->open_files.erase(fd);
+    }
+
+    this->p_out_msg = p_out_msg;
+}
+
+void DataNodeSession::write()
+{
+    ErrorCode ec = ErrorCode::NONE;
+    std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
+    std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
+
+    int32_t fd = p_in_msg->fd;
+    if (this->open_files.count(fd)) {
+        p_executor->close(this->open_files[fd]);
         this->open_files.erase(fd);
     }
 
