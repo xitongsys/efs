@@ -26,7 +26,7 @@ void DataNodeSession::ls()
     std::shared_ptr<MsgLs> p_in_msg = std::static_pointer_cast<MsgLs>(this->p_in_msg);
     std::shared_ptr<MsgLsResp> p_out_msg = std::make_shared<MsgLsResp>();
 
-    Permission perm = Permission::NONE;
+    Permission perm = Permission::EMPTY;
     ErrorCode ec;
     if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
         p_out_msg->error_code = ec;
@@ -44,7 +44,7 @@ void DataNodeSession::rm()
     std::shared_ptr<MsgRm> p_in_msg = std::static_pointer_cast<MsgRm>(this->p_in_msg);
     std::shared_ptr<MsgRmResp> p_out_msg = std::make_shared<MsgRmResp>();
 
-    Permission perm = Permission::NONE;
+    Permission perm = Permission::EMPTY;
     ErrorCode ec;
     if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
         p_out_msg->error_code = ec;
@@ -65,7 +65,7 @@ void DataNodeSession::chown()
     std::shared_ptr<MsgChown> p_in_msg = std::static_pointer_cast<MsgChown>(this->p_in_msg);
     std::shared_ptr<MsgChownResp> p_out_msg = std::make_shared<MsgChownResp>();
 
-    Permission perm = Permission::NONE;
+    Permission perm = Permission::EMPTY;
     ErrorCode ec;
     if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
         p_out_msg->error_code = ec;
@@ -86,7 +86,7 @@ void DataNodeSession::chmod()
     std::shared_ptr<MsgChmod> p_in_msg = std::static_pointer_cast<MsgChmod>(this->p_in_msg);
     std::shared_ptr<MsgChmodResp> p_out_msg = std::make_shared<MsgChmodResp>();
 
-    Permission perm = Permission::NONE;
+    Permission perm = Permission::EMPTY;
     ErrorCode ec;
     if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
         p_out_msg->error_code = ec;
@@ -115,7 +115,7 @@ void DataNodeSession::mkdir()
             break;
         }
 
-        Permission perm = Permission::NONE;
+        Permission perm = Permission::EMPTY;
         if ((ec = p_executor->permission(parent_path, this->udesc.uid, this->udesc.gid, perm))) {
             p_out_msg->error_code = ec;
 
@@ -188,7 +188,6 @@ void DataNodeSession::open()
 
 void DataNodeSession::close()
 {
-    ErrorCode ec = ErrorCode::NONE;
     std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
     std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
 
@@ -216,7 +215,6 @@ void DataNodeSession::close()
 
 void DataNodeSession::read()
 {
-    ErrorCode ec = ErrorCode::NONE;
     std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
     std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
 
@@ -231,7 +229,6 @@ void DataNodeSession::read()
 
 void DataNodeSession::write()
 {
-    ErrorCode ec = ErrorCode::NONE;
     std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
     std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
 

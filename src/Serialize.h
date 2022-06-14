@@ -23,15 +23,15 @@ namespace serialize {
     template <class T>
     typename std::enable_if<std::is_arithmetic<T>::value, int32_t>::type size(const T& a)
     {
-        int size = sizeof(a);
-        return size;
+        int s = sizeof(a);
+        return s;
     }
 
     template <class T>
     typename std::enable_if<std::is_enum<T>::value, int32_t>::type size(const T& a)
     {
-        int size = sizeof(a);
-        return size;
+        int s = sizeof(a);
+        return s;
     }
 
     template <>
@@ -43,11 +43,11 @@ namespace serialize {
     template <class T>
     int32_t size(const std::vector<T>& vs)
     {
-        int32_t size = 4;
+        int32_t s = 4;
         for (auto it = vs.begin(); it != vs.end(); it++) {
-            size += size(*it);
+            s += size(*it);
         }
-        return size;
+        return s;
     }
 
     // serialize/////////////////////////////////////////////////////
