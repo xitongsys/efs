@@ -30,107 +30,67 @@ ErrorCode DataNodeSession::readMsgHandler()
         return ErrorCode::NONE;
     }
 
+#define RECV_IN_MSG(FUNC)                      \
+    {                                          \
+        int n = p_msg->deserialize(buf, size); \
+        if (n > 0) {                           \
+            p_in_msg = p_msg;                  \
+            p_in_buffer->read_consume(n);      \
+            FUNC();                            \
+        }                                      \
+    }
+
     if (p_in_msg == nullptr) {
         const char* buf = p_in_buffer->read_raw_buffer();
         switch (buf[0]) {
         case MsgType::LOGIN: {
             std::shared_ptr<MsgLogin> p_msg = std::make_shared<MsgLogin>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                login();
-            }
+            RECV_IN_MSG(login);
             break;
         }
         case MsgType::LS: {
             std::shared_ptr<MsgLs> p_msg = std::make_shared<MsgLs>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                ls();
-            }
+            RECV_IN_MSG(ls);
             break;
         }
         case MsgType::RM: {
             std::shared_ptr<MsgRm> p_msg = std::make_shared<MsgRm>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                rm();
-            }
+            RECV_IN_MSG(rm);
             break;
         }
         case MsgType::CHOWN: {
             std::shared_ptr<MsgChown> p_msg = std::make_shared<MsgChown>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                chown();
-            }
+            RECV_IN_MSG(chown);
             break;
         }
         case MsgType::CHMOD: {
             std::shared_ptr<MsgChmod> p_msg = std::make_shared<MsgChmod>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                chmod();
-            }
+            RECV_IN_MSG(chmod);
             break;
         }
         case MsgType::MKDIR: {
             std::shared_ptr<MsgMkdir> p_msg = std::make_shared<MsgMkdir>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                mkdir();
-            }
+            RECV_IN_MSG(mkdir);
             break;
         }
         case MsgType::OPEN: {
             std::shared_ptr<MsgOpen> p_msg = std::make_shared<MsgOpen>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                open();
-            }
+            RECV_IN_MSG(open);
             break;
         }
         case MsgType::CLOSE: {
             std::shared_ptr<MsgClose> p_msg = std::make_shared<MsgClose>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                close();
-            }
+            RECV_IN_MSG(close);
             break;
         }
         case MsgType::READ: {
             std::shared_ptr<MsgRead> p_msg = std::make_shared<MsgRead>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                read();
-            }
+            RECV_IN_MSG(read);
             break;
         }
         case MsgType::WRITE: {
             std::shared_ptr<MsgWrite> p_msg = std::make_shared<MsgWrite>();
-            int n = p_msg->deserialize(buf, size);
-            if (n > 0) {
-                p_in_msg = p_msg;
-                p_in_buffer->read_consume(n);
-                write();
-            }
+            RECV_IN_MSG(write);
             break;
         }
         default:
