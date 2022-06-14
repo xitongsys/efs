@@ -23,8 +23,8 @@ public:
         boost::asio::ip::tcp::socket socket,
         std::shared_ptr<DataNodeExecutor> p_executor);
 
-    void readMsgHandler();
-    void writeMsgHandler();
+    ErrorCode readMsgHandler();
+    ErrorCode writeMsgHandler();
 
     void login();
     void ls();

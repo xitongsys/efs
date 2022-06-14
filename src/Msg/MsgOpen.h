@@ -14,7 +14,7 @@ struct MsgOpen : Msg {
     {
         msg_type = MsgType::OPEN;
         path = "";
-        open_mod = ""
+        open_mod = "";
     }
 
     inline int32_t size() const
@@ -56,13 +56,14 @@ struct MsgOpen : Msg {
     }
 };
 
-struct MsgLsResp : Msg {
+struct MsgOpenResp : Msg {
     int32_t fd;
 
-    MsgLsResp()
+    MsgOpenResp()
     {
         msg_type = MsgType::OPEN_RESP;
         error_code = ErrorCode::NONE;
+        fd = 0;
     }
 
     inline int32_t size() const

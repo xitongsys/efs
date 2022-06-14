@@ -1,5 +1,14 @@
 #include "DataNodeSession.h"
+#include "Msg/MsgChmod.h"
+#include "Msg/MsgChown.h"
+#include "Msg/MsgClose.h"
+#include "Msg/MsgLogin.h"
 #include "Msg/MsgLs.h"
+#include "Msg/MsgMkdir.h"
+#include "Msg/MsgOpen.h"
+#include "Msg/MsgRead.h"
+#include "Msg/MsgRm.h"
+#include "Msg/MsgWrite.h"
 
 namespace efs {
 DataNodeSession::DataNodeSession(int32_t buffer_size,
@@ -14,56 +23,196 @@ DataNodeSession::DataNodeSession(int32_t buffer_size,
     this->p_executor = p_executor;
 }
 
-void DataNodeSession::readMsgHandler()
+ErrorCode DataNodeSession::readMsgHandler()
 {
     int32_t size = p_in_buffer->read_size();
     if (size == 0 || p_in_msg != nullptr) {
-        return;
+        return ErrorCode::NONE;
     }
 
     if (p_in_msg == nullptr) {
         const char* buf = p_in_buffer->read_raw_buffer();
         switch (buf[0]) {
+        case MsgType::LOGIN: {
+            std::shared_ptr<MsgLogin> p_msg = std::make_shared<MsgLogin>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                login();
+            }
+            break;
+        }
         case MsgType::LS: {
             std::shared_ptr<MsgLs> p_msg = std::make_shared<MsgLs>();
             int n = p_msg->deserialize(buf, size);
             if (n > 0) {
                 p_in_msg = p_msg;
                 p_in_buffer->read_consume(n);
+                ls();
+            }
+            break;
+        }
+        case MsgType::RM: {
+            std::shared_ptr<MsgRm> p_msg = std::make_shared<MsgRm>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                rm();
+            }
+            break;
+        }
+        case MsgType::CHOWN: {
+            std::shared_ptr<MsgChown> p_msg = std::make_shared<MsgChown>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                chown();
+            }
+            break;
+        }
+        case MsgType::CHMOD: {
+            std::shared_ptr<MsgChmod> p_msg = std::make_shared<MsgChmod>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                chmod();
+            }
+            break;
+        }
+        case MsgType::MKDIR: {
+            std::shared_ptr<MsgMkdir> p_msg = std::make_shared<MsgMkdir>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                mkdir();
+            }
+            break;
+        }
+        case MsgType::OPEN: {
+            std::shared_ptr<MsgOpen> p_msg = std::make_shared<MsgOpen>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                open();
+            }
+            break;
+        }
+        case MsgType::CLOSE: {
+            std::shared_ptr<MsgClose> p_msg = std::make_shared<MsgClose>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                close();
+            }
+            break;
+        }
+        case MsgType::READ: {
+            std::shared_ptr<MsgRead> p_msg = std::make_shared<MsgRead>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                read();
+            }
+            break;
+        }
+        case MsgType::WRITE: {
+            std::shared_ptr<MsgWrite> p_msg = std::make_shared<MsgWrite>();
+            int n = p_msg->deserialize(buf, size);
+            if (n > 0) {
+                p_in_msg = p_msg;
+                p_in_buffer->read_consume(n);
+                write();
             }
             break;
         }
         default:
-            break;
+            return ErrorCode::E_MSG_UNKNOWN;
         }
     }
 
-    if (p_in_msg && p_out_msg == nullptr) {
-        switch (p_in_msg->msg_type) {
-        case MsgType::LS: {
-            ls();
-            break;
-        }
-        default:
-            break;
-        }
+#define SEND_OUT_MSG                                                                     \
+    {                                                                                    \
+        int32_t msg_size = p_msg->size();                                                \
+        int32_t buf_size = p_out_buffer->write_size();                                   \
+        if (msg_size <= buf_size) {                                                      \
+            int32_t size = p_msg->serialize(p_out_buffer->write_raw_buffer(), buf_size); \
+            p_out_buffer->write_consume(size);                                           \
+            p_out_msg = nullptr;                                                         \
+            p_in_msg = nullptr;                                                          \
+        }                                                                                \
     }
 
     if (p_out_msg) {
-        int32_t msg_size = p_out_msg->size();
-        int32_t buf_size = p_out_buffer->write_size();
-        if (msg_size <= buf_size) {
-            int32_t size = p_out_msg->serialize(p_out_buffer->write_raw_buffer(), buf_size);
-            p_out_buffer->write_consume(size);
-
-            p_out_msg = nullptr;
-            p_in_msg = nullptr;
+        switch (p_out_msg->msg_type) {
+        case MsgType::LOGIN: {
+            std::shared_ptr<MsgLogin> p_msg = std::static_pointer_cast<MsgLogin>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::LS: {
+            std::shared_ptr<MsgLs> p_msg = std::static_pointer_cast<MsgLs>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::RM: {
+            std::shared_ptr<MsgRm> p_msg = std::static_pointer_cast<MsgRm>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::CHOWN: {
+            std::shared_ptr<MsgChown> p_msg = std::static_pointer_cast<MsgChown>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::CHMOD: {
+            std::shared_ptr<MsgChmod> p_msg = std::static_pointer_cast<MsgChmod>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::MKDIR: {
+            std::shared_ptr<MsgMkdir> p_msg = std::static_pointer_cast<MsgMkdir>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::OPEN: {
+            std::shared_ptr<MsgOpen> p_msg = std::static_pointer_cast<MsgOpen>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::CLOSE: {
+            std::shared_ptr<MsgClose> p_msg = std::static_pointer_cast<MsgClose>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::READ: {
+            std::shared_ptr<MsgRead> p_msg = std::static_pointer_cast<MsgRead>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::WRITE: {
+            std::shared_ptr<MsgWrite> p_msg = std::static_pointer_cast<MsgWrite>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        default:
+            return ErrorCode::E_MSG_UNKNOWN;
         }
     }
+
+    return ErrorCode::NONE;
 }
 
-void DataNodeSession::writeMsgHandler()
+ErrorCode DataNodeSession::writeMsgHandler()
 {
+    return ErrorCode::NONE;
 }
 
 }

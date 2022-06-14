@@ -1,8 +1,14 @@
 #include "DataNode/DataNodeSession.h"
+#include "Msg/MsgChmod.h"
+#include "Msg/MsgChown.h"
 #include "Msg/MsgClose.h"
 #include "Msg/MsgLogin.h"
 #include "Msg/MsgLs.h"
+#include "Msg/MsgMkdir.h"
 #include "Msg/MsgOpen.h"
+#include "Msg/MsgRead.h"
+#include "Msg/MsgRm.h"
+#include "Msg/MsgWrite.h"
 
 namespace efs {
 void DataNodeSession::ls()

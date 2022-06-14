@@ -6,6 +6,8 @@ enum ErrorCode : int8_t {
     E_OVERFLOW = -1,
     E_BUFFER_SIZE,
 
+    E_MSG_UNKNOWN,
+
     E_LOGIN_USER_NOT_FOUND = -2,
     E_LOGIN_WRONG_PASSWORD = -3,
 
