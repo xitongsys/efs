@@ -76,6 +76,20 @@ ErrorCode DataNodeExecutor::setFileDesc(const std::string& path, const FileDesc&
 
 ErrorCode DataNodeExecutor::getFileDescFromDisk(const std::string& path, FileDesc& fdesc)
 {
+    ErrorCode ec = ErrorCode::NONE;
+    std::string absolute_path;
+    if (ec = absolutePath(path, absolute_path)) {
+        return ec;
+    }
+
+    if (!fs::exists(absolute_path)) {
+        return ErrorCode::E_FILE_NOT_FOUND;
+    }
+
+    fdesc.fsize = fs::fileSize(absolute_path);
+    fdesc.modified_time = fs::modifiedTime(absolute_path);
+
+    return ErrorCode::NONE;
 }
 
 ErrorCode DataNodeExecutor::permission(const std::string& path, int32_t uid, int32_t gid, Permission& perm)

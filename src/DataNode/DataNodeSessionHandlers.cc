@@ -195,6 +195,19 @@ void DataNodeSession::close()
     int32_t fd = p_in_msg->fd;
     if (this->open_files.count(fd)) {
         p_executor->close(this->open_files[fd]);
+
+        OpenFileHandler& fh = this->open_files[fd];
+        FileDesc fdesc;
+        if (!(p_executor->getFileDescFromDisk(fh.fdesc.path, fdesc))) {
+            // actually only modified_time and fsize can be get from the host filesystem
+
+            fh.fdesc.modified_time = fdesc.modified_time;
+            fh.fdesc.fsize = fdesc.fsize;
+
+            // TODO:: if error, what should do ?
+            p_executor->setFileDesc(fh.fdesc.path, fh.fdesc);
+        }
+
         this->open_files.erase(fd);
     }
 

@@ -40,5 +40,27 @@ namespace fs {
         return std::filesystem::exists(path);
     }
 
+    inline bool isFile(const std::string& path)
+    {
+        return std::filesystem::is_regular_file(path);
+    }
+
+    inline bool isDirectory(const std::string& path)
+    {
+        return std::filesystem::is_directory(path);
+    }
+
+    inline int64_t fileSize(const std::string& path)
+    {
+        return std::filesystem::file_size(path);
+    }
+
+    inline int64_t modifiedTime(const std::string& path)
+    {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::filesystem::last_write_time(path).time_since_epoch())
+            .count();
+    }
+
 }
 }
