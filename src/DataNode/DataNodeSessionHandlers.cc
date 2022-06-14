@@ -57,16 +57,14 @@ void DataNodeSession::open()
                 break;
             }
 
-            FILE* fp = nullptr;
-            if ((ec = p_executor->open(path, open_mod, this->uid, this->gid, &fp))) {
+            OpenFileHandler fh;
+            if ((ec = p_executor->open(path, open_mod, this->uid, this->gid, fh))) {
                 p_out_msg->error_code = ec;
                 break;
             }
 
-            int32_t fd = fileno(fp);
-            this->open_files[fd] = fp;
-
-            p_out_msg->fd = fd;
+            this->open_files[fh.fd] = fh;
+            p_out_msg->fd = fh.fd;
         }
 
     } while (0);

@@ -33,7 +33,7 @@ struct FileDesc {
         modified_time = util::now();
     }
 
-    inline Permission perm(int32_t uid, int64_t gid)
+    inline Permission perm(int32_t uid, int64_t gid) const
     {
         if (this->uid == uid) {
             return Permission((this->mod >> 6) & (0b111));
@@ -46,7 +46,7 @@ struct FileDesc {
         return Permission(this->mod & 0b111);
     }
 
-    inline int32_t size()
+    inline int32_t size() const
     {
         int32_t res = 0;
         res += serialize::size(path);
@@ -59,7 +59,7 @@ struct FileDesc {
         return res;
     }
 
-    inline int32_t serialize(char* buf, int32_t buf_size)
+    inline int32_t serialize(char* buf, int32_t buf_size) const
     {
         if (this->size() > buf_size) {
             return -1;

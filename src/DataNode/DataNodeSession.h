@@ -5,12 +5,6 @@
 
 namespace efs {
 
-struct OpenFileHandler {
-    int32_t fd;
-    FILE* fp;
-    FileDesc fdesc;
-};
-
 class DataNodeSession : public SessionBase {
 public:
     static const int32_t MAX_OPEN_FILE_NUM = 1024;
