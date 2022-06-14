@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #include "Serialize.h"
@@ -6,7 +8,7 @@
 namespace efs {
 
 enum Permission : uint8_t {
-    NONE = 0x0,
+    EMPTY = 0x0,
     R = 0x1,
     W = 0x2,
     X = 0x4,

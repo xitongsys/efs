@@ -1,3 +1,5 @@
+#pragma once
+
 #include <chrono>
 #include <stdint.h>
 #include <string>
@@ -14,7 +16,7 @@ namespace util {
     }
 
     template <typename T>
-    inline bool isPower2(const T& value)
+    inline bool isPower2(const T& x)
     {
         return (x != 0) && !(x & (x - 1));
     }

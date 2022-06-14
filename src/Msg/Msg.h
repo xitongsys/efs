@@ -4,7 +4,8 @@
 
 namespace efs {
 enum MsgType : uint8_t {
-    NONE,
+    DEFAULT = 0,
+
     LOGIN,
     LOGIN_RESP,
 
@@ -42,7 +43,7 @@ struct Msg {
 
     Msg()
     {
-        msg_type = MsgType::NONE;
+        msg_type = MsgType::DEFAULT;
         error_code = ErrorCode::NONE;
     }
 

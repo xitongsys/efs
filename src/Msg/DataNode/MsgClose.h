@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 
@@ -53,7 +55,7 @@ struct MsgCloseResp : Msg {
 
     MsgCloseResp()
     {
-        msg_type = MsgType::ClOSE_RESP;
+        msg_type = MsgType::CLOSE_RESP;
         error_code = ErrorCode::NONE;
     }
 };
