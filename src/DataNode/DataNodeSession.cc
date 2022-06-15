@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "DataNodeSession.h"
 #include "Msg/DataNode/MsgChmod.h"
 #include "Msg/DataNode/MsgChown.h"
@@ -113,53 +115,53 @@ ErrorCode DataNodeSession::readMsgHandler()
 
     if (p_out_msg) {
         switch (p_out_msg->msg_type) {
-        case MsgType::LOGIN: {
-            std::shared_ptr<MsgLogin> p_msg = std::static_pointer_cast<MsgLogin>(p_out_msg);
+        case MsgType::LOGIN_RESP: {
+            std::shared_ptr<MsgLoginResp> p_msg = std::static_pointer_cast<MsgLoginResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::LS: {
-            std::shared_ptr<MsgLs> p_msg = std::static_pointer_cast<MsgLs>(p_out_msg);
+        case MsgType::LS_RESP: {
+            std::shared_ptr<MsgLsResp> p_msg = std::static_pointer_cast<MsgLsResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::RM: {
-            std::shared_ptr<MsgRm> p_msg = std::static_pointer_cast<MsgRm>(p_out_msg);
+        case MsgType::RM_RESP: {
+            std::shared_ptr<MsgRmResp> p_msg = std::static_pointer_cast<MsgRmResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::CHOWN: {
-            std::shared_ptr<MsgChown> p_msg = std::static_pointer_cast<MsgChown>(p_out_msg);
+        case MsgType::CHOWN_RESP: {
+            std::shared_ptr<MsgChownResp> p_msg = std::static_pointer_cast<MsgChownResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::CHMOD: {
-            std::shared_ptr<MsgChmod> p_msg = std::static_pointer_cast<MsgChmod>(p_out_msg);
+        case MsgType::CHMOD_RESP: {
+            std::shared_ptr<MsgChmodResp> p_msg = std::static_pointer_cast<MsgChmodResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::MKDIR: {
-            std::shared_ptr<MsgMkdir> p_msg = std::static_pointer_cast<MsgMkdir>(p_out_msg);
+        case MsgType::MKDIR_RESP: {
+            std::shared_ptr<MsgMkdirResp> p_msg = std::static_pointer_cast<MsgMkdirResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::OPEN: {
-            std::shared_ptr<MsgOpen> p_msg = std::static_pointer_cast<MsgOpen>(p_out_msg);
+        case MsgType::OPEN_RESP: {
+            std::shared_ptr<MsgOpenResp> p_msg = std::static_pointer_cast<MsgOpenResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::CLOSE: {
-            std::shared_ptr<MsgClose> p_msg = std::static_pointer_cast<MsgClose>(p_out_msg);
+        case MsgType::CLOSE_RESP: {
+            std::shared_ptr<MsgCloseResp> p_msg = std::static_pointer_cast<MsgCloseResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::READ: {
-            std::shared_ptr<MsgRead> p_msg = std::static_pointer_cast<MsgRead>(p_out_msg);
+        case MsgType::READ_RESP: {
+            std::shared_ptr<MsgReadResp> p_msg = std::static_pointer_cast<MsgReadResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }
-        case MsgType::WRITE: {
-            std::shared_ptr<MsgWrite> p_msg = std::static_pointer_cast<MsgWrite>(p_out_msg);
+        case MsgType::WRITE_RESP: {
+            std::shared_ptr<MsgWriteResp> p_msg = std::static_pointer_cast<MsgWriteResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }

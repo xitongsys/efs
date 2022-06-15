@@ -25,8 +25,11 @@ void SessionBase::do_read()
     auto self(shared_from_this());
     socket.async_read_some(boost::asio::buffer(p_in_buffer->write_raw_buffer(), p_in_buffer->write_size()),
         [this, self](boost::system::error_code ec, int32_t size) {
-            if (!ec && !(read_msg_handler)()) {
-                do_write();
+            if (!ec && size >= 0) {
+                p_in_buffer->write_consume(size);
+                if (!(read_msg_handler)()) {
+                    do_write();
+                }
             }
         });
 }
@@ -34,10 +37,13 @@ void SessionBase::do_read()
 void SessionBase::do_write()
 {
     auto self(shared_from_this());
-    boost::asio::async_write(socket, boost::asio::buffer(p_out_buffer->read_raw_buffer(), p_in_buffer->read_size()),
+    boost::asio::async_write(socket, boost::asio::buffer(p_out_buffer->read_raw_buffer(), p_out_buffer->read_size()),
         [this, self](boost::system::error_code ec, int32_t size) {
-            if (!ec && !(write_msg_handler)()) {
-                do_read();
+            if (!ec && size >= 0) {
+                p_out_buffer->read_consume(size);
+                if (!(write_msg_handler)()) {
+                    do_read();
+                }
             }
         });
 }

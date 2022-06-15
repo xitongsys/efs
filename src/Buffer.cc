@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 
 #include "Buffer.h"
 
@@ -35,12 +36,12 @@ int32_t Buffer::write_size()
 
 void Buffer::read_consume(int32_t size)
 {
-    read_pos = (read_pos + size) & (~(capacity - 1));
+    read_pos = (read_pos + size) & ((capacity - 1));
 }
 
 void Buffer::write_consume(int32_t size)
 {
-    write_pos = (write_pos + size) & (~(capacity - 1));
+    write_pos = (write_pos + size) & ((capacity - 1));
 }
 
 void Buffer::read(char* data, int32_t size)

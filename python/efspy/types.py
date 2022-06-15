@@ -86,25 +86,25 @@ class Base:
         if self.type == BaseType.int8 or self.type == BaseType.uint8:
             if len(buf) < 1:
                 return 0
-            self.value = Base.decode_int(buf, 1)
+            self.value = Base.deserialize_int(buf, 1)
             return 1
 
         elif self.type == BaseType.int16 or self.type == BaseType.uint16:
             if len(buf) < 2:
                 return 0
-            self.value = Base.decode_int(buf, 2)
+            self.value = Base.deserialize_int(buf, 2)
             return 2
 
         elif self.type == BaseType.int32 or self.type == BaseType.uint32:
             if len(buf) < 4:
                 return 0
-            self.value = Base.decode_int(buf, 4)
+            self.value = Base.deserialize_int(buf, 4)
             return 4
 
         elif self.type == BaseType.string:
             if len(buf) < 4:
                 return 0
-            ln = Base.decode_int(buf, 4)
+            ln = Base.deserialize_int(buf, 4)
             if len(buf) < ln + 4:
                 return 0
 
