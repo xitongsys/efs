@@ -176,12 +176,12 @@ ErrorCode DataNodeExecutor::ls(const std::string& path, std::vector<FileDesc>& f
         }
         FileDesc fdesc;
         if ((ec = getFileDesc(relative_path, fdesc))) {
-            return ec;
+        } else {
+            fs.push_back(fdesc);
         }
-        fs.push_back(fdesc);
     }
 
-    return ErrorCode::NONE;
+    return ec;
 }
 
 ErrorCode DataNodeExecutor::rm(const std::string& path)
@@ -190,7 +190,12 @@ ErrorCode DataNodeExecutor::rm(const std::string& path)
     if ((ec = db.del(path))) {
         ec = ErrorCode::E_FILE_RM;
     }
-    if (std::remove(path.c_str())) {
+    std::string absolute_path;
+    if (ec = absolutePath(path, absolute_path)) {
+        return ec;
+    }
+
+    if (!std::filesystem::remove_all(absolute_path.c_str())) {
         ec = ErrorCode::E_FILE_RM;
     }
     return ec;

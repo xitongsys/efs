@@ -69,10 +69,23 @@ class Client:
         self.recv(resp)
         return resp
 
+    def rm(self, path: str):
+        req = msg.MsgRm()
+        req.path.value = path
+        self.send(req)
+
+        resp = msg.MsgRmResp()
+        self.recv(resp)
+        return resp
+
 
 if __name__ == '__main__':
     client = Client("127.0.0.1", 12345, "zxt", "zxt")
     resp = client.login()
+    resp = client.rm(b'/zxt2')
+    print(resp.error_code)
+
     resp = client.ls(b"/")
+    print(resp.error_code)
     for f in resp.files.values:
         print(f.path)
