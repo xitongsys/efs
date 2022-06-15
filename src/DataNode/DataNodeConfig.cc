@@ -1,3 +1,4 @@
+#include <iostream>
 #include <yaml-cpp/yaml.h>
 
 #include "DataNodeConfig.h"
@@ -42,12 +43,16 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
 DataNodeConfig::DataNodeConfig(const DataNodeConfig& config)
 {
     name = config.name;
+    password = config.password;
     ip = config.ip;
     port = config.port;
     root_path = config.root_path;
     log_path = config.log_path;
     disk_size = config.disk_size;
+    buffer_size = config.buffer_size;
+    max_msg_size = config.max_msg_size;
     name_node_ip = config.name_node_ip;
     name_node_port = config.name_node_port;
+    users = config.users;
 }
 }

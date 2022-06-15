@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <functional>
 #include <memory>
 
 #include "Buffer.h"
@@ -14,8 +15,9 @@ public:
     boost::asio::ip::tcp::socket socket;
 
 public:
-    ErrorCode writeMsgHandler();
-    ErrorCode readMsgHandler();
+    std::function<ErrorCode()> write_msg_handler;
+    std::function<ErrorCode()> read_msg_handler;
+
     void start();
 
 private:
@@ -23,6 +25,9 @@ private:
     void do_write();
 
 public:
-    SessionBase(int32_t buffer_size, boost::asio::ip::tcp::socket socket);
+    SessionBase(int32_t buffer_size,
+        boost::asio::ip::tcp::socket socket,
+        std::function<ErrorCode()> read_msg_handler,
+        std::function<ErrorCode()> write_msg_handler);
 };
 }

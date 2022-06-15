@@ -14,7 +14,10 @@ namespace efs {
 DataNodeSession::DataNodeSession(int32_t buffer_size,
     boost::asio::ip::tcp::socket socket,
     std::shared_ptr<DataNodeExecutor> p_executor)
-    : SessionBase(buffer_size, std::move(socket))
+    : SessionBase(buffer_size,
+        std::move(socket),
+        std::bind(&DataNodeSession::readMsgHandler, this),
+        std::bind(&DataNodeSession::writeMsgHandler, this))
 {
     p_in_msg = nullptr;
     p_out_msg = nullptr;

@@ -32,7 +32,7 @@ namespace util {
                 j++;
             }
             res.push_back(s.substr(i, j - i));
-            i = j;
+            i = j + 1;
         }
         return res;
     }

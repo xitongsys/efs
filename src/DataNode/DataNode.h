@@ -13,11 +13,8 @@ public:
     DataNodeConfig config;
     std::shared_ptr<DataNodeExecutor> p_executor;
 
-private:
-    boost::asio::io_context io_context;
-    std::unique_ptr<boost::asio::ip::tcp::acceptor> acceptor;
-
 public:
-    DataNode(const std::string& config_file);
+    DataNode(const DataNodeConfig& config);
+    std::shared_ptr<DataNodeSession> new_session(boost::asio::ip::tcp::socket socket);
 };
 }

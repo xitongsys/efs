@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <iostream>
 
 #include "DataNodeExecutor.h"
 #include "FS.h"

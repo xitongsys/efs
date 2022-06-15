@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <iostream>
 #include <queue>
 
 namespace efs {
@@ -29,11 +30,16 @@ public:
             endpoint);
     }
 
+    virtual std::shared_ptr<Session> new_session(boost::asio::ip::tcp::socket socket)
+    {
+        return nullptr;
+    }
+
     void do_accept()
     {
         acceptor->async_accept([this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket) {
             if (!ec) {
-                std::make_shared<Session>(std::move(socket))->start();
+                new_session(std::move(socket))->start();
             }
             do_accept();
         });
@@ -41,6 +47,7 @@ public:
 
     void run()
     {
+        do_accept();
         io_context.run();
     }
 };
