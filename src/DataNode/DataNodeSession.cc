@@ -26,6 +26,13 @@ DataNodeSession::DataNodeSession(int32_t buffer_size,
     this->p_executor = p_executor;
 }
 
+DataNodeSession::~DataNodeSession()
+{
+    for (auto it = open_files.begin(); it != open_files.end(); it++) {
+        p_executor->close(it->second);
+    }
+}
+
 ErrorCode DataNodeSession::readMsgHandler()
 {
     int32_t size = p_in_buffer->read_size();

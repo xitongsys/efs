@@ -1,0 +1,30 @@
+class ErrorCode:
+    NONE = 0
+    E_OVERFLOW = -127
+    E_BUFFER_SIZE = -126
+
+    E_PANIC = -125
+
+    E_MSG_UNKNOWN = -124
+
+    E_LOGIN_USER_NOT_FOUND = -123
+    E_LOGIN_WRONG_PASSWORD = -122
+
+    E_SERIALIZE = -121
+    E_DESERIALIZE = -120
+
+    E_FILE_OPEN = -119
+    E_FILE_RM = -118
+    E_FILE_MKDIR = -117
+    E_FILE_WRITE = -116
+    E_FILE_READ = -115
+    E_FILE_EOF = -114
+    E_FILE_PERMISSION = -113
+    E_FILE_NOT_FOUND = -112
+    E_FILE_TOO_MANY = -111
+    E_FILE_PATH = -110
+
+    E_DB_OPEN = -109
+    E_DB_GET = -108
+    E_DB_PUT = -107
+    E_DB_DEL = -106

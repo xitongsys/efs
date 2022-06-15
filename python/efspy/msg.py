@@ -1,3 +1,4 @@
+from asyncio.events import BaseDefaultEventLoopPolicy
 from enum import Enum
 from .types import Base, BaseType, Vector
 
@@ -179,7 +180,41 @@ class MsgMkdir(Msg):
 class MsgMkdirResp(Msg):
     def __init__(self):
         Msg.__init__(self)
-        self.msg_type.value = MsgType.MKDIR
+        self.msg_type.value = MsgType.MKDIR_RESP
+
+
+class MsgChmod(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.CHMOD
+
+        self.path = Base(BaseType.string, b"")
+        self.mod = Base(BaseType.uint16, 0b111000000)
+
+        self.fields += [self.path, self.mod]
+
+
+class MsgChmodResp(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.CHMOD_RESP
+
+
+class MsgChown(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.CHOWN
+
+        self.path = Base(BaseType.string, b"")
+        self.user = Base(BaseType.string, b"")
+
+        self.fields += [self.path, self.user]
+
+
+class MsgChownResp(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.CHOWN_RESP
 
 
 class MsgOpen(Msg):
@@ -217,6 +252,50 @@ class MsgCloseResp(Msg):
     def __init__(self):
         Msg.__init__(self)
         self.msg_type.value = MsgType.CLOSE_RESP
+
+
+class MsgRead(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.READ
+
+        self.fd = Base(BaseType.int32, 0)
+        self.read_size = Base(BaseType.int32, 0)
+
+        self.fields += [self.fd, self.read_size]
+
+
+class MsgReadResp(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.READ_RESP
+
+        self.fd = Base(BaseType.int32, 0)
+        self.data = Base(BaseType.string, b"")
+
+        self.fields += [self.fd, self.data]
+
+
+class MsgWrite(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.READ
+
+        self.fd = Base(BaseType.int32, 0)
+        self.data = Base(BaseType.string, 0)
+
+        self.fields += [self.fd, self.data]
+
+
+class MsgWriteResp(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.WRITE_RESP
+
+        self.fd = Base(BaseType.int32, 0)
+        self.write_size = Base(BaseType.int32, 0)
+
+        self.fields += [self.fd, self.write_size]
 
 
 if __name__ == '__main__':

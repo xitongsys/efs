@@ -28,12 +28,16 @@ class Base:
         res = bytearray()
         for i in range(size):
             res.append((value >> (i*8)) & 0xff)
+
         return res
 
-    def deserialize_int(buf: bytearray, size: int):
+    def deserialize_int(buf: bytearray, size: int, sign: bool):
         res = 0
         for i in range(size):
             res |= int(buf[i]) << (i * 8)
+
+        if sign and (res >> (size*8-1)) > 0:
+            res = ((1 << (size*8)) - res) * -1
         return res
 
     def __init__(self, type: BaseType, value):
@@ -89,31 +93,35 @@ class Base:
         if self.type == BaseType.int8 or self.type == BaseType.uint8:
             if len(buf) < 1:
                 return 0
-            self.value = Base.deserialize_int(buf, 1)
+            self.value = Base.deserialize_int(
+                buf, 1, self.type == BaseType.int8)
             return 1
 
         elif self.type == BaseType.int16 or self.type == BaseType.uint16:
             if len(buf) < 2:
                 return 0
-            self.value = Base.deserialize_int(buf, 2)
+            self.value = Base.deserialize_int(
+                buf, 2, self.type == BaseType.int16)
             return 2
 
         elif self.type == BaseType.int32 or self.type == BaseType.uint32:
             if len(buf) < 4:
                 return 0
-            self.value = Base.deserialize_int(buf, 4)
+            self.value = Base.deserialize_int(
+                buf, 4, self.type == BaseType.int32)
             return 4
 
         elif self.type == BaseType.int64 or self.type == BaseType.uint64:
             if len(buf) < 8:
                 return 0
-            self.value = Base.deserialize_int(buf, 8)
+            self.value = Base.deserialize_int(
+                buf, 8, self.type == BaseType.int64)
             return 8
 
         elif self.type == BaseType.string:
             if len(buf) < 4:
                 return 0
-            ln = Base.deserialize_int(buf, 4)
+            ln = Base.deserialize_int(buf, 4, True)
             if len(buf) < ln + 4:
                 return 0
 
@@ -152,7 +160,7 @@ class Vector:
         if len(buf) < 4:
             return 0
         self.values = []
-        n = Base.deserialize_int(buf, 4)
+        n = Base.deserialize_int(buf, 4, True)
         ln = 4
         for i in range(n):
             if ln >= len(buf):
