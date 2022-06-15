@@ -125,8 +125,6 @@ class Base:
 
     def copy(self):
         obj = Base(self.type, self.value)
-        if self.type == BaseType.object:
-            obj.value = self.value.copy()
         return obj
 
     def __str__(self):

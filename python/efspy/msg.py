@@ -64,13 +64,13 @@ class FileDesc:
 
     def copy(self):
         fdesc = FileDesc()
-        fdesc.path = self.path
-        fdesc.fsize = self.fsize
-        fdesc.uid = self.uid
-        fdesc.gid = self.gid
-        fdesc.mod = self.mod
-        fdesc.create_time = self.create_time
-        fdesc.modified_time = self.modified_time
+        fdesc.path = self.path.copy()
+        fdesc.fsize = self.fsize.copy()
+        fdesc.uid = self.uid.copy()
+        fdesc.gid = self.gid.copy()
+        fdesc.mod = self.mod.copy()
+        fdesc.create_time = self.create_time.copy()
+        fdesc.modified_time = self.modified_time.copy()
         fdesc.fields = [fdesc.path, fdesc.fsize, fdesc.uid, fdesc.gid,
                         fdesc.mod, fdesc.create_time, fdesc.modified_time]
         return fdesc
