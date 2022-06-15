@@ -60,9 +60,19 @@ class Client:
         self.recv(resp)
         return resp
 
+    def mkdir(self, path: str):
+        req = msg.MsgMkdir()
+        req.path.value = path
+        self.send(req)
+
+        resp = msg.MsgMkdirResp()
+        self.recv(resp)
+        return resp
+
 
 if __name__ == '__main__':
     client = Client("127.0.0.1", 12345, "zxt", "zxt")
     resp = client.login()
     resp = client.ls(b"/")
-    print(resp.files.values)
+    for f in resp.files.values:
+        print(f.path)

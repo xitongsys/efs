@@ -15,4 +15,4 @@ max_msg_size: 2048
 name_node_ip: "127.0.0.1"
 name_node_port: 23456
 
-users: ["zxt,zxt,1,1", "zxt2,zxt2,1,2"]
+users: ["zxt,zxt,1,1,/zxt", "zxt2,zxt2,1,2,/zxt2"]

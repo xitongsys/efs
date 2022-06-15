@@ -73,6 +73,7 @@ class FileDesc:
         fdesc.modified_time = self.modified_time
         fdesc.fields = [fdesc.path, fdesc.fsize, fdesc.uid, fdesc.gid,
                         fdesc.mod, fdesc.create_time, fdesc.modified_time]
+        return fdesc
 
 
 class Msg:

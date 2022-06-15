@@ -17,10 +17,31 @@ DataNodeExecutor::DataNodeExecutor(const DataNodeConfig& config)
         UserDesc udesc(csv);
         this->users[udesc.user] = udesc;
     }
+
+    init();
 }
 
 DataNodeExecutor::~DataNodeExecutor()
 {
+}
+
+ErrorCode DataNodeExecutor::init()
+{
+    ErrorCode ec = ErrorCode::NONE;
+    FileDesc fdesc;
+    fdesc.path = "/";
+    fdesc.mod = 0b1111001001;
+    fdesc.uid = 1;
+    fdesc.gid = 1;
+
+    this->setFileDesc(fdesc.path, fdesc);
+
+    for (auto it = users.begin(); it != users.end(); it++) {
+        UserDesc& udesc = it->second;
+        ec = this->mkdir(udesc.root_path, udesc.uid, udesc.gid);
+    }
+
+    return ec;
 }
 
 ErrorCode DataNodeExecutor::absolutePath(const std::string& path, std::string& absolute_path)
@@ -105,6 +126,12 @@ ErrorCode DataNodeExecutor::permission(const std::string& path, int32_t uid, int
 
     if ((ec = getFileDesc(path, fdesc))) {
         return ec;
+    }
+
+    // for root user
+    if (uid == 1) {
+        perm = Permission(0b111);
+        return ErrorCode::NONE;
     }
 
     if (fdesc.uid == uid) {
@@ -220,6 +247,7 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t 
     if (ec = absolutePath(path, absolute_path)) {
         return ec;
     }
+
     if (!std::filesystem::create_directory(absolute_path)) {
         ec = ErrorCode::E_FILE_MKDIR;
     }

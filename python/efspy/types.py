@@ -73,6 +73,9 @@ class Base:
         elif self.type == BaseType.int32 or self.type == BaseType.uint32:
             res += Base.serialize_int(self.value, 4)
 
+        elif self.type == BaseType.int64 or self.type == BaseType.uint64:
+            res += Base.serialize_int(self.value, 8)
+
         elif self.type == BaseType.string:
             res += Base.serialize_int(len(self.value), 4)
             res += self.value
@@ -100,6 +103,12 @@ class Base:
                 return 0
             self.value = Base.deserialize_int(buf, 4)
             return 4
+
+        elif self.type == BaseType.int64 or self.type == BaseType.uint64:
+            if len(buf) < 8:
+                return 0
+            self.value = Base.deserialize_int(buf, 8)
+            return 8
 
         elif self.type == BaseType.string:
             if len(buf) < 4:

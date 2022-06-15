@@ -21,6 +21,8 @@ public:
     ~DataNodeExecutor();
     DataNodeConfig config;
 
+    ErrorCode init();
+
     ErrorCode absolutePath(const std::string& path, std::string& absolute_path);
     ErrorCode relativePath(const std::string& path, std::string& relative_path);
     ErrorCode parentPath(const std::string& path, std::string& parent_path);

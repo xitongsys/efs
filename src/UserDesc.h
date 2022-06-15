@@ -10,6 +10,7 @@ struct UserDesc {
     std::string password;
     int32_t uid;
     int32_t gid;
+    std::string root_path;
 
     UserDesc();
 
@@ -28,6 +29,7 @@ struct UserDesc {
         res += serialize::size(password);
         res += serialize::size(uid);
         res += serialize::size(gid);
+        res += serialize::size(root_path);
         return res;
     }
 
@@ -41,6 +43,7 @@ struct UserDesc {
         size += serialize::serialize(password, buf + size, buf_size - size);
         size += serialize::serialize(uid, buf + size, buf_size - size);
         size += serialize::serialize(gid, buf + size, buf_size - size);
+        size += serialize::serialize(root_path, buf + size, buf_size - size);
         return size;
     }
 
@@ -64,6 +67,11 @@ struct UserDesc {
         size += size1;
 
         if ((size1 = serialize::deserialize(gid, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(root_path, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;
