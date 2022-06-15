@@ -63,5 +63,6 @@ class Client:
 
 if __name__ == '__main__':
     client = Client("127.0.0.1", 12345, "zxt", "zxt")
-
-    client.login()
+    resp = client.login()
+    resp = client.ls(b"/")
+    print(resp.files.values)

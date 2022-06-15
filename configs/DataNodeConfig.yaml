@@ -1,23 +1,18 @@
-{
-  "name": "datanode01",
-  "password": "",
+name: "datanode01"
+password: ""
 
-  "ip":"0.0.0.0",
-  "port":12345,
+ip: "0.0.0.0"
+port: 12345
 
-  "log_path":"logs",
-  "root_path":"data",
+log_path: "logs"
+root_path: "data"
 
-  "disk_size":1024,
+disk_size: 1024
 
-  "buffer_size":4096,
-  "max_msg_size":2048,
+buffer_size: 4096
+max_msg_size: 2048
 
-  "name_node_ip":"127.0.0.1",
-  "name_node_port":23456,
+name_node_ip: "127.0.0.1"
+name_node_port: 23456
 
-  "users":[
-    "zxt,zxt,1,1",
-    "zxt2,zxt2,1,2",
-  ]
-}
+users: ["zxt,zxt,1,1", "zxt2,zxt2,1,2"]
