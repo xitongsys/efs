@@ -243,7 +243,7 @@ void DataNodeSession::read()
         OpenFileHandler& fh = this->open_files[p_in_msg->fd];
         int32_t max_read_size = std::min(p_in_msg->read_size, p_executor->config.max_msg_size);
         p_out_msg->data = std::string(max_read_size, 0);
-        
+
         int32_t read_size = fread(p_out_msg->data.data(), 1, max_read_size, fh.fp);
         if (read_size < max_read_size) {
             p_out_msg->data.resize(read_size);
@@ -273,7 +273,6 @@ void DataNodeSession::write()
         }
 
         OpenFileHandler& fh = this->open_files[p_in_msg->fd];
-
         int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fh.fp);
 
         if (write_size != p_in_msg->data.size()) {

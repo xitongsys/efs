@@ -29,7 +29,7 @@ class DataNodeConn:
             cnt = mg.deserialize(self.recv_buf)
             if cnt == 0:
                 try:
-                    self.recv_buf += self.sock.recv(1024)
+                    self.recv_buf += self.sock.recv(1024 * 1024)
                 except socket.timeout:
                     continue
                 except Exception as e:
@@ -143,6 +143,7 @@ class DataNodeConn:
 if __name__ == '__main__':
     conn = DataNodeConn("127.0.0.1", 12345, "zxt", "zxt")
     resp = conn.login()
+
     resp = conn.open("/zxt/a.txt", "w+")
     fd = resp.fd.value
     print(resp.fd, resp.error_code)
