@@ -38,7 +38,10 @@ ErrorCode DataNodeExecutor::init()
 
     for (auto it = users.begin(); it != users.end(); it++) {
         UserDesc& udesc = it->second;
-        ec = this->mkdir(udesc.root_path, udesc.uid, udesc.gid);
+        FileDesc fdesc;
+        if (this->getFileDesc(udesc.root_path, fdesc)) {
+            ec = this->mkdir(udesc.root_path, udesc.uid, udesc.gid);
+        }
     }
 
     return ec;

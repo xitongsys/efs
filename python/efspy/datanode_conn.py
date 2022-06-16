@@ -152,7 +152,7 @@ if __name__ == '__main__':
     for i in range(1000 * 1024):
         data += b"a"
 
-    for i in range(1024):
+    for i in range(100):
         resp = conn.write(fd, data)
     print(resp.write_size, resp.error_code)
 
