@@ -163,6 +163,7 @@ void DataNodeSession::open()
             }
 
             Permission perm = parent_fdesc.perm(this->udesc.uid, this->udesc.gid);
+
             if (!(perm & Permission::W)) {
                 p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
                 break;
@@ -173,6 +174,16 @@ void DataNodeSession::open()
                 break;
             }
 
+            OpenFileHandler fh;
+            if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, fh))) {
+                p_out_msg->error_code = ec;
+                break;
+            }
+
+            this->open_files[fh.fd] = fh;
+            p_out_msg->fd = fh.fd;
+
+        } else {
             OpenFileHandler fh;
             if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, fh))) {
                 p_out_msg->error_code = ec;

@@ -74,6 +74,10 @@ ErrorCode DataNodeExecutor::parentPath(const std::string& path, std::string& par
         parent_path.pop_back();
     }
 
+    if (parent_path.size() > 1 && (*parent_path.rbegin()) == '/') {
+        parent_path.pop_back();
+    }
+
     if (parent_path.size() == 0) {
         return ErrorCode::E_FILE_PATH;
     }
@@ -239,7 +243,7 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t 
     fdesc.path = path;
     fdesc.uid = uid;
     fdesc.gid = gid;
-    fdesc.mod = 0x1111000000;
+    fdesc.mod = 0b1111000000;
 
     std::string value(fdesc.size(), 0);
     fdesc.serialize(value.data(), value.size());
@@ -273,12 +277,18 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
         return ec;
     }
 
+    std::string absolute_path;
+
+    if ((ec = absolutePath(path, absolute_path))) {
+        return ec;
+    }
+
     FILE* fp;
-    if ((fp = fopen(path.c_str(), mod.c_str())) == NULL) {
+    if ((fp = fopen(absolute_path.c_str(), mod.c_str())) == NULL) {
         return ErrorCode::E_FILE_OPEN;
     }
 
-    if ((ec = getFileDesc(path, fdesc))) {
+    if (ec = getFileDesc(path, fdesc)) {
         fdesc.path = path;
         fdesc.mod = 0b0111000000;
         fdesc.uid = uid;
@@ -287,10 +297,7 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
         fdesc.modified_time = util::now();
         fdesc.fsize = 0;
 
-        std::string value(fdesc.size(), 0);
-        fdesc.deserialize(value.data(), value.size());
-
-        if ((ec = db.put(path, value))) {
+        if (ec = setFileDesc(path, fdesc)) {
             fclose(fp);
             fp = nullptr;
             return ec;
