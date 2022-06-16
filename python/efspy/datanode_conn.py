@@ -150,7 +150,7 @@ if __name__ == '__main__':
     fd = resp.fd.value
     print(resp.fd, resp.error_code)
 
-    resp = conn.write(fd, b"hello,world\n")
+    resp = conn.write(fd, b"hello,world\ngoodbye!")
     print(resp.write_size, resp.error_code)
 
 
