@@ -232,11 +232,6 @@ void DataNodeSession::read()
     std::shared_ptr<MsgReadResp> p_out_msg = std::make_shared<MsgReadResp>();
 
     int32_t fd = p_in_msg->fd;
-    if (this->open_files.count(fd)) {
-        p_executor->close(this->open_files[fd]);
-        this->open_files.erase(fd);
-    }
-
     this->p_out_msg = p_out_msg;
 }
 

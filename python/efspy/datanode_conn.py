@@ -142,15 +142,17 @@ class DataNodeConn:
 if __name__ == '__main__':
     conn = DataNodeConn("127.0.0.1", 12345, "zxt", "zxt")
     resp = conn.login()
-    resp = conn.ls("/")
-    for f in resp.files.values:
-        print(f.path)
-    
     resp = conn.open("/zxt/a.txt", "w+")
     fd = resp.fd.value
     print(resp.fd, resp.error_code)
 
-    resp = conn.write(fd, b"hello,world\ngoodbye!")
+    data = bytearray()
+    for i in range(1000 * 1024):
+        data += b"a"
+
+    for i in range(10240):
+        resp = conn.write(fd, data)
     print(resp.write_size, resp.error_code)
 
-
+    resp = conn.close(fd)
+    print(resp.error_code)
