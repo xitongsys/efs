@@ -131,6 +131,7 @@ class DataNodeConn:
         req = msg.MsgWrite()
         req.fd.value = fd
         req.data.value = data
+
         self.send(req)
 
         resp = msg.MsgWriteResp()
@@ -146,4 +147,10 @@ if __name__ == '__main__':
         print(f.path)
     
     resp = conn.open("/zxt/a.txt", "w+")
+    fd = resp.fd.value
     print(resp.fd, resp.error_code)
+
+    resp = conn.write(fd, b"hello,world\n")
+    print(resp.write_size, resp.error_code)
+
+

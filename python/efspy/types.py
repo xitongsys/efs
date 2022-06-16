@@ -24,11 +24,10 @@ NUM_TYPES = INT_TYPES + [BaseType.float, BaseType.double]
 
 
 class Base:
-    def serialize_int(value: int, size: int) -> bytearray:
+    def serialize_int(v: int, size: int) -> bytearray:
         res = bytearray()
         for i in range(size):
-            res.append((value >> (i*8)) & 0xff)
-
+            res.append((v >> (i*8)) & 0xff)
         return res
 
     def deserialize_int(buf: bytearray, size: int, sign: bool):
@@ -40,9 +39,9 @@ class Base:
             res = ((1 << (size*8)) - res) * -1
         return res
 
-    def __init__(self, type: BaseType, value):
-        self.type = type
-        self.value = value
+    def __init__(self, t: BaseType, v):
+        self.type = t
+        self.value = v
 
     def size(self):
         if self.type == BaseType.int8 or self.type == BaseType.uint8:
@@ -59,9 +58,6 @@ class Base:
 
         elif self.type == BaseType.string:
             return 4 + len(self.value)
-
-        elif self.type == BaseType.object:
-            return self.value.size()
 
         else:
             raise Exception("unknown type: ", self.type)
@@ -136,7 +132,8 @@ class Base:
         return obj
 
     def __str__(self):
-        return str(self.value)
+        return f"{self.type},{self.value}"
+
 
 
 class Vector:

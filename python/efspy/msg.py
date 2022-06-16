@@ -279,10 +279,10 @@ class MsgReadResp(Msg):
 class MsgWrite(Msg):
     def __init__(self):
         Msg.__init__(self)
-        self.msg_type.value = MsgType.READ
+        self.msg_type.value = MsgType.WRITE
 
         self.fd = Base(BaseType.int32, 0)
-        self.data = Base(BaseType.string, 0)
+        self.data = Base(BaseType.string, b"")
 
         self.fields += [self.fd, self.data]
 

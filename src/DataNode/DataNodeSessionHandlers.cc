@@ -228,8 +228,8 @@ void DataNodeSession::close()
 
 void DataNodeSession::read()
 {
-    std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
-    std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
+    std::shared_ptr<MsgRead> p_in_msg = std::static_pointer_cast<MsgRead>(this->p_in_msg);
+    std::shared_ptr<MsgReadResp> p_out_msg = std::make_shared<MsgReadResp>();
 
     int32_t fd = p_in_msg->fd;
     if (this->open_files.count(fd)) {
@@ -242,14 +242,28 @@ void DataNodeSession::read()
 
 void DataNodeSession::write()
 {
-    std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
-    std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
+    ErrorCode ec = ErrorCode::NONE;
+    std::shared_ptr<MsgWrite> p_in_msg = std::static_pointer_cast<MsgWrite>(this->p_in_msg);
+    std::shared_ptr<MsgWriteResp> p_out_msg = std::make_shared<MsgWriteResp>();
 
-    int32_t fd = p_in_msg->fd;
-    if (this->open_files.count(fd)) {
-        p_executor->close(this->open_files[fd]);
-        this->open_files.erase(fd);
-    }
+    do {
+        if (this->open_files.count(p_in_msg->fd) == 0) {
+            p_out_msg->error_code = E_FILE_WRITE;
+            p_out_msg->write_size = 0;
+            break;
+        }
+
+        OpenFileHandler& fh = this->open_files[p_in_msg->fd];
+
+        int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fh.fp);
+
+        if (write_size != p_in_msg->data.size()) {
+            p_out_msg->error_code = E_FILE_WRITE;
+            p_out_msg->write_size = write_size;
+            break;
+        }
+
+    } while (0);
 
     this->p_out_msg = p_out_msg;
 }
