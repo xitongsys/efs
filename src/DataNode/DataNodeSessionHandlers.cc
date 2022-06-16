@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include "DataNode/DataNodeSession.h"
@@ -232,6 +234,28 @@ void DataNodeSession::read()
     std::shared_ptr<MsgReadResp> p_out_msg = std::make_shared<MsgReadResp>();
 
     int32_t fd = p_in_msg->fd;
+    do {
+        if (this->open_files.count(p_in_msg->fd) == 0) {
+            p_out_msg->error_code = E_FILE_READ;
+            break;
+        }
+
+        OpenFileHandler& fh = this->open_files[p_in_msg->fd];
+        int32_t max_read_size = std::min(p_in_msg->read_size, p_executor->config.max_msg_size);
+        p_out_msg->data = std::string(max_read_size, 0);
+        
+        int32_t read_size = fread(p_out_msg->data.data(), 1, max_read_size, fh.fp);
+        if (read_size < max_read_size) {
+            p_out_msg->data.resize(read_size);
+            if (feof(fh.fp)) {
+                p_out_msg->error_code = ErrorCode::E_FILE_EOF;
+
+            } else {
+                p_out_msg->error_code = ErrorCode::E_FILE_READ;
+            }
+        }
+
+    } while (0);
     this->p_out_msg = p_out_msg;
 }
 

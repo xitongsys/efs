@@ -1,3 +1,4 @@
+from errno import errorcode
 from pydoc import cli
 import socket
 
@@ -150,9 +151,22 @@ if __name__ == '__main__':
     for i in range(1000 * 1024):
         data += b"a"
 
-    for i in range(10240):
+    for i in range(1024):
         resp = conn.write(fd, data)
     print(resp.write_size, resp.error_code)
 
     resp = conn.close(fd)
-    print(resp.error_code)
+
+    resp = conn.open("/zxt/a.txt", "r")
+    fd = resp.fd.value
+    print(resp.fd, resp.error_code)
+
+    size = 0
+    while True:
+        resp = conn.read(fd, 1000 * 1024)
+        size += len(resp.data.value)
+        if resp.error_code.value != 0:
+            break
+    resp = conn.close(fd)
+
+    print(size)
