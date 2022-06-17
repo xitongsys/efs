@@ -1,19 +1,21 @@
 #include <iostream>
 
-#include "NameNodeSession.h"
+#include "Msg/NameNode/MsgAccount.h"
+#include "Msg/NameNode/MsgHost.h"
+#include "NameNode/NameNodeSession.h"
 
 namespace efs {
 NameNodeSession::NameNodeSession(int32_t buffer_size,
     boost::asio::ip::tcp::socket socket,
-    NameNodeConfig& config)
+    NameNode& namenode)
     : SessionBase(buffer_size,
         std::move(socket),
         std::bind(&NameNodeSession::readMsgHandler, this),
         std::bind(&NameNodeSession::writeMsgHandler, this))
-    , config(config)
+    , namenode(namenode)
+    , p_in_msg(nullptr)
+    , p_out_msg(nullptr)
 {
-    p_in_msg = nullptr;
-    p_out_msg = nullptr;
 }
 
 NameNodeSession::~NameNodeSession()

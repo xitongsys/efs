@@ -3,28 +3,31 @@
 #include <memory>
 #include <unordered_set>
 
-#include "NameNodeConfig.h"
+#include "NameNode/NameNode.h"
+#include "NameNode/NameNodeConfig.h"
 #include "SessionBase.h"
 #include "UserDesc.h"
 
 namespace efs {
 
+class NameNode;
+
 class NameNodeSession : public SessionBase {
 public:
-    NameNodeConfig& config;
+    NameNode& namenode;
     std::shared_ptr<Msg> p_in_msg, p_out_msg;
 
 public:
     NameNodeSession(int32_t buffer_size,
         boost::asio::ip::tcp::socket socket,
-        NameNodeConfig& config);
+        NameNode& namenode);
 
     ~NameNodeSession();
 
     ErrorCode readMsgHandler();
     ErrorCode writeMsgHandler();
 
-    void accout();
+    void account();
     void host();
 };
 }

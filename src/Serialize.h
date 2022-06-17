@@ -35,7 +35,7 @@ namespace serialize {
     }
 
     template <>
-    inline int32_t size<std::string>(const std::string& a)
+    inline int32_t size(const std::string& a)
     {
         return a.size() + 4;
     }
@@ -44,8 +44,8 @@ namespace serialize {
     int32_t size(const std::vector<T>& vs)
     {
         int32_t s = 4;
-        for (auto it = vs.begin(); it != vs.end(); it++) {
-            s += size(*it);
+        for (int i = 0; i < int(vs.size()); i++) {
+            s += serialize::size(vs[i]);
         }
         return s;
     }
@@ -78,7 +78,7 @@ namespace serialize {
     {
         int32_t size = 0;
         int32_t len = a.size();
-        size += serialize(len, buf + size, bufsize - size);
+        size += serialize::serialize(len, buf + size, bufsize - size);
         memcpy(buf + size, a.c_str(), len);
         size += len;
         return size;
@@ -89,9 +89,9 @@ namespace serialize {
     {
         int32_t size = 0;
         int32_t cnt = vs.size();
-        size += serialize(cnt, buf + size, bufsize - size);
-        for (auto it = vs.begin(); it != vs.end(); it++) {
-            size += serialize(*it, buf + size, bufsize - size);
+        size += serialize::serialize(cnt, buf + size, bufsize - size);
+        for (int i = 0; i < int(vs.size()); i++) {
+            size += serialize::serialize(vs[i], buf + size, bufsize - size);
         }
         return size;
     }
@@ -131,7 +131,7 @@ namespace serialize {
         int32_t size = 0;
         int32_t len = 0;
 
-        int32_t size1 = deserialize(len, buf + size, bufsize - size);
+        int32_t size1 = serialize::deserialize(len, buf + size, bufsize - size);
         if (size1 < 0) {
             return -1;
         }
@@ -150,7 +150,7 @@ namespace serialize {
     {
         int32_t size = 0;
         int32_t cnt = 0;
-        int32_t size1 = deserialize(cnt, buf + size, bufsize - size);
+        int32_t size1 = serialize::deserialize(cnt, buf + size, bufsize - size);
         if (size1 < 0) {
             return -1;
         }
@@ -159,7 +159,7 @@ namespace serialize {
         vs.clear();
         for (int i = 0; i < cnt; i++) {
             T v;
-            size1 = deserialize(v, buf + size, bufsize - size);
+            size1 = serialize::deserialize(v, buf + size, bufsize - size);
             if (size1 < 0) {
                 return -1;
             }

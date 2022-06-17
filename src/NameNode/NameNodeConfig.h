@@ -23,5 +23,10 @@ public:
     std::vector<GroupDesc> groups;
 
     std::string log_path;
+    int32_t buffer_size;
+
+public:
+    NameNodeConfig(const std::string& config_file);
+    NameNodeConfig(const NameNodeConfig& config);
 };
 }

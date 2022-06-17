@@ -5,7 +5,8 @@
 #include "NameNode/NameNodeSession.h"
 
 namespace efs {
-void NameNodeSession::account() { 
+void NameNodeSession::account()
+{
 }
 
 void NameNodeSession::host() { }
