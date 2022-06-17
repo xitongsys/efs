@@ -7,7 +7,7 @@ namespace efs {
 class DataNodeConfig {
 public:
     std::string name;
-    std::string password;
+    std::string token;
 
     std::string ip;
     uint16_t port;
@@ -23,7 +23,7 @@ public:
     std::string name_node_ip;
     uint16_t name_node_port;
 
-    //["user01,pwd01,1,1", "user02,pwd02,2,1"]
+    //["user01,pwd01,1,1,/user01", "user02,pwd02,2,1,/user02"]
     std::vector<std::string> users;
 
     DataNodeConfig();

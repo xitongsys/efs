@@ -14,7 +14,7 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
     YAML::Node node = YAML::LoadFile(file);
 
     name = node["name"].as<std::string>();
-    password = node["password"].as<std::string>();
+    token = node["token"].as<std::string>();
 
     ip = node["ip"].as<std::string>();
     port = node["port"].as<uint16_t>();
@@ -43,7 +43,7 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
 DataNodeConfig::DataNodeConfig(const DataNodeConfig& config)
 {
     name = config.name;
-    password = config.password;
+    token = config.token;
     ip = config.ip;
     port = config.port;
     root_path = config.root_path;
