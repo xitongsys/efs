@@ -17,10 +17,10 @@ public:
     std::unordered_set<std::string> tokens;
 
     //["user01,pwd01,1,1,/user01", "user02,pwd02,2,1,/user02"]
-    std::vector<std::string> users;
+    std::vector<UserDesc> users;
 
     //["group01,1"]
-    std::vector<std::string> groups;
+    std::vector<GroupDesc> groups;
 
     std::string log_path;
 };

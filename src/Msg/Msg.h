@@ -8,6 +8,7 @@ namespace efs {
 enum MsgType : uint8_t {
     DEFAULT = 0,
 
+    // DataNode
     LOGIN,
     LOGIN_RESP,
 
@@ -40,6 +41,14 @@ enum MsgType : uint8_t {
 
     PERM,
     PERM_RESP,
+
+    // NameNode
+    ACCOUNT,
+    ACCOUNT_RESP,
+
+    HOST,
+    HOST_RESP,
+
 };
 
 struct Msg {
