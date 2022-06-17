@@ -47,6 +47,26 @@ ErrorCode DataNodeExecutor::init()
     return ec;
 }
 
+ErrorCode DataNodeExecutor::getUser(const std::string& name, UserDesc& udesc)
+{
+    if (this->users.count(name)) {
+        udesc = users[name];
+        return ErrorCode::NONE;
+    }
+
+    return ErrorCode::E_USER_NOT_FOUND;
+}
+
+ErrorCode DataNodeExecutor::getGroup(const std::string& name, GroupDesc& gdesc)
+{
+    if (this->groups.count(name)) {
+        gdesc = groups[name];
+        return ErrorCode::NONE;
+    }
+
+    return ErrorCode::E_GROUP_NOT_FOUND;
+}
+
 ErrorCode DataNodeExecutor::absolutePath(const std::string& path, std::string& absolute_path)
 {
     absolute_path = fs::formatPath(config.root_path + "/" + path);
@@ -126,7 +146,7 @@ ErrorCode DataNodeExecutor::getFileDescFromDisk(const std::string& path, FileDes
     return ErrorCode::NONE;
 }
 
-ErrorCode DataNodeExecutor::permission(const std::string& path, int32_t uid, int32_t gid, Permission& perm)
+ErrorCode DataNodeExecutor::permission(const std::string& path, int16_t uid, int16_t gid, Permission& perm)
 {
     FileDesc fdesc;
     ErrorCode ec;
@@ -208,7 +228,7 @@ ErrorCode DataNodeExecutor::rm(const std::string& path)
     return ec;
 }
 
-ErrorCode DataNodeExecutor::chown(const std::string& path, int32_t uid, int32_t gid)
+ErrorCode DataNodeExecutor::chown(const std::string& path, int16_t uid, int16_t gid)
 {
     ErrorCode ec = ErrorCode::NONE;
     FileDesc fdesc;
@@ -239,7 +259,63 @@ ErrorCode DataNodeExecutor::chmod(const std::string& path, uint16_t mod)
     return ec;
 }
 
-ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t gid)
+ErrorCode DataNodeExecutor::perm(const std::string& path, int16_t id, PermType perm_type, Permission p)
+{
+    ErrorCode ec = ErrorCode::NONE;
+    FileDesc fdesc;
+    if ((ec = getFileDesc(path, fdesc))) {
+        return ec;
+    }
+
+    if (perm_type == PermType::USER) {
+        if (id == fdesc.uid) {
+            fdesc.mod &= ~(0b111);
+            fdesc.mod |= (p & 0b111) << perm_type;
+
+        } else {
+            int32_t i = 0;
+            int32_t n = int32_t(fdesc.user_perms.size());
+            for (i = 0; i < n; i++) {
+                if (int16_t(fdesc.user_perms[i] >> 16) == id) {
+                    break;
+                }
+            }
+            if (i >= n) {
+                fdesc.user_perms.push_back(Permission::EMPTY);
+            }
+            fdesc.user_perms[i] &= 0b111;
+            fdesc.user_perms[i] |= p & 0b111;
+        }
+
+    } else if (perm_type == PermType::GROUP) {
+        if (id == fdesc.gid) {
+            fdesc.mod &= ~(0b111000);
+            fdesc.mod |= (p & 0b111) << perm_type;
+
+        } else {
+            int32_t i = 0;
+            int32_t n = int32_t(fdesc.group_perms.size());
+            for (i = 0; i < n; i++) {
+                if (int16_t(fdesc.group_perms[i] >> 16) == id) {
+                    break;
+                }
+            }
+            if (i >= n) {
+                fdesc.group_perms.push_back(Permission::EMPTY);
+            }
+            fdesc.group_perms[i] &= 0b111;
+            fdesc.group_perms[i] |= p & 0b111;
+        }
+
+    } else { // PermType::OTHER
+        fdesc.mod &= ~(0b111000000);
+        fdesc.mod |= (p & 0b111) << perm_type;
+    }
+
+    return ec;
+}
+
+ErrorCode DataNodeExecutor::mkdir(const std::string& path, int16_t uid, int16_t gid)
 {
     ErrorCode ec = ErrorCode::NONE;
     FileDesc fdesc;
@@ -266,7 +342,7 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t 
     return ec;
 }
 
-ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod, int32_t uid, int32_t gid, OpenFileHandler& fh)
+ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod, int16_t uid, int16_t gid, OpenFileHandler& fh)
 {
     ErrorCode ec = ErrorCode::NONE;
     std::string parent_path;

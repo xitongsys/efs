@@ -8,6 +8,7 @@
 #include "Msg/DataNode/MsgLs.h"
 #include "Msg/DataNode/MsgMkdir.h"
 #include "Msg/DataNode/MsgOpen.h"
+#include "Msg/DataNode/MsgPerm.h"
 #include "Msg/DataNode/MsgRead.h"
 #include "Msg/DataNode/MsgRm.h"
 #include "Msg/DataNode/MsgWrite.h"
@@ -103,6 +104,11 @@ ErrorCode DataNodeSession::readMsgHandler()
             RECV_IN_MSG(write);
             break;
         }
+        case MsgType::PERM: {
+            std::shared_ptr<MsgPerm> p_msg = std::make_shared<MsgPerm>();
+            RECV_IN_MSG(perm);
+            break;
+        }
         default:
             return ErrorCode::E_MSG_UNKNOWN;
         }
@@ -169,6 +175,11 @@ ErrorCode DataNodeSession::readMsgHandler()
         }
         case MsgType::WRITE_RESP: {
             std::shared_ptr<MsgWriteResp> p_msg = std::static_pointer_cast<MsgWriteResp>(p_out_msg);
+            SEND_OUT_MSG;
+            break;
+        }
+        case MsgType::PERM_RESP: {
+            std::shared_ptr<MsgPermResp> p_msg = std::static_pointer_cast<MsgPermResp>(p_out_msg);
             SEND_OUT_MSG;
             break;
         }

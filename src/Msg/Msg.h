@@ -37,6 +37,9 @@ enum MsgType : uint8_t {
 
     CHOWN,
     CHOWN_RESP,
+
+    PERM,
+    PERM_RESP,
 };
 
 struct Msg {

@@ -14,9 +14,10 @@ enum Permission : uint8_t {
     X = 0x4,
 };
 
-enum IdType : uint8_t {
+enum PermType : uint8_t {
     USER = 0,
-    GROUP = 1,
+    GROUP = 3,
+    OTHER = 6,
 };
 
 struct FileDesc {
@@ -26,7 +27,10 @@ struct FileDesc {
     uint16_t uid;
     uint16_t gid;
     uint16_t mod;
-    std::vector<uint32_t> perms;
+
+    // perm: High id(uint16_t) + (int16_t)mod Low
+    std::vector<uint32_t> user_perms;
+    std::vector<uint32_t> group_perms;
     int64_t create_time;
     int64_t modified_time;
 
@@ -44,7 +48,8 @@ struct FileDesc {
         res += serialize::size(uid);
         res += serialize::size(gid);
         res += serialize::size(mod);
-        res += serialize::size(perms);
+        res += serialize::size(user_perms);
+        res += serialize::size(group_perms);
         res += serialize::size(create_time);
         res += serialize::size(modified_time);
         return res;
@@ -61,7 +66,8 @@ struct FileDesc {
         size += serialize::serialize(uid, buf + size, buf_size - size);
         size += serialize::serialize(gid, buf + size, buf_size - size);
         size += serialize::serialize(mod, buf + size, buf_size - size);
-        size += serialize::serialize(perms, buf + size, buf_size - size);
+        size += serialize::serialize(user_perms, buf + size, buf_size - size);
+        size += serialize::serialize(group_perms, buf + size, buf_size - size);
         size += serialize::serialize(create_time, buf + size, buf_size - size);
         size += serialize::serialize(modified_time, buf + size, buf_size - size);
         return size;
@@ -96,7 +102,12 @@ struct FileDesc {
         }
         size += size1;
 
-        if ((size1 = serialize::deserialize(perms, buf + size, buf_size - size)) < 0) {
+        if ((size1 = serialize::deserialize(user_perms, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(group_perms, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;

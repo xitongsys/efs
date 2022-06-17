@@ -10,6 +10,7 @@
 #include "Msg/DataNode/MsgLs.h"
 #include "Msg/DataNode/MsgMkdir.h"
 #include "Msg/DataNode/MsgOpen.h"
+#include "Msg/DataNode/MsgPerm.h"
 #include "Msg/DataNode/MsgRead.h"
 #include "Msg/DataNode/MsgRm.h"
 #include "Msg/DataNode/MsgWrite.h"
@@ -101,6 +102,56 @@ void DataNodeSession::chmod()
     } else {
         p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
     }
+
+    this->p_out_msg = p_out_msg;
+}
+
+void DataNodeSession::perm()
+{
+    std::shared_ptr<MsgPerm> p_in_msg = std::static_pointer_cast<MsgPerm>(this->p_in_msg);
+    std::shared_ptr<MsgPermResp> p_out_msg = std::make_shared<MsgPermResp>();
+
+    do {
+        Permission perm = Permission::EMPTY;
+        ErrorCode ec;
+        FileDesc fdesc;
+        UserDesc udesc;
+        GroupDesc gdesc;
+        int16_t id = 0;
+
+        if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
+            p_out_msg->error_code = ec;
+            break;
+        }
+
+        if ((perm & Permission::W) == 0) {
+            p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+            break;
+        }
+
+        if (p_in_msg->perm_type == PermType::USER) {
+            if ((ec = p_executor->getUser(p_in_msg->name, udesc))) {
+                p_out_msg->error_code = ec;
+                break;
+            }
+            id = udesc.uid;
+
+        } else if (p_in_msg->perm_type == PermType::GROUP) {
+            if ((ec = p_executor->getGroup(p_in_msg->name, gdesc))) {
+                p_out_msg->error_code = ec;
+                break;
+            }
+            id = gdesc.gid;
+
+        } else { // PermType::OTHER
+        }
+
+        if ((ec = p_executor->perm(p_in_msg->path, id, p_in_msg->perm_type, p_in_msg->perm))) {
+            p_out_msg->error_code = ec;
+            break;
+        }
+
+    } while (0);
 
     this->p_out_msg = p_out_msg;
 }
@@ -281,5 +332,4 @@ void DataNodeSession::write()
 
     this->p_out_msg = p_out_msg;
 }
-
 }

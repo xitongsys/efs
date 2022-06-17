@@ -38,6 +38,7 @@ public:
     void chown();
     void chmod();
     void mkdir();
+    void perm();
 
     void open();
     void close();

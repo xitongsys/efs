@@ -13,6 +13,9 @@ enum ErrorCode : int8_t {
     E_LOGIN_USER_NOT_FOUND,
     E_LOGIN_WRONG_PASSWORD,
 
+    E_USER_NOT_FOUND,
+    E_GROUP_NOT_FOUND,
+
     E_SERIALIZE,
     E_DESERIALIZE,
 
@@ -26,6 +29,7 @@ enum ErrorCode : int8_t {
     E_FILE_NOT_FOUND,
     E_FILE_TOO_MANY,
     E_FILE_PATH,
+    E_FILE_PERM,
 
     E_DB_OPEN,
     E_DB_GET,

@@ -13,7 +13,8 @@ FileDesc::FileDesc()
     uid = -1;
     gid = -1;
     mod = 0b0111000000;
-    perms = {};
+    user_perms = {};
+    group_perms = {};
     create_time = util::now();
     modified_time = util::now();
 }
@@ -25,7 +26,8 @@ FileDesc::FileDesc(const FileDesc& fdesc)
     uid = fdesc.uid;
     gid = fdesc.gid;
     mod = fdesc.mod;
-    perms = fdesc.perms;
+    user_perms = fdesc.user_perms;
+    group_perms = fdesc.group_perms;
     create_time = fdesc.create_time;
     modified_time = fdesc.modified_time;
 }
@@ -37,7 +39,8 @@ FileDesc::FileDesc(FileDesc&& fdesc)
     uid = fdesc.uid;
     gid = fdesc.gid;
     mod = fdesc.mod;
-    perms = fdesc.perms;
+    user_perms = fdesc.user_perms;
+    group_perms = fdesc.group_perms;
     create_time = fdesc.create_time;
     modified_time = fdesc.modified_time;
 }
@@ -49,7 +52,8 @@ FileDesc& FileDesc::operator=(const FileDesc& fdesc)
     uid = fdesc.uid;
     gid = fdesc.gid;
     mod = fdesc.mod;
-    perms = fdesc.perms;
+    user_perms = fdesc.user_perms;
+    group_perms = fdesc.group_perms;
     create_time = fdesc.create_time;
     modified_time = fdesc.modified_time;
 
@@ -58,22 +62,28 @@ FileDesc& FileDesc::operator=(const FileDesc& fdesc)
 
 Permission FileDesc::perm(int32_t uid, int64_t gid) const
 {
+    // user perm has higher priority
+
     if (this->uid == uid) {
-        return Permission((this->mod >> 6) & (0b111));
+        return Permission((this->mod) & (0b111));
     }
 
     if (this->gid == gid) {
         return Permission((this->mod >> 3) & (0b111));
     }
 
-    for (auto& id_perm : perms) {
+    for (auto& id_perm : user_perms) {
         int16_t id = id_perm >> 16;
         Permission perm = Permission(id_perm & 0b111);
-        IdType id_type = IdType((id_perm >> 4) & 1);
-
-        if (id_type == IdType::USER && id == uid) {
+        if (id == uid) {
             return perm;
-        } else if (id_type == IdType::GROUP && id == gid) {
+        }
+    }
+
+    for (auto& id_perm : group_perms) {
+        int16_t id = id_perm >> 16;
+        Permission perm = Permission(id_perm & 0b111);
+        if (id == gid) {
             return perm;
         }
     }
