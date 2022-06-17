@@ -71,8 +71,9 @@ ErrorCode DataNodeExecutor::updateAccount()
     int32_t read_size = 0;
 
     while (read_size < BUF_SIZE) {
-        read_size += boost::asio::read(sock, boost::asio::buffer(buf + read_size, BUF_SIZE - read_size));
-        if (msg_account_resp.deserialize(buf, read_size) == 0) {
+        // TODO:: read 1 byte every time is bad.
+        read_size += boost::asio::read(sock, boost::asio::buffer(buf + read_size, 1));
+        if (msg_account_resp.deserialize(buf, read_size) > 0) {
             break;
         }
     }
