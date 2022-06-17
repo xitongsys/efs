@@ -169,12 +169,15 @@ void DataNodeSession::mkdir()
             break;
         }
 
-        Permission perm = Permission::EMPTY;
-        if ((ec = p_executor->permission(parent_path, this->udesc.uid, this->udesc.gid, perm))) {
+        FileDesc parent_desc;
+        if ((ec = p_executor->getFileDesc(p_in_msg->path, parent_desc))) {
             p_out_msg->error_code = ec;
+            break;
+        }
 
-        } else if ((perm & Permission::W)) {
-            ec = p_executor->mkdir(p_in_msg->path, this->udesc.uid, this->udesc.gid);
+        Permission perm = parent_desc.perm(this->udesc.uid, this->udesc.gid);
+        if ((perm & Permission::W)) {
+            ec = p_executor->mkdir(p_in_msg->path, this->udesc.uid, this->udesc.gid, parent_desc);
             p_out_msg->error_code = ec;
 
         } else {
@@ -227,7 +230,7 @@ void DataNodeSession::open()
             }
 
             OpenFileHandler fh;
-            if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, fh))) {
+            if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
                 p_out_msg->error_code = ec;
                 break;
             }
@@ -237,7 +240,7 @@ void DataNodeSession::open()
 
         } else {
             OpenFileHandler fh;
-            if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, fh))) {
+            if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, fdesc, fh))) {
                 p_out_msg->error_code = ec;
                 break;
             }

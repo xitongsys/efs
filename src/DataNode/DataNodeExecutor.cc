@@ -42,7 +42,8 @@ ErrorCode DataNodeExecutor::init()
         int16_t gid = std::atoi(vs[2].c_str());
         FileDesc fdesc;
         if ((ec = getFileDesc(path, fdesc))) {
-            if ((ec = mkdir(path, uid, gid))) {
+            fdesc.mod = 0b1000000111;
+            if ((ec = mkdir(path, uid, gid, fdesc))) {
                 throw ec;
             }
         }
@@ -361,7 +362,7 @@ ErrorCode DataNodeExecutor::perm(const std::string& path, int16_t id, PermType p
     return ec;
 }
 
-ErrorCode DataNodeExecutor::mkdir(const std::string& path, int16_t uid, int16_t gid)
+ErrorCode DataNodeExecutor::mkdir(const std::string& path, int16_t uid, int16_t gid, const FileDesc& parent_desc)
 {
     ErrorCode ec = ErrorCode::NONE;
     FileDesc fdesc;
@@ -388,7 +389,11 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int16_t uid, int16_t 
     return ec;
 }
 
-ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod, int16_t uid, int16_t gid, OpenFileHandler& fh)
+ErrorCode DataNodeExecutor::open(const std::string& path,
+    const std::string& mod,
+    int16_t uid, int16_t gid,
+    const FileDesc& parent_desc,
+    OpenFileHandler& fh)
 {
     ErrorCode ec = ErrorCode::NONE;
     std::string parent_path;
@@ -415,7 +420,7 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
 
     if ((ec = getFileDesc(path, fdesc))) {
         fdesc.path = path;
-        fdesc.mod = 0b0000000111;
+        fdesc.mod = parent_desc.mod & (~(1 << 9));
         fdesc.uid = uid;
         fdesc.gid = gid;
         fdesc.create_time = util::now();
