@@ -25,6 +25,56 @@ class MsgType:
     CHMOD_RESP = 18
     CHOWN = 19
     CHOWN_RESP = 20
+    ACCOUNT = 21
+    ACCOUNT_RESP = 22
+    HOST = 23
+    HOST_RESP = 24
+
+
+class HostDesc:
+    def __init__(self):
+        self.name = Base(BaseType.string, "")
+        self.token = Base(BaseType.string, 0)
+        self.ip = Base(BaseType.string, 0)
+        self.port = Base(BaseType.uint16, 0)
+        self.paths = Vector(Base(BaseType.string, ""))
+
+        self.fields = [self.name, self.token, self.ip, self.port, self.paths]
+
+    def serialize(self) -> bytearray:
+        res = bytearray()
+        for field in self.fields:
+            res += field.encode()
+        return res
+
+    def deserialize(self, buf: bytearray) -> int:
+        ln = 0
+        for field in self.fields:
+            if ln >= len(buf):
+                return 0
+            c = field.deserialize(buf[ln:])
+            if c == 0:
+                return 0
+            ln += c
+        return ln
+
+    def size(self) -> int:
+        res = 0
+        for field in self.fields:
+            res += field.size()
+        return res
+
+    def copy(self):
+        fdesc = FileDesc()
+        fdesc.name = self.name.copy()
+        fdesc.token = self.token.copy()
+        fdesc.ip = self.ip.copy()
+        fdesc.port = self.port
+        fdesc.paths = self.paths.copy()
+
+        fdesc.fields = [fdesc.name, fdesc.token,
+                        fdesc.ip, fdesc.port, fdesc.paths]
+        return fdesc
 
 
 class FileDesc:
@@ -296,6 +346,21 @@ class MsgWriteResp(Msg):
         self.write_size = Base(BaseType.int32, 0)
 
         self.fields += [self.fd, self.write_size]
+
+
+class MsgHost(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.HOST
+
+
+class MsgHostResp(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.HOST_RESP
+        self.hosts = Vector(HostDesc())
+
+        self.fields += [self.hosts]
 
 
 if __name__ == '__main__':
