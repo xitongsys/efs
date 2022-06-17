@@ -19,6 +19,8 @@ void NameNodeSession::account()
             break;
         }
 
+        namenode.hosts[p_in_msg->hdesc.name] = p_in_msg->hdesc;
+
         p_out_msg->users = namenode.config.users;
         p_out_msg->groups = namenode.config.groups;
 
@@ -32,9 +34,11 @@ void NameNodeSession::host()
     std::shared_ptr<MsgHost> p_in_msg = std::static_pointer_cast<MsgHost>(this->p_in_msg);
     std::shared_ptr<MsgHostResp> p_out_msg = std::make_shared<MsgHostResp>();
 
-    for (auto host : namenode.hosts) {
-        host.token = "";
-        p_out_msg->hosts.push_back(host);
+    for (auto it = namenode.hosts.begin(); it != namenode.hosts.end(); it++) {
+        HostDesc hdesc = it->second;
+        // clear the token info
+        hdesc.token = "";
+        p_out_msg->hosts.push_back(hdesc);
     }
 
     this->p_out_msg = p_out_msg;

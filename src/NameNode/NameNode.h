@@ -14,7 +14,7 @@ class NameNode : public ServerBase<NameNodeSession> {
 public:
     NameNodeConfig config;
 
-    std::vector<HostDesc> hosts;
+    std::unordered_map<std::string, HostDesc> hosts;
 
 public:
     NameNode(const NameNodeConfig& config);
