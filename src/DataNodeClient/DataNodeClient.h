@@ -1,4 +1,0 @@
-namespace efs {
-class DataNodeClient {
-};
-}

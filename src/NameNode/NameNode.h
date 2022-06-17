@@ -14,6 +14,8 @@ class NameNode : public ServerBase<NameNodeSession> {
 public:
     NameNodeConfig config;
 
+    std::vector<HostDesc> hosts;
+
 public:
     NameNode(const NameNodeConfig& config);
     std::shared_ptr<NameNodeSession> new_session(boost::asio::ip::tcp::socket socket);

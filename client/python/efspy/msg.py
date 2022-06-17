@@ -25,10 +25,12 @@ class MsgType:
     CHMOD_RESP = 18
     CHOWN = 19
     CHOWN_RESP = 20
-    ACCOUNT = 21
-    ACCOUNT_RESP = 22
-    HOST = 23
-    HOST_RESP = 24
+    PERM = 21
+    PERM_RESP = 22
+    ACCOUNT = 23
+    ACCOUNT_RESP = 24
+    HOST = 25
+    HOST_RESP = 26
 
 
 class HostDesc:
