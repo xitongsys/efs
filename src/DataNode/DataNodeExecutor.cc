@@ -65,21 +65,22 @@ ErrorCode DataNodeExecutor::updateAccount()
     MsgAccount msg_account;
     msg_account.hdesc = hdesc;
     int32_t msg_account_size = msg_account.size();
-    msg_account.serialize(buf, BUF_SIZE);
-    boost::asio::write(sock, boost::asio::buffer(buf, msg_account_size));
+    serialize::serialize(msg_account_size, buf, BUF_SIZE);
+    msg_account.serialize(buf + 4, BUF_SIZE - 4);
+    boost::asio::write(sock, boost::asio::buffer(buf, msg_account_size + 4));
 
     MsgAccountResp msg_account_resp;
     int32_t read_size = 0;
+    read_size += boost::asio::read(sock, boost::asio::buffer(buf + read_size, 4));
+    int32_t msg_size = 0;
+    serialize::deserialize(msg_size, buf, 4);
 
-    while (read_size < BUF_SIZE) {
-        // TODO:: read 1 byte every time is bad.
-        read_size += boost::asio::read(sock, boost::asio::buffer(buf + read_size, 1));
-        if (msg_account_resp.deserialize(buf, read_size) > 0) {
-            break;
-        }
-    }
-
+    read_size += boost::asio::read(sock, boost::asio::buffer(buf, msg_size));
     sock.close();
+
+    if (msg_account_resp.deserialize(buf, read_size) <= 0) {
+        throw ErrorCode::E_PANIC;
+    }
 
     groups.clear();
     for (auto& group : msg_account_resp.groups) {
