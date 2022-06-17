@@ -202,8 +202,8 @@ ErrorCode DataNodeExecutor::permission(const std::string& path, int16_t uid, int
         return ec;
     }
 
-    // for root user
-    if (uid == 1) {
+    // for root user and group
+    if (uid == 1 or gid == 1) {
         perm = Permission(0b111);
         return ErrorCode::NONE;
     }
