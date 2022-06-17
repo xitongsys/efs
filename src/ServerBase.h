@@ -9,7 +9,7 @@ namespace efs {
 template <typename Session>
 class ServerBase {
 
-private:
+public:
     boost::asio::io_context io_context;
     std::unique_ptr<boost::asio::ip::tcp::acceptor> acceptor;
 
