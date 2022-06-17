@@ -1,3 +1,4 @@
+#include <boost/asio.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -5,6 +6,8 @@
 
 #include "DataNodeExecutor.h"
 #include "FS.h"
+#include "HostDesc.h"
+#include "Msg/NameNode/MsgAccount.h"
 #include "Util.h"
 
 namespace efs {
@@ -12,11 +15,10 @@ DataNodeExecutor::DataNodeExecutor(const DataNodeConfig& config)
     : db(config.log_path)
 {
     this->config = config;
-
-    for (const std::string& csv : config.users) {
-        UserDesc udesc(csv);
-        this->users[udesc.user] = udesc;
-    }
+    hdesc.ip = config.ip;
+    hdesc.port = config.port;
+    hdesc.token = config.token;
+    hdesc.paths = config.paths;
 
     init();
 }
@@ -28,20 +30,61 @@ DataNodeExecutor::~DataNodeExecutor()
 ErrorCode DataNodeExecutor::init()
 {
     ErrorCode ec = ErrorCode::NONE;
-    FileDesc fdesc;
-    fdesc.path = "/";
-    fdesc.mod = 0b1111001001;
-    fdesc.uid = 1;
-    fdesc.gid = 1;
-
-    this->setFileDesc(fdesc.path, fdesc);
-
-    for (auto it = users.begin(); it != users.end(); it++) {
-        UserDesc& udesc = it->second;
-        FileDesc fdesc;
-        if (this->getFileDesc(udesc.root_path, fdesc)) {
-            ec = this->mkdir(udesc.root_path, udesc.uid, udesc.gid);
+    ec = updateAccount();
+    for (auto& init_path : config.init_paths) {
+        std::vector<std::string> vs = util::split(init_path, ',');
+        if (vs.size() != 3) {
+            throw ErrorCode::E_CONFIG_ERROR;
         }
+
+        std::string path = vs[0];
+        int16_t uid = std::atoi(vs[1].c_str());
+        int16_t gid = std::atoi(vs[2].c_str());
+        FileDesc fdesc;
+        if ((ec = getFileDesc(path, fdesc))) {
+            if ((ec = mkdir(path, uid, gid))) {
+                throw ec;
+            }
+        }
+    }
+    return ec;
+}
+
+ErrorCode DataNodeExecutor::updateAccount()
+{
+    ErrorCode ec = ErrorCode::NONE;
+
+    boost::asio::io_context io_context;
+    boost::asio::ip::tcp::socket sock(io_context);
+    boost::asio::ip::tcp::resolver resolver(io_context);
+    boost::asio::connect(sock, resolver.resolve(config.name_node_ip, std::to_string(config.name_node_port)));
+
+    constexpr int32_t BUF_SIZE = 4096;
+    char buf[BUF_SIZE];
+    MsgAccount msg_account;
+    msg_account.hdesc = hdesc;
+    int32_t msg_account_size = msg_account.size();
+    msg_account.serialize(buf, BUF_SIZE);
+    boost::asio::write(sock, boost::asio::buffer(buf, msg_account_size));
+
+    MsgAccountResp msg_account_resp;
+    int32_t read_size = 0;
+
+    while (read_size < BUF_SIZE) {
+        read_size += boost::asio::read(sock, boost::asio::buffer(buf + read_size, BUF_SIZE - read_size));
+        if (msg_account_resp.deserialize(buf, read_size) == 0) {
+            break;
+        }
+    }
+
+    groups.clear();
+    for (auto& group : msg_account_resp.groups) {
+        groups[group.group] = group;
+    }
+
+    users.clear();
+    for (auto& user : msg_account_resp.users) {
+        users[user.user] = user;
     }
 
     return ec;

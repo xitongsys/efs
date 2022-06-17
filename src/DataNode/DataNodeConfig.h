@@ -23,8 +23,9 @@ public:
     std::string name_node_ip;
     uint16_t name_node_port;
 
-    //["user01,pwd01,1,1,/user01", "user02,pwd02,2,1,/user02"]
-    std::vector<std::string> users;
+    std::vector<std::string> paths;
+
+    std::vector<std::string> init_paths;
 
     DataNodeConfig();
     DataNodeConfig(const std::string& file);

@@ -1,0 +1,10 @@
+ip: "0.0.0.0"
+port: 12345
+
+tokens: ["abc"]
+
+log_path: "logs"
+buffer_size: 4194304
+
+users: ["admin,adminpwd,1,1,/admin", "zxt,zxtpwd,2,2,/zxt"]
+groups: ["admin,1", "user,2"]

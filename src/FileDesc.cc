@@ -62,8 +62,12 @@ FileDesc& FileDesc::operator=(const FileDesc& fdesc)
 
 Permission FileDesc::perm(int32_t uid, int64_t gid) const
 {
-    // user perm has higher priority
+    // for root user and root group
+    if (uid == 1 || gid == 1) {
+        return Permission(0b111);
+    }
 
+    // user perm has higher priority
     if (this->uid == uid) {
         return Permission((this->mod) & (0b111));
     }

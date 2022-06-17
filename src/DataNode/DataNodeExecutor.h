@@ -8,6 +8,7 @@
 #include "DataNode/OpenFileHandler.h"
 #include "FileDesc.h"
 #include "GroupDesc.h"
+#include "HostDesc.h"
 #include "UserDesc.h"
 
 namespace efs {
@@ -15,6 +16,7 @@ namespace efs {
 class DataNodeExecutor {
 public:
     DBBase db;
+    HostDesc hdesc;
     std::unordered_map<std::string, UserDesc> users;
     std::unordered_map<std::string, GroupDesc> groups;
 
@@ -24,6 +26,7 @@ public:
     DataNodeConfig config;
 
     ErrorCode init();
+    ErrorCode updateAccount();
 
     ErrorCode getUser(const std::string& name, UserDesc& udesc);
     ErrorCode getGroup(const std::string& name, GroupDesc& gdesc);

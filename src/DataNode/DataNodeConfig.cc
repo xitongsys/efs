@@ -37,7 +37,8 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
     name_node_ip = node["name_node_ip"].as<std::string>();
     name_node_port = node["name_node_port"].as<uint16_t>();
 
-    users = node["users"].as<std::vector<std::string>>();
+    paths = node["paths"].as<std::vector<std::string>>();
+    init_paths = node["init_paths"].as<std::vector<std::string>>();
 }
 
 DataNodeConfig::DataNodeConfig(const DataNodeConfig& config)
@@ -53,6 +54,7 @@ DataNodeConfig::DataNodeConfig(const DataNodeConfig& config)
     max_msg_size = config.max_msg_size;
     name_node_ip = config.name_node_ip;
     name_node_port = config.name_node_port;
-    users = config.users;
+    paths = config.paths;
+    init_paths = config.init_paths;
 }
 }

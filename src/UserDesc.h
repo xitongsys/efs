@@ -5,6 +5,7 @@
 #include "Serialize.h"
 
 namespace efs {
+
 struct UserDesc {
     std::string user;
     std::string password;

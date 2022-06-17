@@ -37,5 +37,6 @@ enum ErrorCode : int8_t {
     E_DB_DEL,
 
     E_TOKEN_ERROR,
+    E_CONFIG_ERROR,
 };
 }
