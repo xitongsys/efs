@@ -44,12 +44,24 @@ class NameNodeConn:
         req = msg.MsgHost()
         self.send(req)
 
-        resp = msg.MsgLsResp()
+        resp = msg.MsgHostResp()
+        self.recv(resp)
+        return resp
+
+    def account(self):
+        req = msg.MsgAccount()
+        # req.hdesc.token.value = b"abc"
+        self.send(req)
+
+        resp = msg.MsgAccountResp()
         self.recv(resp)
         return resp
 
 
 if __name__ == '__main__':
-    conn = NameNodeConn("127.0.0.1", 12345)
+    conn = NameNodeConn("127.0.0.1", 10000)
     resp = conn.host()
-    print(resp.error_code)
+    print(resp.hosts.values, resp.error_code)
+
+    resp = conn.account()
+    print(resp.users.values, resp.error_code)

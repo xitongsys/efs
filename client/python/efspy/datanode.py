@@ -141,7 +141,7 @@ class DataNodeConn:
 
 
 if __name__ == '__main__':
-    conn = DataNodeConn("127.0.0.1", 12345, "zxt", "zxt")
+    conn = DataNodeConn("127.0.0.1", 10001, "zxt", "zxt")
     resp = conn.login()
 
     resp = conn.open("/zxt/a.txt", "w+")

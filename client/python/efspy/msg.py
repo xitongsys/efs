@@ -33,15 +33,59 @@ class MsgType:
     HOST_RESP = 26
 
 
-class HostDesc:
+class UserDesc:
     def __init__(self):
-        self.name = Base(BaseType.string, "")
-        self.token = Base(BaseType.string, 0)
-        self.ip = Base(BaseType.string, 0)
-        self.port = Base(BaseType.uint16, 0)
-        self.paths = Vector(Base(BaseType.string, ""))
+        self.user = Base(BaseType.string, b"")
+        self.password = Base(BaseType.string, b"")
+        self.uid = Base(BaseType.int16, 0)
+        self.gid = Base(BaseType.int16, 0)
+        self.root_path = Base(BaseType.string, b"")
 
-        self.fields = [self.name, self.token, self.ip, self.port, self.paths]
+        self.fields = [self.user, self.password,
+                       self.uid, self.gid, self.root_path]
+
+    def serialize(self) -> bytearray:
+        res = bytearray()
+        for field in self.fields:
+            res += field.serialize()
+        return res
+
+    def deserialize(self, buf: bytearray) -> int:
+        ln = 0
+        for field in self.fields:
+            if ln >= len(buf):
+                return 0
+            c = field.deserialize(buf[ln:])
+            if c == 0:
+                return 0
+            ln += c
+        return ln
+
+    def size(self) -> int:
+        res = 0
+        for field in self.fields:
+            res += field.size()
+        return res
+
+    def copy(self):
+        udesc = UserDesc()
+        udesc.user = self.user.copy()
+        udesc.password = self.password.copy()
+        udesc.uid = self.uid
+        udesc.gid = self.gid
+        udesc.root_path = self.root_path.copy()
+
+        udesc.fields = [udesc.user, udesc.password,
+                        udesc.uid, udesc.gid, udesc.root_path]
+        return udesc
+
+
+class GroupDesc:
+    def __init__(self):
+        self.group = Base(BaseType.string, b"")
+        self.gid = Base(BaseType.int16, 0)
+
+        self.fields = [self.group, self.gid]
 
     def serialize(self) -> bytearray:
         res = bytearray()
@@ -67,21 +111,63 @@ class HostDesc:
         return res
 
     def copy(self):
-        fdesc = FileDesc()
-        fdesc.name = self.name.copy()
-        fdesc.token = self.token.copy()
-        fdesc.ip = self.ip.copy()
-        fdesc.port = self.port
-        fdesc.paths = self.paths.copy()
+        gdesc = GroupDesc()
+        gdesc.group = self.group.copy()
+        gdesc.gid = self.gid
 
-        fdesc.fields = [fdesc.name, fdesc.token,
-                        fdesc.ip, fdesc.port, fdesc.paths]
-        return fdesc
+        gdesc.fields = [gdesc.group, gdesc.gid]
+        return gdesc
+
+
+class HostDesc:
+    def __init__(self):
+        self.name = Base(BaseType.string, b"")
+        self.token = Base(BaseType.string, b"")
+        self.ip = Base(BaseType.string, b"")
+        self.port = Base(BaseType.uint16, 0)
+        self.paths = Vector(Base(BaseType.string, b""))
+
+        self.fields = [self.name, self.token, self.ip, self.port, self.paths]
+
+    def serialize(self) -> bytearray:
+        res = bytearray()
+        for field in self.fields:
+            res += field.serialize()
+        return res
+
+    def deserialize(self, buf: bytearray) -> int:
+        ln = 0
+        for field in self.fields:
+            if ln >= len(buf):
+                return 0
+            c = field.deserialize(buf[ln:])
+            if c == 0:
+                return 0
+            ln += c
+        return ln
+
+    def size(self) -> int:
+        res = 0
+        for field in self.fields:
+            res += field.size()
+        return res
+
+    def copy(self):
+        hdesc = HostDesc()
+        hdesc.name = self.name.copy()
+        hdesc.token = self.token.copy()
+        hdesc.ip = self.ip.copy()
+        hdesc.port = self.port
+        hdesc.paths = self.paths.copy()
+
+        hdesc.fields = [hdesc.name, hdesc.token,
+                        hdesc.ip, hdesc.port, hdesc.paths]
+        return hdesc
 
 
 class FileDesc:
     def __init__(self):
-        self.path = Base(BaseType.string, "")
+        self.path = Base(BaseType.string, b"")
         self.fsize = Base(BaseType.int64, 0)
         self.uid = Base(BaseType.int32, 0)
         self.gid = Base(BaseType.int32, 0)
@@ -95,7 +181,7 @@ class FileDesc:
     def serialize(self) -> bytearray:
         res = bytearray()
         for field in self.fields:
-            res += field.encode()
+            res += field.serialize()
         return res
 
     def deserialize(self, buf: bytearray) -> int:
@@ -363,6 +449,25 @@ class MsgHostResp(Msg):
         self.hosts = Vector(HostDesc())
 
         self.fields += [self.hosts]
+
+
+class MsgAccount(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.ACCOUNT
+        self.hdesc = HostDesc()
+
+        self.fields += [self.hdesc]
+
+
+class MsgAccountResp(Msg):
+    def __init__(self):
+        Msg.__init__(self)
+        self.msg_type.value = MsgType.ACCOUNT_RESP
+        self.users = Vector(UserDesc())
+        self.groups = Vector(GroupDesc())
+
+        self.fields += [self.users, self.groups]
 
 
 if __name__ == '__main__':
