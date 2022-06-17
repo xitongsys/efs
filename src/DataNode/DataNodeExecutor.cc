@@ -77,6 +77,8 @@ ErrorCode DataNodeExecutor::updateAccount()
         }
     }
 
+    sock.close();
+
     groups.clear();
     for (auto& group : msg_account_resp.groups) {
         groups[group.group] = group;
