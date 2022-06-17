@@ -1,3 +1,4 @@
+from datetime import datetime
 from errno import errorcode
 from pydoc import cli
 import socket
@@ -150,6 +151,7 @@ class DataNodeConn:
 
 if __name__ == '__main__':
     conn = DataNodeConn("127.0.0.1", 10001, "zxt", "zxtpwd")
+
     resp = conn.login()
 
     resp = conn.open("/zxt/a.txt", "w+")
