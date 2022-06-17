@@ -12,7 +12,7 @@ FileDesc::FileDesc()
     fsize = 0;
     uid = -1;
     gid = -1;
-    mod = 0b0111000000;
+    mod = 0b0000000111;
     user_perms = {};
     group_perms = {};
     create_time = util::now();

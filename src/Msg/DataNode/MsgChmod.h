@@ -17,7 +17,7 @@ struct MsgChmod : Msg {
         msg_type = MsgType::CHMOD;
         error_code = ErrorCode::NONE;
         path = "";
-        mod = 0b0111000000;
+        mod = 0b0000000111;
     }
 
     inline int32_t size() const

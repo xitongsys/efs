@@ -6,5 +6,5 @@ tokens: ["abc"]
 log_path: "logs"
 buffer_size: 4194304
 
-users: ["admin,adminpwd,1,1,/admin", "zxt,zxtpwd,2,2,/zxt"]
-groups: ["admin,1", "user,2"]
+users: ["root,rootpwd,1,1,/root", "zxt,zxtpwd,2,2,/zxt"]
+groups: ["root,1", "user,2"]

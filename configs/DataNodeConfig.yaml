@@ -17,6 +17,6 @@ name_node_port: 10000
 
 paths: ["/zxt", "/root"]
 
-# ["path,uid,gid", ""]
+# ["path,uid,gid"]
 # ["/zxt,2,2"]
-init_paths: []
+init_paths: ["/root,1,1", "/zxt,2,2"]

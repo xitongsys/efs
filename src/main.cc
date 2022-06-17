@@ -12,28 +12,26 @@ int main(int argc, char** argv)
     std::string role(argv[1]);
     std::string config_file = std::string(argv[2]);
 
-    if (role == "datanode") {
-        try {
+    try {
+        if (role == "datanode") {
             efs::DataNodeConfig config(config_file);
             efs::DataNode datanode(config);
 
             datanode.run();
-
-        } catch (boost::system::error_code ec) {
-            std::cout << ec.category().name() << ":" << ec.value() << "," << ec.message() << std::endl;
         }
-    }
 
-    if (role == "namenode") {
-        try {
+        if (role == "namenode") {
             efs::NameNodeConfig config(config_file);
             efs::NameNode namenode(config);
 
             namenode.run();
-
-        } catch (boost::system::error_code ec) {
-            std::cout << ec.category().name() << ":" << ec.value() << "," << ec.message() << std::endl;
         }
+
+    } catch (boost::system::error_code ec) {
+        std::cout << ec.category().name() << ":" << ec.value() << "," << ec.message() << std::endl;
+
+    } catch (efs::ErrorCode ec) {
+        std::cout << ec << std::endl;
     }
 
     return 0;

@@ -368,7 +368,7 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int16_t uid, int16_t 
     fdesc.path = path;
     fdesc.uid = uid;
     fdesc.gid = gid;
-    fdesc.mod = 0b1111000000;
+    fdesc.mod = 0b1000000111;
 
     std::string value(fdesc.size(), 0);
     fdesc.serialize(value.data(), value.size());
@@ -415,7 +415,7 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
 
     if ((ec = getFileDesc(path, fdesc))) {
         fdesc.path = path;
-        fdesc.mod = 0b0111000000;
+        fdesc.mod = 0b0000000111;
         fdesc.uid = uid;
         fdesc.gid = gid;
         fdesc.create_time = util::now();

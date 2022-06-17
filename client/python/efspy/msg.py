@@ -169,8 +169,8 @@ class FileDesc:
     def __init__(self):
         self.path = Base(BaseType.string, b"")
         self.fsize = Base(BaseType.int64, 0)
-        self.uid = Base(BaseType.int32, 0)
-        self.gid = Base(BaseType.int32, 0)
+        self.uid = Base(BaseType.int16, 0)
+        self.gid = Base(BaseType.int16, 0)
         self.mod = Base(BaseType.uint16, 0)
         self.create_time = Base(BaseType.int64, 0)
         self.modified_time = Base(BaseType.int64, 0)
@@ -327,7 +327,7 @@ class MsgChmod(Msg):
         self.msg_type.value = MsgType.CHMOD
 
         self.path = Base(BaseType.string, b"")
-        self.mod = Base(BaseType.uint16, 0b111000000)
+        self.mod = Base(BaseType.uint16, 0b0000000111)
 
         self.fields += [self.path, self.mod]
 
