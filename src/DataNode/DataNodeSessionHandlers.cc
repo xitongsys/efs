@@ -19,7 +19,6 @@ void DataNodeSession::login()
 {
     std::shared_ptr<MsgLogin> p_in_msg = std::static_pointer_cast<MsgLogin>(this->p_in_msg);
     std::shared_ptr<MsgLoginResp> p_out_msg = std::make_shared<MsgLoginResp>();
-    ErrorCode ec = ErrorCode::NONE;
     p_out_msg->error_code = p_executor->login(p_in_msg->user, p_in_msg->password, this->udesc);
 
     this->p_out_msg = p_out_msg;
@@ -114,7 +113,7 @@ void DataNodeSession::mkdir()
 
     do {
         std::string parent_path;
-        if (ec = p_executor->parentPath(p_in_msg->path, parent_path)) {
+        if ((ec = p_executor->parentPath(p_in_msg->path, parent_path))) {
             p_out_msg->error_code = ec;
             break;
         }
@@ -153,7 +152,7 @@ void DataNodeSession::open()
         FileDesc fdesc;
         if ((ec = p_executor->getFileDesc(path, fdesc))) {
             std::string parent_path;
-            if (ec = p_executor->parentPath(path, parent_path)) {
+            if ((ec = p_executor->parentPath(path, parent_path))) {
                 p_out_msg->error_code = ec;
                 break;
             }
@@ -232,8 +231,6 @@ void DataNodeSession::read()
 {
     std::shared_ptr<MsgRead> p_in_msg = std::static_pointer_cast<MsgRead>(this->p_in_msg);
     std::shared_ptr<MsgReadResp> p_out_msg = std::make_shared<MsgReadResp>();
-
-    int32_t fd = p_in_msg->fd;
     do {
         if (this->open_files.count(p_in_msg->fd) == 0) {
             p_out_msg->error_code = E_FILE_READ;
@@ -261,7 +258,6 @@ void DataNodeSession::read()
 
 void DataNodeSession::write()
 {
-    ErrorCode ec = ErrorCode::NONE;
     std::shared_ptr<MsgWrite> p_in_msg = std::static_pointer_cast<MsgWrite>(this->p_in_msg);
     std::shared_ptr<MsgWriteResp> p_out_msg = std::make_shared<MsgWriteResp>();
 
@@ -275,7 +271,7 @@ void DataNodeSession::write()
         OpenFileHandler& fh = this->open_files[p_in_msg->fd];
         int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fh.fp);
 
-        if (write_size != p_in_msg->data.size()) {
+        if (write_size != int32_t(p_in_msg->data.size())) {
             p_out_msg->error_code = E_FILE_WRITE;
             p_out_msg->write_size = write_size;
             break;

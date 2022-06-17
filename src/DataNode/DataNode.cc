@@ -3,8 +3,8 @@
 namespace efs {
 
 DataNode::DataNode(const DataNodeConfig& config)
-    : config(config)
-    , ServerBase<DataNodeSession>(config.ip, config.port)
+    : ServerBase<DataNodeSession>(config.ip, config.port)
+    , config(config)
 {
     p_executor = std::make_shared<DataNodeExecutor>(config);
 }

@@ -47,7 +47,7 @@ inline std::string formatPath(const std::string& path)
         res.pop_back();
     }
 
-    return std::move(res);
+    return res;
 }
 
 inline bool exists(const std::string& path)

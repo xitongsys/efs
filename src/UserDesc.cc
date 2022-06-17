@@ -52,6 +52,8 @@ UserDesc& UserDesc::operator=(const UserDesc& udesc)
     uid = udesc.uid;
     gid = udesc.gid;
     root_path = udesc.root_path;
+
+    return *this;
 }
 
 }

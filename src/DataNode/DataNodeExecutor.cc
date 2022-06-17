@@ -55,10 +55,10 @@ ErrorCode DataNodeExecutor::absolutePath(const std::string& path, std::string& a
 
 ErrorCode DataNodeExecutor::relativePath(const std::string& path, std::string& relative_path)
 {
-    int n = config.root_path.size();
+    int32_t n = config.root_path.size();
 
     relative_path = fs::formatPath(path);
-    if (relative_path.size() < n) {
+    if (int32_t(relative_path.size()) < n) {
         return ErrorCode::E_FILE_PATH;
     }
 
@@ -112,7 +112,7 @@ ErrorCode DataNodeExecutor::getFileDescFromDisk(const std::string& path, FileDes
 {
     ErrorCode ec = ErrorCode::NONE;
     std::string absolute_path;
-    if (ec = absolutePath(path, absolute_path)) {
+    if ((ec = absolutePath(path, absolute_path))) {
         return ec;
     }
 
@@ -172,13 +172,13 @@ ErrorCode DataNodeExecutor::ls(const std::string& path, std::vector<FileDesc>& f
 {
     ErrorCode ec = ErrorCode::NONE;
     std::string absolute_path;
-    if (ec = absolutePath(path, absolute_path)) {
+    if ((ec = absolutePath(path, absolute_path))) {
         return ec;
     }
 
     for (const auto& entry : std::filesystem::directory_iterator(absolute_path)) {
         std::string relative_path;
-        if (ec = relativePath(entry.path(), relative_path)) {
+        if ((ec = relativePath(entry.path(), relative_path))) {
             return ec;
         }
         FileDesc fdesc;
@@ -198,7 +198,7 @@ ErrorCode DataNodeExecutor::rm(const std::string& path)
         ec = ErrorCode::E_FILE_RM;
     }
     std::string absolute_path;
-    if (ec = absolutePath(path, absolute_path)) {
+    if ((ec = absolutePath(path, absolute_path))) {
         return ec;
     }
 
@@ -256,7 +256,7 @@ ErrorCode DataNodeExecutor::mkdir(const std::string& path, int32_t uid, int32_t 
     }
 
     std::string absolute_path;
-    if (ec = absolutePath(path, absolute_path)) {
+    if ((ec = absolutePath(path, absolute_path))) {
         return ec;
     }
 
@@ -270,7 +270,7 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
 {
     ErrorCode ec = ErrorCode::NONE;
     std::string parent_path;
-    if (ec = parentPath(path, parent_path)) {
+    if ((ec = parentPath(path, parent_path))) {
         return ec;
     }
 
@@ -291,7 +291,7 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
         return ErrorCode::E_FILE_OPEN;
     }
 
-    if (ec = getFileDesc(path, fdesc)) {
+    if ((ec = getFileDesc(path, fdesc))) {
         fdesc.path = path;
         fdesc.mod = 0b0111000000;
         fdesc.uid = uid;
@@ -300,7 +300,7 @@ ErrorCode DataNodeExecutor::open(const std::string& path, const std::string& mod
         fdesc.modified_time = util::now();
         fdesc.fsize = 0;
 
-        if (ec = setFileDesc(path, fdesc)) {
+        if ((ec = setFileDesc(path, fdesc))) {
             fclose(fp);
             fp = nullptr;
             return ec;
