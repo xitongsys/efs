@@ -1,4 +1,4 @@
-PROJECT(efs)
+PROJECT(efs-server)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 INCLUDE_DIRECTORIES(src)
 
@@ -7,7 +7,7 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall -std=c++17")
 
 FILE(GLOB_RECURSE SRCS "src/*.cc")
 
-ADD_EXECUTABLE(efs ${SRCS})
+ADD_EXECUTABLE(efs-server ${SRCS})
 
-TARGET_LINK_LIBRARIES(efs pthread rocksdb yaml-cpp)
+TARGET_LINK_LIBRARIES(efs-server pthread rocksdb yaml-cpp)
 
