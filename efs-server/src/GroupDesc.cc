@@ -7,7 +7,7 @@ namespace efs {
 GroupDesc::GroupDesc()
 {
     group = "";
-    gid = -1;
+    gid = 0;
 }
 
 GroupDesc::GroupDesc(const std::string& csv)

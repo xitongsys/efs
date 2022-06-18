@@ -9,8 +9,8 @@ namespace efs {
 struct UserDesc {
     std::string user;
     std::string password;
-    int16_t uid;
-    int16_t gid;
+    uint16_t uid;
+    uint16_t gid;
     std::string root_path;
 
     UserDesc();

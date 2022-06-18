@@ -7,7 +7,7 @@
 namespace efs {
 struct GroupDesc {
     std::string group;
-    int16_t gid;
+    uint16_t gid;
 
     GroupDesc();
 

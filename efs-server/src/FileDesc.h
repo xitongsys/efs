@@ -7,122 +7,198 @@
 
 namespace efs {
 
-enum Permission : uint8_t {
-    EMPTY = 0x0,
-    R = 0x1,
-    W = 0x2,
-    X = 0x4,
-};
+	enum Permission : uint8_t {
+		EMPTY = 0b0,
+		R = 0b100,
+		W = 0b010,
+		X = 0b001,
+	};
 
-enum PermType : uint8_t {
-    USER = 0,
-    GROUP = 3,
-    OTHER = 6,
-};
+	enum PermType : uint8_t {
+		USER = 0,
+		GROUP = 3,
+		OTHER = 6,
+	};
 
-struct FileDesc {
-    std::string path;
-    int64_t fsize;
+	enum FileType : uint8_t {
+		F_FILE = 0,
+		F_DIR = 1,
+		F_SYMLINK = 2,
+	};
 
-    uint16_t uid;
-    uint16_t gid;
-    uint16_t mod;
 
-    // perm: High id(uint16_t) + (int16_t)mod Low
-    std::vector<uint32_t> user_perms;
-    std::vector<uint32_t> group_perms;
-    int64_t create_time;
-    int64_t modified_time;
+	inline Permission getUserPerm(uint16_t mod) {
+		return Permission((mod >> 6) & 0b111);
+	}
 
-    FileDesc();
-    FileDesc(const FileDesc& fdesc);
-    FileDesc(FileDesc&& fdesc);
-    FileDesc& operator=(const FileDesc& fdesc);
-    Permission perm(int32_t uid, int64_t gid) const;
+	inline Permission getGroupPerm(uint16_t mod) {
+		return Permission((mod >> 3) & 0b111);
+	}
 
-    inline int32_t size() const
-    {
-        int32_t res = 0;
-        res += serialize::size(path);
-        res += serialize::size(fsize);
-        res += serialize::size(uid);
-        res += serialize::size(gid);
-        res += serialize::size(mod);
-        res += serialize::size(user_perms);
-        res += serialize::size(group_perms);
-        res += serialize::size(create_time);
-        res += serialize::size(modified_time);
-        return res;
-    }
+	inline Permission getOtherPerm(uint16_t mod) {
+		return Permission((mod >> 0) & 0b111);
+	}
 
-    inline int32_t serialize(char* buf, int32_t buf_size) const
-    {
-        if (this->size() > buf_size) {
-            return -1;
-        }
-        int32_t size = 0;
-        size += serialize::serialize(path, buf + size, buf_size - size);
-        size += serialize::serialize(fsize, buf + size, buf_size - size);
-        size += serialize::serialize(uid, buf + size, buf_size - size);
-        size += serialize::serialize(gid, buf + size, buf_size - size);
-        size += serialize::serialize(mod, buf + size, buf_size - size);
-        size += serialize::serialize(user_perms, buf + size, buf_size - size);
-        size += serialize::serialize(group_perms, buf + size, buf_size - size);
-        size += serialize::serialize(create_time, buf + size, buf_size - size);
-        size += serialize::serialize(modified_time, buf + size, buf_size - size);
-        return size;
-    }
+	inline FileType getFileType(uint16_t mod) {
+		return FileType((mod >> 12) & 0xF);
+	}
 
-    inline int32_t deserialize(const char* buf, int32_t buf_size)
-    {
-        int size = 0, size1 = 0;
+	inline void setUserPerm(uint16_t& mod, Permission p) {
+		mod = (mod & (~(0b111000000))) | (p << 6);
+	}
 
-        if ((size1 = serialize::deserialize(path, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+	inline void setGroupPerm(uint16_t& mod, Permission p) {
+		mod = (mod & (~(0b000111000))) | (p << 3);
+	}
 
-        if ((size1 = serialize::deserialize(fsize, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+	inline void setOtherPerm(uint16_t& mod, Permission p) {
+		mod = (mod & (~(0b000000111))) | (p << 0);
+	}
 
-        if ((size1 = serialize::deserialize(uid, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+	inline void setFileType(uint16_t& mod, int8_t ft) {
+		mod = (mod & (~(0b1111000000000000))) | (ft << 12);
+	}
 
-        if ((size1 = serialize::deserialize(gid, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+	struct IdPerm {
+		uint16_t id;
+		uint16_t perm;
 
-        if ((size1 = serialize::deserialize(mod, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+		inline int32_t size() const {
+			return serialize::size(id) + serialize::size(perm);
+		}
 
-        if ((size1 = serialize::deserialize(user_perms, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+		inline int32_t serialize(char* buf, int32_t buf_size) const
+		{
+			if (this->size() > buf_size) {
+				return -1;
+			}
+			int32_t size = 0;
+			size += serialize::serialize(id, buf + size, buf_size - size);
+			size += serialize::serialize(perm, buf + size, buf_size - size);
+			return size;
+		}
 
-        if ((size1 = serialize::deserialize(group_perms, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+		inline int32_t deserialize(const char* buf, int32_t buf_size)
+		{
+			int size = 0, size1 = 0;
 
-        if ((size1 = serialize::deserialize(create_time, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+			if ((size1 = serialize::deserialize(id, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
 
-        if ((size1 = serialize::deserialize(modified_time, buf + size, buf_size - size)) < 0) {
-            return -1;
-        }
-        size += size1;
+			if ((size1 = serialize::deserialize(perm, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
 
-        return size;
-    }
-};
+			return size;
+		}
+	};
+
+	struct FileDesc {
+		std::string path;
+		int64_t fsize;
+
+		uint16_t uid;
+		uint16_t gid;
+		uint16_t mod;
+
+		// perm: High id(uint16_t) + (int16_t)mod Low
+		std::vector<IdPerm> user_perms;
+		std::vector<IdPerm> group_perms;
+		int64_t create_time;
+		int64_t modified_time;
+
+		FileDesc();
+		FileDesc(const FileDesc& fdesc);
+		FileDesc(FileDesc&& fdesc);
+		FileDesc& operator=(const FileDesc& fdesc);
+		Permission perm(uint16_t uid, uint16_t gid) const;
+
+		inline int32_t size() const
+		{
+			int32_t res = 0;
+			res += serialize::size(path);
+			res += serialize::size(fsize);
+			res += serialize::size(uid);
+			res += serialize::size(gid);
+			res += serialize::size(mod);
+			res += serialize::size(user_perms);
+			res += serialize::size(group_perms);
+			res += serialize::size(create_time);
+			res += serialize::size(modified_time);
+			return res;
+		}
+
+		inline int32_t serialize(char* buf, int32_t buf_size) const
+		{
+			if (this->size() > buf_size) {
+				return -1;
+			}
+			int32_t size = 0;
+			size += serialize::serialize(path, buf + size, buf_size - size);
+			size += serialize::serialize(fsize, buf + size, buf_size - size);
+			size += serialize::serialize(uid, buf + size, buf_size - size);
+			size += serialize::serialize(gid, buf + size, buf_size - size);
+			size += serialize::serialize(mod, buf + size, buf_size - size);
+			size += serialize::serialize(user_perms, buf + size, buf_size - size);
+			size += serialize::serialize(group_perms, buf + size, buf_size - size);
+			size += serialize::serialize(create_time, buf + size, buf_size - size);
+			size += serialize::serialize(modified_time, buf + size, buf_size - size);
+			return size;
+		}
+
+		inline int32_t deserialize(const char* buf, int32_t buf_size)
+		{
+			int size = 0, size1 = 0;
+
+			if ((size1 = serialize::deserialize(path, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(fsize, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(uid, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(gid, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(mod, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(user_perms, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(group_perms, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(create_time, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(modified_time, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			return size;
+		}
+	};
 }

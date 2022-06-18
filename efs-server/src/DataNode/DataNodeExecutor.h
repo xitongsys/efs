@@ -46,7 +46,7 @@ public:
     ErrorCode rm(const std::string& path);
     ErrorCode chown(const std::string& path, int16_t uid, int16_t gid);
     ErrorCode chmod(const std::string& path, uint16_t mod);
-    ErrorCode perm(const std::string& path, int16_t id, PermType perm_type, Permission p);
+    ErrorCode perm(const std::string& path, uint16_t id, PermType perm_type, Permission p);
     ErrorCode mkdir(const std::string& path, int16_t uid, int16_t gid, const FileDesc& parent_desc);
 
     ErrorCode open(const std::string& path, const std::string& mod, int16_t uid, int16_t gid, const FileDesc& parent_desc, OpenFileHandler& fh);
