@@ -21,9 +21,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{3fe93b28-a818-4e47-8bbd-36a9968b31d0}</ProjectGuid>
+    <ProjectGuid>{04a7bf81-46e0-451e-8ac7-761d81004616}</ProjectGuid>
     <RootNamespace>efsserver</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>efs-lib</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,7 +41,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -114,12 +115,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\zxt\workspace\efs\efs-lib\src;C:\App\vcpkg\packages\zlib_x64-windows\include;C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\App\vcpkg\packages\rocksdb_x64-windows\include;C:\App\boost_1_79_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\App\vcpkg\packages\rocksdb_x64-windows\debug\lib\rocksdbd.lib;C:\App\vcpkg\packages\yaml-cpp_x64-windows\debug\lib\yaml-cppd.lib;C:\App\vcpkg\packages\zlib_x64-windows\debug\lib\zlibd.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,7 +143,65 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cc" />
+    <ClCompile Include="src\Buffer.cc" />
+    <ClCompile Include="src\Conn.cc" />
+    <ClCompile Include="src\DataNodeConn\DataNodeConn.cc" />
+    <ClCompile Include="src\DataNode\DataNode.cc" />
+    <ClCompile Include="src\DataNode\DataNodeConfig.cc" />
+    <ClCompile Include="src\DataNode\DataNodeExecutor.cc" />
+    <ClCompile Include="src\DataNode\DataNodeSession.cc" />
+    <ClCompile Include="src\DataNode\DataNodeSessionHandlers.cc" />
+    <ClCompile Include="src\DBBase.cc" />
+    <ClCompile Include="src\FileDesc.cc" />
+    <ClCompile Include="src\FS.cc" />
+    <ClCompile Include="src\GroupDesc.cc" />
+    <ClCompile Include="src\HostDesc.cc" />
+    <ClCompile Include="src\NameNodeConn\NameNodeConn.cc" />
+    <ClCompile Include="src\NameNode\NameNode.cc" />
+    <ClCompile Include="src\NameNode\NameNodeConfig.cc" />
+    <ClCompile Include="src\NameNode\NameNodeSession.cc" />
+    <ClCompile Include="src\NameNode\NameNodeSessionHandlers.cc" />
+    <ClCompile Include="src\SessionBase.cc" />
+    <ClCompile Include="src\UserDesc.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Buffer.h" />
+    <ClInclude Include="src\Conn.h" />
+    <ClInclude Include="src\DataNodeConn\DataNodeConn.h" />
+    <ClInclude Include="src\DataNode\DataNode.h" />
+    <ClInclude Include="src\DataNode\DataNodeConfig.h" />
+    <ClInclude Include="src\DataNode\DataNodeExecutor.h" />
+    <ClInclude Include="src\DataNode\DataNodeSession.h" />
+    <ClInclude Include="src\DataNode\OpenFileHandler.h" />
+    <ClInclude Include="src\DBBase.h" />
+    <ClInclude Include="src\Error.h" />
+    <ClInclude Include="src\FileDesc.h" />
+    <ClInclude Include="src\FS.h" />
+    <ClInclude Include="src\GroupDesc.h" />
+    <ClInclude Include="src\HostDesc.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgChmod.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgChown.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgClose.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgLogin.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgLs.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgMkdir.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgOpen.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgPerm.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgRead.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgRm.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgWrite.h" />
+    <ClInclude Include="src\Msg\Msg.h" />
+    <ClInclude Include="src\Msg\NameNode\MsgAccount.h" />
+    <ClInclude Include="src\Msg\NameNode\MsgHost.h" />
+    <ClInclude Include="src\NameNodeConn\NameNodeConn.h" />
+    <ClInclude Include="src\NameNode\NameNode.h" />
+    <ClInclude Include="src\NameNode\NameNodeConfig.h" />
+    <ClInclude Include="src\NameNode\NameNodeSession.h" />
+    <ClInclude Include="src\Serialize.h" />
+    <ClInclude Include="src\ServerBase.h" />
+    <ClInclude Include="src\SessionBase.h" />
+    <ClInclude Include="src\UserDesc.h" />
+    <ClInclude Include="src\Util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

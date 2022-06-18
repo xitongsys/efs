@@ -140,13 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Conn.h" />
-    <ClInclude Include="src\NameNodeConn.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Conn.cc" />
     <ClCompile Include="src\main.cc" />
-    <ClCompile Include="src\NameNodeConn.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
