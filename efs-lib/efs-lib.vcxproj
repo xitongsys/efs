@@ -119,6 +119,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\zxt\workspace\efs\efs-lib\src;C:\App\vcpkg\packages\zlib_x64-windows\include;C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\App\vcpkg\packages\rocksdb_x64-windows\include;C:\App\boost_1_79_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -4,10 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "efs-client", "efs-client\efs-client.vcxproj", "{326E810C-B832-4E2E-BCD0-29B97B8C838C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{04A7BF81-46E0-451E-8AC7-761D81004616} = {04A7BF81-46E0-451E-8AC7-761D81004616}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "efs-lib", "efs-lib\efs-lib.vcxproj", "{04A7BF81-46E0-451E-8AC7-761D81004616}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "efs-server", "efs-server\efs-server.vcxproj", "{3FE93B28-A818-4E47-8BBD-36A9968B31D0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{04A7BF81-46E0-451E-8AC7-761D81004616} = {04A7BF81-46E0-451E-8AC7-761D81004616}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -60,9 +60,6 @@
     <ClCompile Include="src\HostDesc.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SessionBase.cc">
       <Filter>Source Files</Filter>
     </ClCompile>

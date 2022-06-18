@@ -116,10 +116,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\App\boost_1_79_0;C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\App\vcpkg\packages\rocksdb_x64-windows\include;C:\Users\zxt\workspace\efs\efs-lib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\Users\zxt\workspace\efs\x64\Debug\efs-lib.lib;C:\App\vcpkg\packages\yaml-cpp_x64-windows\debug\lib\yaml-cppd.lib;C:\App\vcpkg\packages\rocksdb_x64-windows\debug\lib\rocksdbd.lib;Rpcrt4.lib;C:\App\vcpkg\packages\zlib_x64-windows\debug\lib\zlibd.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
