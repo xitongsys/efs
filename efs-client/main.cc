@@ -1,7 +1,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 
-#include "NameNodeConn.h"
+#include "NameNodeConn/NameNodeConn.h"
 #include "Msg/NameNode/MsgHost.h"
 
 int main()

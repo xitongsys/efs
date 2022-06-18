@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include <boost/asio.hpp>
+
 #include "DataNode/DataNode.h"
 #include "DataNode/DataNodeConfig.h"
 #include "Error.h"
