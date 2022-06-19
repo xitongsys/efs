@@ -33,6 +33,7 @@ public:
     ErrorCode writeMsgHandler();
 
     void login();
+    void getFileDesc();
     void ls();
     void rm();
     void chown();

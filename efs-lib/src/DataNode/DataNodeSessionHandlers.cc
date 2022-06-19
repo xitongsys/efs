@@ -14,6 +14,7 @@
 #include "Msg/DataNode/MsgRead.h"
 #include "Msg/DataNode/MsgRm.h"
 #include "Msg/DataNode/MsgWrite.h"
+#include "Msg/DataNode/MsgGetFileDesc.h"
 
 namespace efs {
 void DataNodeSession::login()
@@ -22,6 +23,14 @@ void DataNodeSession::login()
     std::shared_ptr<MsgLoginResp> p_out_msg = std::make_shared<MsgLoginResp>();
     p_out_msg->error_code = p_executor->login(p_in_msg->user, p_in_msg->password, this->udesc);
 
+    this->p_out_msg = p_out_msg;
+}
+
+void DataNodeSession::getFileDesc()
+{
+    std::shared_ptr<MsgGetFileDesc> p_in_msg = std::static_pointer_cast<MsgGetFileDesc>(this->p_in_msg);
+    std::shared_ptr<MsgGetFileDescResp> p_out_msg = std::make_shared<MsgGetFileDescResp>();
+    p_out_msg->error_code = p_executor->getFileDesc(p_in_msg->path, p_out_msg->fdesc);
     this->p_out_msg = p_out_msg;
 }
 

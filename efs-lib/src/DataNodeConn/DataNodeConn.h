@@ -5,6 +5,7 @@
 
 #include "Conn.h"
 #include "Error.h"
+#include "FileDesc.h"
 
 namespace efs {
 	class DataNodeConn : public Conn {
@@ -19,5 +20,8 @@ namespace efs {
 			const std::string& user, const std::string& password);
 
 		ErrorCode login();
+		ErrorCode getFileDesc(const std::string& path, FileDesc& fdesc);
+		ErrorCode mkdir(const std::string& path);
+		ErrorCode rm(const std::string& path);
 	};
 }

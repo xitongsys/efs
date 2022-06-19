@@ -17,11 +17,11 @@ namespace efs {
 		boost::asio::io_context io_context;
 		ClientConfig config;
 
-		std::vector<HostDesc> datanodes;
-		std::unordered_map<std::string, std::shared_ptr<DataNodeConn>> p_datanodes;
+		std::vector<HostDesc> hosts;
+		std::unordered_map<std::string, std::shared_ptr<DataNodeConn>> p_conns;
 
 	public:
-		Client();
+		Client(const ClientConfig& config);
 
 		ErrorCode getDataNodes();
 		ErrorCode getDataNodeConn(const std::string& path, std::shared_ptr<DataNodeConn>& p_datanode);

@@ -12,6 +12,9 @@ enum MsgType : uint8_t {
     LOGIN,
     LOGIN_RESP,
 
+    GET_FILE_DESC,
+    GET_FILE_DESC_RESP,
+
     OPEN,
     OPEN_RESP,
 
