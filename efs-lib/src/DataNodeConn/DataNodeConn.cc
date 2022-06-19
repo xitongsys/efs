@@ -120,8 +120,7 @@ namespace efs {
 
 		MsgLsResp m_ls_resp;
 		query<MsgLs, MsgLsResp>(m_ls, m_ls_resp);
-		fdesc = m_ls_resp.files;
-
+		fdescs = m_ls_resp.files;
 		return ErrorCode(m_ls_resp.error_code);
 	}
 }

@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\Users\zxt\workspace\efs\efs-lib\src;C:\App\boost_1_79_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\WinFsp\inc;C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\Users\zxt\workspace\efs\efs-lib\src;C:\App\boost_1_79_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,13 +140,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Client.cc" />
     <ClCompile Include="ClientConfig.cc" />
     <ClCompile Include="main.cc" />
+    <ClCompile Include="Netdisk.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientConfig.h" />
+    <ClInclude Include="Netdisk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
