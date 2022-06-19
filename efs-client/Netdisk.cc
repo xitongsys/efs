@@ -19,6 +19,21 @@ namespace efs {
 		};
 	}
 
+	fuse_stat Netdisk::toFuseState(const FileDesc& fdesc)
+	{
+		fuse_stat stat;
+		stat.st_ino = 1;
+		stat.st_mode = fdesc.mod;
+		stat.st_nlink = 1;
+		stat.st_uid = fdesc.uid;
+		stat.st_gid = fdesc.gid;
+		stat.st_rdev = 0;
+		stat.st_ctim = toFuseTime(fdesc.create_time);
+		stat.st_mtim = toFuseTime(fdesc.modified_time);
+		stat.st_atim = toFuseTime(fdesc.modified_time);
+		return stat;
+	}
+
 	std::shared_ptr<DataNodeConn> Netdisk::getConn(const std::string& path)
 	{
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
@@ -124,27 +139,77 @@ namespace efs {
 
 	int Netdisk::open(const char* path, fuse_file_info* fi)
 	{
+		if (open_fds.count(path)) {
+			return 0;
+		}
+
+		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		if (p_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		int32_t fd = 0;
+		if (p_conn->open(path, "wr", fd)) {
+			return -ENOENT;
+		}
+
+		open_fds[path] = fd;
+		fi->fh = fd;
+
 		return 0;
 	}
 
 	int Netdisk::read(const char* path, char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		return 0;
+		if (!open_fds.count(path)) {
+			return -ENOENT;
+		}
+
+		int32_t fd = open_fds[path];
+		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		if (p_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		std::string data;
+		if (p_conn->read(fd, size, data)) {
+			return -ENOENT;
+		}
+
+		std::memcpy(buf, data.c_str(), data.size());
+		return data.size();		
 	}
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		return 0;
+		if (!open_fds.count(path)) {
+			return -ENOENT;
+		}
+
+		int32_t fd = open_fds[path];
+		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		if (p_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		int32_t write_size = 0;
+		std::string data(buf, size);
+		if (p_conn->write(fd, data, write_size)) {
+			return -ENOENT;
+		}
+
+		return write_size;
 	}
 
 	int Netdisk::statfs(const char* path, fuse_statvfs* stbuf)
 	{
+		std::memset(stbuf, 0, sizeof * stbuf);
 		return 0;
 	}
 
 	int Netdisk::flush(const char* path, fuse_file_info* fi)
 	{
-		return 0;
+		return -ENOSYS;
 	}
 
 	int Netdisk::release(const char* path, fuse_file_info* fi)
@@ -154,7 +219,7 @@ namespace efs {
 
 	int Netdisk::setxattr(const char* path, const char* name0, const char* value, size_t size, int flags)
 	{
-		return 0;
+		return -ENOSYS;
 	}
 
 	int Netdisk::getxattr(const char* path, const char* name0, char* value, size_t size)
@@ -179,6 +244,22 @@ namespace efs {
 
 	int Netdisk::readdir(const char* path, void* buf, fuse_fill_dir_t filler, fuse_off_t off, fuse_file_info* fi, fuse_readdir_flags)
 	{
+		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		if (p_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		std::vector<FileDesc> fdescs;
+		if (p_conn->ls(path, fdescs)) {
+			return -ENOENT;
+		}
+
+		for (auto& fdesc : fdescs) {
+			fuse_stat fstat = toFuseState(fdesc);
+			if (filler(buf, fdesc.path.c_str(), &fstat, 0, FUSE_FILL_DIR_PLUS)) {
+				break;
+			}
+		}
 		return 0;
 	}
 

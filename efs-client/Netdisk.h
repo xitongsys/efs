@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <memory>
+#include <unordered_map>
 #include <fuse3/fuse.h>
 
 #include "Client.h"
@@ -11,6 +12,7 @@ namespace efs {
 	class Netdisk {
 	public:
 		std::shared_ptr<Client> p_client;
+		std::unordered_map<std::string, int32_t> open_fds;
 
 	public:
 		Netdisk(std::shared_ptr<Client> p_client);
@@ -18,6 +20,8 @@ namespace efs {
 		ErrorCode mount();
 
 		fuse_timespec toFuseTime(int64_t t);
+		fuse_stat toFuseState(const FileDesc& fdesc);
+
 		std::shared_ptr<DataNodeConn> getConn(const std::string& path);
 
 		int getattr(const char* path, struct fuse_stat* stbuf, struct fuse_file_info* fi);
