@@ -22,7 +22,7 @@ namespace efs {
 			const std::string& ip, const uint16_t& port, 
 			const std::string& token);
 
-		ErrorCode host(MsgHostResp& m_host_resp);
+		ErrorCode hosts(std::vector<HostDesc>& hosts);
 	};
 
 }

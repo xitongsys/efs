@@ -27,16 +27,18 @@ namespace efs {
 		Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port);
 
 		template<class MSG, class MSG_RESP>
-		ErrorCode query(const MSG& msg, MSG_RESP& msg_resp)
+		void query(const MSG& msg, MSG_RESP& msg_resp)
 		{
 			char buf[BUF_SIZE];
 			int32_t msg_size = msg.size();
 			if (serialize::serialize(msg_size, buf, BUF_SIZE) <= 0) {
-				return ErrorCode::E_SERIALIZE;
+				msg_resp.error_code = ErrorCode::E_SERIALIZE;
+				return;
 			}
 
 			if (msg.serialize(buf + 4, BUF_SIZE - 4) <= 0) {
-				return ErrorCode::E_SERIALIZE;
+				msg_resp.error_code = ErrorCode::E_SERIALIZE;
+				return;
 			}
 
 			boost::asio::write(sock, boost::asio::buffer(buf, msg_size + 4));
@@ -44,20 +46,21 @@ namespace efs {
 			int32_t msg_resp_size = 0;
 			boost::asio::read(sock, boost::asio::buffer(buf, 4));
 			if (serialize::deserialize(msg_resp_size, buf, 4) <= 0) {
-				return ErrorCode::E_DESERIALIZE;
+				msg_resp.error_code = ErrorCode::E_DESERIALIZE;
+				return;
 			}
 
 			if (msg_resp_size > BUF_SIZE) {
-				return ErrorCode::E_OVERFLOW;
+				msg_resp.error_code = ErrorCode::E_OVERFLOW;
+				return;
 			}
 
 			boost::asio::read(sock, boost::asio::buffer(buf, msg_resp_size));
 
 			if (msg_resp.deserialize(buf, msg_resp_size) < 0) {
-				return ErrorCode::E_DESERIALIZE;
+				msg_resp.error_code = E_DESERIALIZE;
+				return;
 			}
-
-			return ErrorCode::NONE;
 		}
 	};
 
