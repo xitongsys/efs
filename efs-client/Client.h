@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 #include <boost/asio.hpp>
 
@@ -17,13 +18,13 @@ namespace efs {
 		ClientConfig config;
 
 		std::vector<HostDesc> datanodes;
-		std::vector<std::shared_ptr<DataNodeConn>> p_datanodes;
+		std::unordered_map<std::string, std::shared_ptr<DataNodeConn>> p_datanodes;
 
 	public:
 		Client();
 
 		ErrorCode getDataNodes();
-
+		ErrorCode getDataNodeConn(const std::string& path, std::shared_ptr<DataNodeConn>& p_datanode);
 	};
 }
 
