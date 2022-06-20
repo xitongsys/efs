@@ -25,6 +25,7 @@ namespace efs {
 
 		ErrorCode getDataNodes();
 		ErrorCode getDataNodeConn(const std::string& path, std::shared_ptr<DataNodeConn>& p_datanode);
+		ErrorCode getAllDataNodeConns(std::vector<std::shared_ptr<DataNodeConn>>& p_conns);
 	};
 }
 

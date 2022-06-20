@@ -1,9 +1,14 @@
+#include <set>
+
 #include "Client.h"
 
+
+
 namespace efs {
-	Client::Client(const ClientConfig& config):
+	Client::Client(const ClientConfig& config) :
 		config(config)
 	{
+		getDataNodes();
 	}
 
 	ErrorCode Client::getDataNodes()
@@ -22,7 +27,8 @@ namespace efs {
 		p_conns.clear();
 
 		for (int i = 0; i < hosts.size(); i++) {
-			std::shared_ptr<DataNodeConn> p_conn = std::make_shared<DataNodeConn>(io_context,
+			std::shared_ptr<DataNodeConn> p_conn = std::make_shared<DataNodeConn>(
+				io_context,
 				hosts[i].ip, hosts[i].port,
 				config.user, config.password);
 
@@ -53,5 +59,15 @@ namespace efs {
 			}
 		}
 
+	}
+	ErrorCode Client::getAllDataNodeConns(std::vector<std::shared_ptr<DataNodeConn>>& p_conns)
+	{
+		std::set<std::shared_ptr<DataNodeConn>> st;
+		for (auto it = this->p_conns.begin(); it != this->p_conns.end(); it++) {
+			st.insert(it->second);
+		}
+
+		p_conns = std::vector<std::shared_ptr<DataNodeConn>>(st.begin(), st.end());
+		return ErrorCode::NONE;
 	}
 }

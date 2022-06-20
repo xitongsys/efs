@@ -12,7 +12,7 @@ namespace efs {
 		fsize = 0;
 		uid = 0;
 		gid = 0;
-		mod = 0700;
+		mod = FileType::F_IFREG | 0b0000000111000000;
 		user_perms = {};
 		group_perms = {};
 		create_time = util::now();

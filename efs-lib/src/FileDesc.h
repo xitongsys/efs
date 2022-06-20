@@ -20,10 +20,15 @@ namespace efs {
 		OTHER = 6,
 	};
 
-	enum FileType : uint8_t {
-		F_FILE = 0,
-		F_DIR = 1,
-		F_SYMLINK = 2,
+	enum FileType : uint16_t {
+		F_IFMT = 0170000,
+		F_IFSOCK = 0140000,  // socket
+		F_IFLNK = 0120000,   //symbolic link
+		F_IFREG = 0100000,   //regular file
+		F_IFBLK = 0060000,   //block device
+		F_IFDIR = 0040000,   //directory
+		F_IFCHR = 0020000,   //character device
+		F_IFIFO = 0010000,   //FIFO
 	};
 
 
@@ -40,7 +45,7 @@ namespace efs {
 	}
 
 	inline FileType getFileType(uint16_t mod) {
-		return FileType((mod >> 12) & 0xF);
+		return FileType(mod & F_IFMT);
 	}
 
 	inline void setUserPerm(uint16_t& mod, Permission p) {
@@ -55,8 +60,8 @@ namespace efs {
 		mod = (mod & (~(0b000000111))) | (p << 0);
 	}
 
-	inline void setFileType(uint16_t& mod, int8_t ft) {
-		mod = (mod & (~(0b1111000000000000))) | (ft << 12);
+	inline void setFileType(uint16_t& mod, int16_t ft) {
+		mod = (mod & (~(0b1111000000000000))) | ft;
 	}
 
 	struct IdPerm {

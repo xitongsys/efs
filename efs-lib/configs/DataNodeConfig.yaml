@@ -1,7 +1,7 @@
 name: "datanode01"
 token: "abc"
 
-ip: "0.0.0.0"
+ip: "127.0.0.1"
 port: 20001
 
 log_path: "logs"
@@ -19,4 +19,4 @@ paths: ["/zxt", "/root"]
 
 # ["path,uid,gid"]
 # ["/zxt,2,2"]
-init_paths: ["/root,1,1", "/zxt,2,2"]
+init_paths: ["/,1,1,40755", "/root,1,1,40700", "/zxt,2,2,40700"]

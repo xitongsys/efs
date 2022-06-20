@@ -34,19 +34,19 @@ namespace efs {
 		ec = updateAccount();
 		for (auto& init_path : config.init_paths) {
 			std::vector<std::string> vs = util::split(init_path, ',');
-			if (vs.size() != 3) {
+			if (vs.size() != 4) {
 				throw ErrorCode::E_CONFIG_ERROR;
 			}
 
 			std::string path = vs[0];
 			int16_t uid = std::atoi(vs[1].c_str());
 			int16_t gid = std::atoi(vs[2].c_str());
+			uint16_t mod = std::stoi(vs[3], 0, 8);
 			FileDesc fdesc;
-			if ((ec = getFileDesc(path, fdesc))) {
-				fdesc.mod = 010700;
-				if ((ec = mkdir(path, uid, gid, fdesc))) {
-					throw ec;
-				}
+			fdesc.mod = mod;
+
+			if ((ec = mkdir(path, uid, gid, fdesc))) {
+				throw ec;
 			}
 		}
 		return ec;
@@ -377,6 +377,11 @@ namespace efs {
 		fdesc.gid = gid;
 		fdesc.mod = parent_desc.mod;
 
+		if (path == "/") {
+			setFileDesc(path, fdesc);
+			return ErrorCode::NONE;
+		}
+
 		std::string value(fdesc.size(), 0);
 		fdesc.serialize(value.data(), value.size());
 
@@ -426,7 +431,7 @@ namespace efs {
 
 		if ((ec = getFileDesc(path, fdesc))) {
 			fdesc.path = path;
-			fdesc.mod = parent_desc.mod & (~(1 << 9));
+			fdesc.mod = (parent_desc.mod & ((1<<9) - 1)) | FileType::F_IFREG;
 			fdesc.uid = uid;
 			fdesc.gid = gid;
 			fdesc.create_time = util::now();

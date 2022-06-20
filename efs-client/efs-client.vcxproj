@@ -138,7 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\Users\zxt\workspace\efs\x64\Release\efs-lib.lib;C:\app\vcpkg\packages\rocksdb_x64-windows\lib\rocksdb.lib;C:\app\vcpkg\packages\yaml-cpp_x64-windows\lib\yaml-cpp.lib;C:\app\vcpkg\packages\zlib_x64-windows\lib\zlib.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\zxt\workspace\efs\x64\Release\efs-lib.lib;C:\app\vcpkg\packages\rocksdb_x64-windows\lib\rocksdb.lib;C:\app\vcpkg\packages\yaml-cpp_x64-windows\lib\yaml-cpp.lib;C:\app\vcpkg\packages\zlib_x64-windows\lib\zlib.lib;Rpcrt4.lib;Shlwapi.lib;C:\Program Files (x86)\WinFsp\lib\winfsp-x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientConfig.h" />
+    <ClInclude Include="compat.h" />
     <ClInclude Include="Netdisk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

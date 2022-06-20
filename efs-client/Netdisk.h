@@ -11,45 +11,45 @@
 namespace efs {
 	class Netdisk {
 	public:
-		std::shared_ptr<Client> p_client;
-		std::unordered_map<std::string, int32_t> open_fds;
+		static std::shared_ptr<Client> p_client;
+		static std::unordered_map<std::string, int32_t> open_fds;
 
 	public:
 		Netdisk(std::shared_ptr<Client> p_client);
+		int mount(int argc, char* argv[]);
 
-		ErrorCode mount();
+		static Netdisk* getself();
+		static fuse_timespec toFuseTime(int64_t t);
+		static fuse_stat toFuseState(const FileDesc& fdesc);
+		static std::shared_ptr<DataNodeConn> getConn(const std::string& path);
 
-		fuse_timespec toFuseTime(int64_t t);
-		fuse_stat toFuseState(const FileDesc& fdesc);
-
-		std::shared_ptr<DataNodeConn> getConn(const std::string& path);
-
-		int getattr(const char* path, struct fuse_stat* stbuf, struct fuse_file_info* fi);
-		int readlink(const char* path, char* buf, size_t size);
-		int mknod(const char* path, fuse_mode_t mode, fuse_dev_t dev);
-		int mkdir(const char* path, fuse_mode_t mode);
-		int unlink(const char* path);
-		int rmdir(const char* path);
-		int symlink(const char* dstpath, const char* srcpath);
-		int rename(const char* oldpath, const char* newpath, unsigned int flags);
-		int link(const char* oldpath, const char* newpath);
-		int chmod(const char* path, fuse_mode_t mode, struct fuse_file_info* fi);
-		int chown(const char* path, fuse_uid_t uid, fuse_gid_t gid, struct fuse_file_info* fi);
-		int truncate(const char* path, fuse_off_t size, struct fuse_file_info* fi);
-		int open(const char* path, struct fuse_file_info* fi);
-		int read(const char* path, char* buf, size_t size, fuse_off_t off, struct fuse_file_info* fi);
-		int write(const char* path, const char* buf, size_t size, fuse_off_t off, struct fuse_file_info* fi);
-		int statfs(const char* path, struct fuse_statvfs* stbuf);
-		int flush(const char* path, struct fuse_file_info* fi);
-		int release(const char* path, struct fuse_file_info* fi);
-		int setxattr(const char* path, const char* name0, const char* value, size_t size, int flags);
-		int getxattr(const char* path, const char* name0, char* value, size_t size);
-		int listxattr(const char* path, char* namebuf, size_t size);
-		int removexattr(const char* path, const char* name0);
-		int opendir(const char* path, struct fuse_file_info* fi);
-		int readdir(const char* path, void* buf, fuse_fill_dir_t filler, fuse_off_t off, struct fuse_file_info* fi, enum fuse_readdir_flags);
-		int releasedir(const char* path, struct fuse_file_info* fi);
-		int utimens(const char* path, const struct fuse_timespec tmsp[2], struct fuse_file_info* fi);
+		static int getattr(const char* path, struct fuse_stat* stbuf, struct fuse_file_info* fi);
+		static int readlink(const char* path, char* buf, size_t size);
+		static int mknod(const char* path, fuse_mode_t mode, fuse_dev_t dev);
+		static int mkdir(const char* path, fuse_mode_t mode);
+		static int unlink(const char* path);
+		static int rmdir(const char* path);
+		static int symlink(const char* dstpath, const char* srcpath);
+		static int rename(const char* oldpath, const char* newpath, unsigned int flags);
+		static int link(const char* oldpath, const char* newpath);
+		static int chmod(const char* path, fuse_mode_t mode, struct fuse_file_info* fi);
+		static int chown(const char* path, fuse_uid_t uid, fuse_gid_t gid, struct fuse_file_info* fi);
+		static int truncate(const char* path, fuse_off_t size, struct fuse_file_info* fi);
+		static int open(const char* path, struct fuse_file_info* fi);
+		static int read(const char* path, char* buf, size_t size, fuse_off_t off, struct fuse_file_info* fi);
+		static int write(const char* path, const char* buf, size_t size, fuse_off_t off, struct fuse_file_info* fi);
+		static int statfs(const char* path, struct fuse_statvfs* stbuf);
+		static int flush(const char* path, struct fuse_file_info* fi);
+		static int release(const char* path, struct fuse_file_info* fi);
+		static int setxattr(const char* path, const char* name0, const char* value, size_t size, int flags);
+		static int getxattr(const char* path, const char* name0, char* value, size_t size);
+		static int listxattr(const char* path, char* namebuf, size_t size);
+		static int removexattr(const char* path, const char* name0);
+		static int opendir(const char* path, struct fuse_file_info* fi);
+		static int readdir(const char* path, void* buf, fuse_fill_dir_t filler, fuse_off_t off, struct fuse_file_info* fi, enum fuse_readdir_flags);
+		static int releasedir(const char* path, struct fuse_file_info* fi);
+		static int utimens(const char* path, const struct fuse_timespec tmsp[2], struct fuse_file_info* fi);
+		static void* init(struct fuse_conn_info* conn, struct fuse_config* conf);
 	};
 
 }
