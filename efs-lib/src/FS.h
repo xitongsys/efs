@@ -19,6 +19,23 @@ namespace efs {
 		return res;
 	}() };
 
+		inline std::string basename(const std::string& path)
+		{
+			int n = path.size();
+			std::string res;
+			int i = n - 1;
+			while (i >= 0 && path[i] == '/') {
+				i--;
+			}
+			while (i >= 0 && path[i] != '/') {
+				res.push_back(path[i]);
+				i--;
+			}
+
+			reverse(res.begin(), res.end());
+			return res;
+		}
+
 		inline std::string formatPath(const std::string& path)
 		{
 			int n = path.size();

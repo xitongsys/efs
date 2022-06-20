@@ -179,7 +179,7 @@ void DataNodeSession::mkdir()
         }
 
         FileDesc parent_desc;
-        if ((ec = p_executor->getFileDesc(p_in_msg->path, parent_desc))) {
+        if ((ec = p_executor->getFileDesc(parent_path, parent_desc))) {
             p_out_msg->error_code = ec;
             break;
         }

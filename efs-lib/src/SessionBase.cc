@@ -32,6 +32,7 @@ void SessionBase::do_read()
                     do_write();
                 }
                 else {
+                    std::cout << "error" << int(ec) << std::endl;
                 }
             }
         });
@@ -49,6 +50,7 @@ void SessionBase::do_write()
                     do_read();
                 }
                 else {
+                    std::cout << "error" << int(ec) << std::endl;
                 }
             }
         });

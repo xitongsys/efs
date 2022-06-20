@@ -1,5 +1,6 @@
 #include "Netdisk.h"
 #include "compat.h"
+#include "FS.h"
 
 namespace efs {
 
@@ -148,8 +149,9 @@ namespace efs {
 
 	int Netdisk::mkdir(const char* path, fuse_mode_t mode)
 	{
-		std::cout << "mkdir" << std::endl;
+		std::cout << "mkdir " << path << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
@@ -218,7 +220,7 @@ namespace efs {
 
 	int Netdisk::open(const char* path, fuse_file_info* fi)
 	{
-		std::cout << "open" << std::endl;
+		std::cout << "open " << path << std::endl;
 		if (open_fds.count(path)) {
 			return 0;
 		}
@@ -229,7 +231,7 @@ namespace efs {
 		}
 
 		int32_t fd = 0;
-		if (p_conn->open(path, "wr", fd)) {
+		if (p_conn->open(path, "w", fd)) {
 			return -ENOENT;
 		}
 
@@ -357,10 +359,8 @@ namespace efs {
 			}
 		}
 
-		std::cout << p_conns.size() << std::endl;
-
 		if (p_conns.size() == 0) {
-			return - ENOENT;
+			return -ENOENT;
 		}
 
 		for (auto& p_conn : p_conns) {
@@ -370,11 +370,8 @@ namespace efs {
 			}
 
 			for (auto& fdesc : fdescs) {
-
-				std::cout << fdesc.path << std::endl;
-
 				fuse_stat fstat = toFuseState(fdesc);
-				if (filler(buf, fdesc.path.c_str(), &fstat, 0, FUSE_FILL_DIR_PLUS)) {
+				if (filler(buf, fs::basename(fdesc.path).c_str(), &fstat, 0, FUSE_FILL_DIR_PLUS)) {
 					break;
 				}
 			}

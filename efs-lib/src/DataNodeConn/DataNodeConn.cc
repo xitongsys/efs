@@ -49,7 +49,6 @@ namespace efs {
 
 		MsgMkdirResp m_mkdir_resp;
 		query<MsgMkdir, MsgMkdirResp>(m_mkdir, m_mkdir_resp);
-
 		return ErrorCode(m_mkdir_resp.error_code);
 	}
 

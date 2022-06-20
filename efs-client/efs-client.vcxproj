@@ -132,6 +132,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Program Files %28x86%29\WinFsp\inc;C:\App\boost_1_79_0;C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\App\vcpkg\packages\rocksdb_x64-windows\include;C:\Users\zxt\workspace\efs\efs-lib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
