@@ -13,7 +13,7 @@ struct MsgReadOffset : Msg {
 
     MsgReadOffset()
     {
-        msg_type = MsgType::READ;
+        msg_type = MsgType::READOFFSET;
         error_code = ErrorCode::NONE;
 
         path = "";
@@ -71,7 +71,7 @@ struct MsgReadOffsetResp : Msg {
 
     MsgReadOffsetResp()
     {
-        msg_type = MsgType::READ_RESP;
+        msg_type = MsgType::READOFFSET_RESP;
         error_code = ErrorCode::NONE;
 
         data = "";

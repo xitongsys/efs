@@ -78,6 +78,7 @@ namespace efs {
 		stat.st_uid = fdesc.uid;
 		stat.st_gid = fdesc.gid;
 		stat.st_rdev = 0;
+		stat.st_size = fdesc.fsize;
 		stat.st_ctim = toFuseTime(fdesc.create_time);
 		stat.st_mtim = toFuseTime(fdesc.modified_time);
 		stat.st_atim = toFuseTime(fdesc.modified_time);
@@ -234,27 +235,29 @@ namespace efs {
 			return -ENOENT;
 		}
 
-		fi->fh = 1001;
+		fi->fh = 10001;
 		return 0;
 	}
 
 	int Netdisk::read(const char* path, char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		std::cout << "read" << std::endl;
-		if (!open_fds.count(path)) {
-			return -ENOENT;
-		}
-
-		int32_t fd = open_fds[path];
+		std::cout << "read " << path << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
 
+		std::cout << "hehe" << size<<" "<<off<<std::endl;
+
 		std::string data;
-		if (p_conn->readOffset(path, size, off, data)) {
+		ErrorCode ec = p_conn->readOffset(path, size, off, data);
+		std::cout << "====" << int(ec) << std::endl;
+
+		if (ec && ec != ErrorCode::E_FILE_EOF) {
 			return -ENOENT;
 		}
+
+		std::cout << "hhaa" << data.size() << std::endl;
 
 		std::memcpy(buf, data.c_str(), data.size());
 		return data.size();
@@ -262,7 +265,7 @@ namespace efs {
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		std::cout << "write" << std::endl;
+		std::cout << "write " << path<<std::endl;
 
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {

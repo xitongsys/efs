@@ -427,7 +427,13 @@ namespace efs {
 				break;
 			}
 
-			FILE* fp = fopen(p_in_msg->path.c_str(), "r");
+			std::string absolute_path;
+			if ((ec = p_executor->absolutePath(p_in_msg->path, absolute_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			FILE* fp = fopen(absolute_path.c_str(), "r");
 			if (fp == nullptr) {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
@@ -446,10 +452,12 @@ namespace efs {
 				if (feof(fp)) {
 					p_out_msg->error_code = ErrorCode::E_FILE_EOF;
 				}
-				else {
+				else if (ferror(fp)) {
 					p_out_msg->error_code = ErrorCode::E_FILE_READ;
 				}
 			}
+
+			fclose(fp);
 
 		} while (0);
 
@@ -476,7 +484,13 @@ namespace efs {
 				break;
 			}
 
-			FILE* fp = fopen(p_in_msg->path.c_str(), "r+");
+			std::string absolute_path;
+			if ((ec = p_executor->absolutePath(p_in_msg->path, absolute_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			FILE* fp = fopen(absolute_path.c_str(), "r+");
 			if (fp == nullptr) {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
@@ -491,6 +505,8 @@ namespace efs {
 			if (write_size != p_in_msg->data.size()) {
 				p_out_msg->error_code = ErrorCode::E_FILE_WRITE;
 			}
+
+			fclose(fp);
 
 		} while (0);
 

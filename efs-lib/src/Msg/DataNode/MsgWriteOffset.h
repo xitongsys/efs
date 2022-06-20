@@ -13,7 +13,7 @@ struct MsgWriteOffset : Msg {
 
     MsgWriteOffset()
     {
-        msg_type = MsgType::WRITE;
+        msg_type = MsgType::WRITEOFFSET;
         error_code = ErrorCode::NONE;
 
         path = "";
@@ -71,7 +71,7 @@ struct MsgWriteOffsetResp : Msg {
 
     MsgWriteOffsetResp()
     {
-        msg_type = MsgType::WRITE_RESP;
+        msg_type = MsgType::WRITEOFFSET_RESP;
         error_code = ErrorCode::NONE;
 
         write_size = 0;
