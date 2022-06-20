@@ -127,6 +127,10 @@ namespace efs {
 		stbuf->st_mtim = toFuseTime(fdesc.modified_time);
 		stbuf->st_atim = toFuseTime(fdesc.modified_time);
 
+		if (fdesc.uid == p_client->udesc.uid) {
+			stbuf->st_mode = fdesc.mod | 0777;
+		}
+
 		return 0;
 	}
 

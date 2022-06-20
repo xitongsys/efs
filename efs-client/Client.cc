@@ -15,7 +15,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		NameNodeConn conn(io_context, config.namenode_ip, config.namenode_port, "");
-		if ((ec = conn.hosts(hosts))) {
+		if ((ec = conn.hosts(config.user, config.password, hosts, udesc))) {
 			return ec;
 		}
 

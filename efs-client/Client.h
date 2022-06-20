@@ -17,7 +17,9 @@ namespace efs {
 		boost::asio::io_context io_context;
 		ClientConfig config;
 
+		UserDesc udesc;
 		std::vector<HostDesc> hosts;
+
 		std::unordered_map<std::string, std::shared_ptr<DataNodeConn>> p_conns;
 
 	public:

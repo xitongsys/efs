@@ -11,12 +11,15 @@ namespace efs {
 	{
 	}
 
-	ErrorCode NameNodeConn::hosts(std::vector<HostDesc>& hosts) 
+	ErrorCode NameNodeConn::hosts(const std::string& user, const std::string& password, std::vector<HostDesc>& hosts, UserDesc& udesc)
 	{
 		MsgHost m_host;
 		MsgHostResp m_host_resp;
+		m_host.user = user;
+		m_host.password = password;
 		query<MsgHost, MsgHostResp>(m_host, m_host_resp);
 		hosts = m_host_resp.hosts;
+		udesc = m_host_resp.udesc;
 		return ErrorCode(m_host_resp.error_code);
 	}
 }
