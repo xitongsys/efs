@@ -130,6 +130,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\WinFsp\inc;C:\App\boost_1_79_0;C:\App\vcpkg\packages\yaml-cpp_x64-windows\include;C:\App\vcpkg\packages\rocksdb_x64-windows\include;C:\Users\zxt\workspace\efs\efs-lib\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -137,6 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\Users\zxt\workspace\efs\x64\Release\efs-lib.lib;C:\app\vcpkg\packages\rocksdb_x64-windows\lib\rocksdb.lib;C:\app\vcpkg\packages\yaml-cpp_x64-windows\lib\yaml-cpp.lib;C:\app\vcpkg\packages\zlib_x64-windows\lib\zlib.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

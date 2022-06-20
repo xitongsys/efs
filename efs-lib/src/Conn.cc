@@ -11,7 +11,7 @@ namespace efs {
 		boost::asio::connect(sock, resolver.resolve(ip, std::to_string(port)));
 	}
 
-	ErrorCode Conn::close()
+	ErrorCode Conn::closeConn()
 	{
 		sock.close();
 		return ErrorCode::NONE;

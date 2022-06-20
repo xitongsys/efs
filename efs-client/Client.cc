@@ -16,7 +16,7 @@ namespace efs {
 
 		for (auto it = p_conns.begin(); it != p_conns.end(); it++) {
 			if (it->second) {
-				it->second->close();
+				it->second->closeConn();
 			}
 		}
 		p_conns.clear();

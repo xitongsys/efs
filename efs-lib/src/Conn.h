@@ -26,7 +26,7 @@ namespace efs {
 	public:
 		Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port);
 
-		ErrorCode close();
+		ErrorCode closeConn();
 
 		template<class MSG, class MSG_RESP>
 		void query(const MSG& msg, MSG_RESP& msg_resp)
