@@ -13,6 +13,9 @@
 #include "Msg/DataNode/MsgRm.h"
 #include "Msg/DataNode/MsgWrite.h"
 #include "Msg/DataNode/MsgGetFileDesc.h"
+#include "Msg/DataNode/MsgOpenOffset.h"
+#include "Msg/DataNode/MsgReadOffset.h"
+#include "Msg/DataNode/MsgWriteOffset.h"
 
 namespace efs {
 	DataNodeSession::DataNodeSession(int32_t buffer_size,
@@ -124,6 +127,21 @@ namespace efs {
 				RECV_IN_MSG(getFileDesc);
 				break;
 			}
+			case MsgType::OPENOFFSET: {
+				std::shared_ptr<MsgOpenOffset> p_msg = std::make_shared<MsgOpenOffset>();
+				RECV_IN_MSG(openOffset);
+				break;
+			}
+			case MsgType::WRITEOFFSET: {
+				std::shared_ptr<MsgWriteOffset> p_msg = std::make_shared<MsgWriteOffset>();
+				RECV_IN_MSG(writeOffset);
+				break;
+			}
+			case MsgType::READOFFSET: {
+				std::shared_ptr<MsgReadOffset> p_msg = std::make_shared<MsgReadOffset>();
+				RECV_IN_MSG(readOffset);
+				break;
+			}
 			default:
 				return ErrorCode::E_MSG_UNKNOWN;
 			}
@@ -203,6 +221,21 @@ namespace efs {
 			}
 			case MsgType::GET_FILE_DESC_RESP: {
 				std::shared_ptr<MsgGetFileDescResp> p_msg = std::static_pointer_cast<MsgGetFileDescResp>(p_out_msg);
+				SEND_OUT_MSG;
+				break;
+			}
+			case MsgType::OPENOFFSET_RESP: {
+				std::shared_ptr<MsgOpenOffsetResp> p_msg = std::static_pointer_cast<MsgOpenOffsetResp>(p_out_msg);
+				SEND_OUT_MSG;
+				break;
+			}
+			case MsgType::READOFFSET_RESP: {
+				std::shared_ptr<MsgReadOffsetResp> p_msg = std::static_pointer_cast<MsgReadOffsetResp>(p_out_msg);
+				SEND_OUT_MSG;
+				break;
+			}
+			case MsgType::WRITEOFFSET_RESP: {
+				std::shared_ptr<MsgWriteOffsetResp> p_msg = std::static_pointer_cast<MsgWriteOffsetResp>(p_out_msg);
 				SEND_OUT_MSG;
 				break;
 			}

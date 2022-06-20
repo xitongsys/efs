@@ -52,6 +52,15 @@ enum MsgType : uint8_t {
     HOST,
     HOST_RESP,
 
+    OPENOFFSET,
+    OPENOFFSET_RESP,
+
+    WRITEOFFSET,
+    WRITEOFFSET_RESP,
+
+    READOFFSET,
+    READOFFSET_RESP,
+
 };
 
 struct Msg {

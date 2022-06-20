@@ -191,5 +191,14 @@
     <ClInclude Include="src\Msg\DataNode\MsgGetFileDesc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Msg\DataNode\MsgReadOffset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Msg\DataNode\MsgWriteOffset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Msg\DataNode\MsgOpenOffset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

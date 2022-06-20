@@ -230,14 +230,11 @@ namespace efs {
 			return -ENOENT;
 		}
 
-		int32_t fd = 0;
-		if (p_conn->open(path, "w", fd)) {
+		if (p_conn->openOffset(path)) {
 			return -ENOENT;
 		}
 
-		open_fds[path] = fd;
-		fi->fh = fd;
-
+		fi->fh = 1001;
 		return 0;
 	}
 
@@ -255,7 +252,7 @@ namespace efs {
 		}
 
 		std::string data;
-		if (p_conn->read(fd, size, data)) {
+		if (p_conn->readOffset(path, size, off, data)) {
 			return -ENOENT;
 		}
 
@@ -266,11 +263,7 @@ namespace efs {
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
 		std::cout << "write" << std::endl;
-		if (!open_fds.count(path)) {
-			return -ENOENT;
-		}
 
-		int32_t fd = open_fds[path];
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
@@ -278,7 +271,7 @@ namespace efs {
 
 		int32_t write_size = 0;
 		std::string data(buf, size);
-		if (p_conn->write(fd, data, write_size)) {
+		if (p_conn->writeOffset(path, data, off, write_size)) {
 			return -ENOENT;
 		}
 

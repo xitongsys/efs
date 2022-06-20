@@ -191,10 +191,13 @@
     <ClInclude Include="src\Msg\DataNode\MsgLs.h" />
     <ClInclude Include="src\Msg\DataNode\MsgMkdir.h" />
     <ClInclude Include="src\Msg\DataNode\MsgOpen.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgOpenOffset.h" />
     <ClInclude Include="src\Msg\DataNode\MsgPerm.h" />
     <ClInclude Include="src\Msg\DataNode\MsgRead.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgReadOffset.h" />
     <ClInclude Include="src\Msg\DataNode\MsgRm.h" />
     <ClInclude Include="src\Msg\DataNode\MsgWrite.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgWriteOffset.h" />
     <ClInclude Include="src\Msg\Msg.h" />
     <ClInclude Include="src\Msg\NameNode\MsgAccount.h" />
     <ClInclude Include="src\Msg\NameNode\MsgHost.h" />

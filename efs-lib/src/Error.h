@@ -30,6 +30,7 @@ enum ErrorCode : int8_t {
     E_FILE_TOO_MANY,
     E_FILE_PATH,
     E_FILE_PERM,
+    E_FILE_SEEK,
 
     E_DB_OPEN,
     E_DB_GET,

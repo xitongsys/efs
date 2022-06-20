@@ -45,5 +45,9 @@ public:
     void close();
     void read();
     void write();
+
+    void openOffset();
+    void readOffset();
+    void writeOffset();
 };
 }

@@ -8,6 +8,9 @@
 #include "Msg/DataNode/MsgWrite.h"
 #include "Msg/DataNode/MsgClose.h"
 #include "Msg/DataNode/MsgLs.h"
+#include "Msg/DataNode/MsgOpenOffset.h"
+#include "Msg/DataNode/MsgReadOffset.h"
+#include "Msg/DataNode/MsgWriteOffset.h"
 
 namespace efs {
 	DataNodeConn::DataNodeConn(
@@ -121,5 +124,41 @@ namespace efs {
 		query<MsgLs, MsgLsResp>(m_ls, m_ls_resp);
 		fdescs = m_ls_resp.files;
 		return ErrorCode(m_ls_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::openOffset(const std::string& path)
+	{
+		MsgOpenOffset m_openoffset;
+		m_openoffset.path = path;
+
+		MsgOpenOffsetResp m_openoffset_resp;
+		query<MsgOpenOffset, MsgOpenOffsetResp>(m_openoffset, m_openoffset_resp);
+		return ErrorCode(m_openoffset_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::readOffset(const std::string& path, const int32_t& read_size, const int64_t& offset, std::string& data)
+	{
+		MsgReadOffset m_readoffset;
+		m_readoffset.path = path;
+		m_readoffset.read_size = read_size;
+		m_readoffset.offset = offset;
+
+		MsgReadOffsetResp m_readoffset_resp;
+		query<MsgReadOffset, MsgReadOffsetResp>(m_readoffset, m_readoffset_resp);
+		data = m_readoffset_resp.data;
+		return ErrorCode(m_readoffset_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::writeOffset(const std::string& path, const std::string& data, const int64_t& offset, int32_t& write_size)
+	{
+		MsgWriteOffset m_writeoffset;
+		m_writeoffset.path = path;
+		m_writeoffset.data = data;
+		m_writeoffset.offset = offset;
+
+		MsgWriteOffsetResp m_writeoffset_resp;
+		query<MsgWriteOffset, MsgWriteOffsetResp>(m_writeoffset, m_writeoffset_resp);
+		write_size = m_writeoffset_resp.write_size;
+		return ErrorCode(m_writeoffset_resp.error_code);
 	}
 }
