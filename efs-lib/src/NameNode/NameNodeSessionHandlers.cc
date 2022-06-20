@@ -12,7 +12,6 @@ void NameNodeSession::account()
 {
     std::shared_ptr<MsgAccount> p_in_msg = std::static_pointer_cast<MsgAccount>(this->p_in_msg);
     std::shared_ptr<MsgAccountResp> p_out_msg = std::make_shared<MsgAccountResp>();
-
     do {
         if (namenode.config.tokens.count(p_in_msg->hdesc.token) == 0) {
             p_out_msg->error_code = ErrorCode::E_TOKEN_ERROR;

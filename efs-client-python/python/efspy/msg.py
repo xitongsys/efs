@@ -7,30 +7,45 @@ class MsgType:
     DEFAULT = 0
     LOGIN = 1
     LOGIN_RESP = 2
-    OPEN = 3
-    OPEN_RESP = 4
-    CLOSE = 5
-    CLOSE_RESP = 6
-    WRITE = 7
-    WRITE_RESP = 8
-    READ = 9
-    READ_RESP = 10
-    LS = 11
-    LS_RESP = 12
-    MKDIR = 13
-    MKDIR_RESP = 14
-    RM = 15
-    RM_RESP = 16
-    CHMOD = 17
-    CHMOD_RESP = 18
-    CHOWN = 19
-    CHOWN_RESP = 20
-    PERM = 21
-    PERM_RESP = 22
-    ACCOUNT = 23
-    ACCOUNT_RESP = 24
-    HOST = 25
-    HOST_RESP = 26
+
+    GET_FILE_DESC = 3
+    GET_FILE_DESC_RESP = 4
+
+    OPEN = 5
+    OPEN_RESP = 6
+
+    CLOSE = 7
+    CLOSE_RESP = 8
+
+    WRITE = 9
+    WRITE_RESP = 10
+
+    READ = 11
+    READ_RESP = 12
+
+    LS = 13
+    LS_RESP = 14
+
+    MKDIR = 15
+    MKDIR_RESP = 16
+
+    RM = 17
+    RM_RESP = 18
+
+    CHMOD = 19
+    CHMOD_RESP = 20
+    
+    CHOWN = 21
+    CHOWN_RESP = 22
+
+    PERM = 23
+    PERM_RESP = 24
+
+    ACCOUNT = 25
+    ACCOUNT_RESP = 26
+
+    HOST = 27
+    HOST_RESP = 28
 
 
 class UserDesc:

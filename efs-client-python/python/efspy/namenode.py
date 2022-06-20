@@ -67,7 +67,7 @@ class NameNodeConn:
 
 
 if __name__ == '__main__':
-    conn = NameNodeConn("127.0.0.1", 10000)
+    conn = NameNodeConn("127.0.0.1", 20000)
     resp = conn.host()
     print(resp.hosts.values, resp.error_code)
 

@@ -2,7 +2,7 @@ name: "datanode01"
 token: "abc"
 
 ip: "0.0.0.0"
-port: 10001
+port: 20001
 
 log_path: "logs"
 root_path: "data"
@@ -13,7 +13,7 @@ buffer_size: 4194304
 max_msg_size: 2097152
 
 name_node_ip: "127.0.0.1"
-name_node_port: 10000
+name_node_port: 20000
 
 paths: ["/zxt", "/root"]
 

@@ -43,7 +43,7 @@ namespace efs {
 			int16_t gid = std::atoi(vs[2].c_str());
 			FileDesc fdesc;
 			if ((ec = getFileDesc(path, fdesc))) {
-				fdesc.mod = 0b1000000111;
+				fdesc.mod = 010700;
 				if ((ec = mkdir(path, uid, gid, fdesc))) {
 					throw ec;
 				}
@@ -375,7 +375,7 @@ namespace efs {
 		fdesc.path = path;
 		fdesc.uid = uid;
 		fdesc.gid = gid;
-		fdesc.mod = 0b1000000111;
+		fdesc.mod = parent_desc.mod;
 
 		std::string value(fdesc.size(), 0);
 		fdesc.serialize(value.data(), value.size());

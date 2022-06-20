@@ -150,7 +150,7 @@ class DataNodeConn:
 
 
 if __name__ == '__main__':
-    conn = DataNodeConn("127.0.0.1", 10001, "zxt", "zxtpwd")
+    conn = DataNodeConn("127.0.0.1", 20001, "zxt", "zxtpwd")
 
     resp = conn.login()
 
@@ -159,10 +159,10 @@ if __name__ == '__main__':
     print(resp.fd, resp.error_code)
 
     data = bytearray()
-    for i in range(1000 * 1024):
+    for i in range(1024 * 1024):
         data += b"a"
 
-    for i in range(1000):
+    for i in range(10240):
         resp = conn.write(fd, data)
     print(resp.write_size, resp.error_code)
 
