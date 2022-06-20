@@ -27,8 +27,11 @@ void SessionBase::do_read()
         [this, self](boost::system::error_code ec, int32_t size) {
             if (!ec && size >= 0) {
                 p_in_buffer->write_consume(size);
-                if (!(read_msg_handler)()) {
+                ErrorCode ec = read_msg_handler();
+                if (!ec) {
                     do_write();
+                }
+                else {
                 }
             }
         });
@@ -41,8 +44,11 @@ void SessionBase::do_write()
         [this, self](boost::system::error_code ec, int32_t size) {
             if (!ec && size >= 0) {
                 p_out_buffer->read_consume(size);
-                if (!(write_msg_handler)()) {
+                ErrorCode ec = write_msg_handler();
+                if (!ec) {
                     do_read();
+                }
+                else {
                 }
             }
         });

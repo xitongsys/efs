@@ -15,12 +15,19 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<efs::Client> p_client = std::make_shared<efs::Client>(config);
 
-	efs::Netdisk netdisk(p_client);
+	try {
 
-	netdisk.mount(argc, argv);
+		efs::Netdisk netdisk(p_client);
 
-	while (1) {
-		Sleep(1000);
+		netdisk.mount(argc, argv);
+
+		while (1) {
+			Sleep(1000);
+		}
+
+	}
+	catch (boost::system::error_code ec) {
+		std::cout << ec.message() << std::endl;
 	}
 
 	return 0;
