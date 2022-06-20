@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 
+#include "FS.h"
 #include "DataNode/DataNodeSession.h"
 #include "Msg/DataNode/MsgChmod.h"
 #include "Msg/DataNode/MsgChown.h"
@@ -438,6 +439,7 @@ namespace efs {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
 			}
+
 			if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
 				p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
 				break;
@@ -502,11 +504,21 @@ namespace efs {
 
 			int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fp);
 
+			p_out_msg->write_size = write_size;
+
 			if (write_size != p_in_msg->data.size()) {
 				p_out_msg->error_code = ErrorCode::E_FILE_WRITE;
 			}
 
 			fclose(fp);
+
+			fdesc.fsize = fs::fileSize(absolute_path);
+			fdesc.modified_time = fs::modifiedTime(absolute_path);
+
+			if ((ec = p_executor->setFileDesc(p_in_msg->path, fdesc))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
 
 		} while (0);
 

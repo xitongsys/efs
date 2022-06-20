@@ -12,7 +12,7 @@ namespace efs {
 		Netdisk::p_client = p_client;
 	}
 
-	int Netdisk::mount(int argc, char *argv[])
+	int Netdisk::mount(int argc, char* argv[])
 	{
 		static fuse_operations ops = {
 			Netdisk::getattr,
@@ -98,7 +98,7 @@ namespace efs {
 		//TODO:: maybe change more elegant
 		if (strcmp(path, "/") == 0) {
 			stbuf->st_ino = 1;
-			stbuf->st_mode = 040755;
+			stbuf->st_mode = 040777;
 			stbuf->st_nlink = 1;
 			stbuf->st_uid = 1;
 			stbuf->st_gid = 1;
@@ -130,21 +130,27 @@ namespace efs {
 		stbuf->st_atim = toFuseTime(fdesc.modified_time);
 
 		if (fdesc.uid == p_client->udesc.uid) {
+			fuse_context* context = fuse_get_context();
 			stbuf->st_mode = fdesc.mod | 0777;
+			stbuf->st_uid = context->uid;
+			stbuf->st_gid = context->gid;
 		}
+
+		std::cout << path << " " << stbuf->st_mode << " " << stbuf->st_uid << " " << stbuf->st_gid << std::endl;
 
 		return 0;
 	}
 
 	int Netdisk::readlink(const char* path, char* buf, size_t size)
 	{
-		std::cout << "readlink" << " "<<path << std::endl;
+		std::cout << "readlink" << " " << path << std::endl;
 		return -ENOENT;
 	}
 
 	int Netdisk::mknod(const char* path, fuse_mode_t mode, fuse_dev_t dev)
 	{
-		std::cout << "mknod" << std::endl;
+		std::cout << "mknode " << path << " " << mode << std::endl;
+
 		return 0;
 	}
 
@@ -152,7 +158,7 @@ namespace efs {
 	{
 		std::cout << "mkdir " << path << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-		
+
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
@@ -222,20 +228,24 @@ namespace efs {
 	int Netdisk::open(const char* path, fuse_file_info* fi)
 	{
 		std::cout << "open " << path << std::endl;
-		if (open_fds.count(path)) {
-			return 0;
-		}
-
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+
+
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
+
+		std::cout << "open hehe" << std::endl;
 
 		if (p_conn->openOffset(path)) {
 			return -ENOENT;
 		}
 
-		fi->fh = 10001;
+		std::cout << "open haha" << std::endl;
+
+		std::cout << fi->fh << std::endl;
+
+		//fi->fh = 10001;
 		return 0;
 	}
 
@@ -247,7 +257,7 @@ namespace efs {
 			return -ENOENT;
 		}
 
-		std::cout << "hehe" << size<<" "<<off<<std::endl;
+		std::cout << "hehe" << size << " " << off << std::endl;
 
 		std::string data;
 		ErrorCode ec = p_conn->readOffset(path, size, off, data);
@@ -265,8 +275,9 @@ namespace efs {
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		std::cout << "write " << path<<std::endl;
+		std::cout << "write " << path << " " << size << " " << off << std::endl;
 
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
@@ -274,9 +285,12 @@ namespace efs {
 
 		int32_t write_size = 0;
 		std::string data(buf, size);
-		if (p_conn->writeOffset(path, data, off, write_size)) {
+		if ((ec = p_conn->writeOffset(path, data, off, write_size))) {
+			std::cout << "write error: " << ec << std::endl;
 			return -ENOENT;
 		}
+
+		std::cout << "write size: " << write_size << std::endl;
 
 		return write_size;
 	}
@@ -284,7 +298,7 @@ namespace efs {
 	int Netdisk::statfs(const char* path, fuse_statvfs* stbuf)
 	{
 		std::cout << "statfs" << std::endl;
-		std::memset(stbuf, 0, sizeof (* stbuf));
+		std::memset(stbuf, 0, sizeof(*stbuf));
 		return 0;
 	}
 
@@ -327,22 +341,22 @@ namespace efs {
 	int Netdisk::opendir(const char* path, fuse_file_info* fi)
 	{
 		std::cout << "opendir" << std::endl;
-		fi->fh = 16895;
+		//fi->fh = 16895;
 		return 0;
 	}
 
 	void* Netdisk::init(fuse_conn_info* conn, fuse_config* conf)
 	{
-		std::cout << "init" << std::endl; 
+		std::cout << "init" << std::endl;
 		conn->want |= (conn->capable & FUSE_CAP_READDIRPLUS);
 		return getself();
 	}
 
-	int Netdisk::readdir(const char* path, void* buf, 
-		fuse_fill_dir_t filler, 
+	int Netdisk::readdir(const char* path, void* buf,
+		fuse_fill_dir_t filler,
 		fuse_off_t off, fuse_file_info* fi, enum fuse_readdir_flags)
 	{
-		std::cout << "======readdir" <<" "<<path<< std::endl;
+		std::cout << "======readdir" << " " << path << std::endl;
 
 		std::vector<std::shared_ptr<DataNodeConn>> p_conns;
 		if (strcmp(path, "/") == 0) {
