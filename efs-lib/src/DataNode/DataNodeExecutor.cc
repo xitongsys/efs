@@ -158,8 +158,11 @@ namespace efs {
 
 	ErrorCode DataNodeExecutor::getFileDesc(const std::string& path, FileDesc& fdesc)
 	{
+		std::cout << path << std::endl;
+
 		std::string value;
 		if (db.get(path, value)) {
+			std::cout << "not get===="<<value.size() << " "<<fdesc.path.size()<<std::endl;
 			return E_DB_GET;
 		}
 

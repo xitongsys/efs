@@ -47,7 +47,9 @@ namespace efs {
 			boost::asio::write(sock, boost::asio::buffer(buf, msg_size + 4));
 
 			int32_t msg_resp_size = 0;
+
 			boost::asio::read(sock, boost::asio::buffer(buf, 4));
+
 			if (serialize::deserialize(msg_resp_size, buf, 4) <= 0) {
 				msg_resp.error_code = ErrorCode::E_DESERIALIZE;
 				return;
@@ -61,6 +63,7 @@ namespace efs {
 			boost::asio::read(sock, boost::asio::buffer(buf, msg_resp_size));
 
 			if (msg_resp.deserialize(buf, msg_resp_size) < 0) {
+
 				msg_resp.error_code = E_DESERIALIZE;
 				return;
 			}

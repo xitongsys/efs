@@ -94,6 +94,10 @@ namespace efs {
 
 	int Netdisk::getattr(const char* path, fuse_stat* stbuf, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
+		ErrorCode ec = ErrorCode::NONE;
 		//TODO:: maybe change more elegant
 		if (strcmp(path, "/") == 0) {
 			fuse_context* context = fuse_get_context();
@@ -115,7 +119,7 @@ namespace efs {
 		}
 
 		FileDesc fdesc;
-		if (p_conn->getFileDesc(path, fdesc)) {
+		if ((ec = p_conn->getFileDesc(path, fdesc))) {
 			return -ENOENT;
 		}
 
@@ -126,16 +130,23 @@ namespace efs {
 
 	int Netdisk::readlink(const char* path, char* buf, size_t size)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
 		return -ENOENT;
 	}
 
 	int Netdisk::mknod(const char* path, fuse_mode_t mode, fuse_dev_t dev)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
 		return 0;
 	}
 
 	int Netdisk::mkdir(const char* path, fuse_mode_t mode)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 
 		if (p_conn == nullptr) {
@@ -150,11 +161,17 @@ namespace efs {
 
 	int Netdisk::unlink(const char* path)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::rmdir(const char* path)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
@@ -168,31 +185,49 @@ namespace efs {
 
 	int Netdisk::symlink(const char* dstpath, const char* srcpath)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::rename(const char* oldpath, const char* newpath, unsigned int flags)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return -ENOSYS;
 	}
 
 	int Netdisk::link(const char* oldpath, const char* newpath)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::chmod(const char* path, fuse_mode_t mode, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return -ENOSYS;
 	}
 
 	int Netdisk::chown(const char* path, fuse_uid_t uid, fuse_gid_t gid, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::truncate(const char* path, fuse_off_t size, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
@@ -208,6 +243,9 @@ namespace efs {
 
 	int Netdisk::open(const char* path, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 
 		if (p_conn == nullptr) {
@@ -223,6 +261,9 @@ namespace efs {
 
 	int Netdisk::read(const char* path, char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
@@ -250,6 +291,9 @@ namespace efs {
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
@@ -271,47 +315,74 @@ namespace efs {
 
 	int Netdisk::statfs(const char* path, fuse_statvfs* stbuf)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		std::memset(stbuf, 0, sizeof(*stbuf));
 		return 0;
 	}
 
 	int Netdisk::flush(const char* path, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return -ENOSYS;
 	}
 
 	int Netdisk::release(const char* path, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::setxattr(const char* path, const char* name0, const char* value, size_t size, int flags)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::getxattr(const char* path, const char* name0, char* value, size_t size)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::listxattr(const char* path, char* namebuf, size_t size)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::removexattr(const char* path, const char* name0)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::opendir(const char* path, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	void* Netdisk::init(fuse_conn_info* conn, fuse_config* conf)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		conn->want |= (conn->capable & FUSE_CAP_READDIRPLUS);
 		return getself();
 	}
@@ -320,6 +391,9 @@ namespace efs {
 		fuse_fill_dir_t filler,
 		fuse_off_t off, fuse_file_info* fi, enum fuse_readdir_flags)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		std::vector<std::shared_ptr<DataNodeConn>> p_conns;
 		if (strcmp(path, "/") == 0) {
 			p_client->getAllDataNodeConns(p_conns);
@@ -353,11 +427,17 @@ namespace efs {
 
 	int Netdisk::releasedir(const char* path, fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 
 	int Netdisk::utimens(const char* path, const fuse_timespec tmsp[2], fuse_file_info* fi)
 	{
+		auto self = getself();
+		std::lock_guard<std::mutex> lock(self->mutex);
+
 		return 0;
 	}
 }

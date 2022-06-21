@@ -11,6 +11,9 @@
 namespace efs {
 	class Netdisk {
 	public:
+		std::mutex mutex;
+
+	public:
 		static std::shared_ptr<Client> p_client;
 	public:
 		Netdisk(std::shared_ptr<Client> p_client);
