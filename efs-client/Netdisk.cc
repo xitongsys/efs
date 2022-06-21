@@ -254,20 +254,25 @@ namespace efs {
 			return -ENOENT;
 		}
 
-		std::cout << "hehe" << size << " " << off << std::endl;
-
+		int64_t i = 0;
 		std::string data;
-		ErrorCode ec = p_conn->readOffset(path, size, off, data);
-		std::cout << "====" << int(ec) << std::endl;
 
-		if (ec && ec != ErrorCode::E_FILE_EOF) {
-			return -ENOENT;
+		while (i < size) {
+			int64_t rs = i + std::min(size - i, size_t(EFS_MAX_READ_SIZE));
+			ErrorCode ec = p_conn->readOffset(path, rs, off + i, data);
+			if (ec && ec != ErrorCode::E_FILE_EOF) {
+				return -ENOENT;
+			}
+
+			rs = data.size();
+			std::memcpy(buf + i, data.c_str(), rs);
+			i += data.size();
+			if (ec == ErrorCode::E_FILE_EOF) {
+				break;
+			}
 		}
 
-		std::cout << "hhaa" << data.size() << std::endl;
-
-		std::memcpy(buf, data.c_str(), data.size());
-		return data.size();
+		return i;
 	}
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
@@ -280,14 +285,21 @@ namespace efs {
 			return -ENOENT;
 		}
 
+		int64_t i = 0;
 		int32_t write_size = 0;
-		std::string data(buf, size);
-		if ((ec = p_conn->writeOffset(path, data, off, write_size))) {
-			std::cout << "write error: " << int(ec) << std::endl;
-			return -ENOENT;
-		}
+		while (i < size) {
+			int64_t b = i, e = i + std::min(size - i, size_t(EFS_MAX_READ_SIZE));
+			std::string data(buf + i, e - b);
+			int32_t ws = 0;
+			if ((ec = p_conn->writeOffset(path, data, off + i, ws))) {
 
-		std::cout << "write size: " << write_size << std::endl;
+				std::cout << "write error: " << int(ec) << std::endl;
+
+				return -EIO;
+			}
+			i = e;
+			write_size += ws;
+		}
 
 		return write_size;
 	}

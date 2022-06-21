@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 
 #include "FS.h"
+#include "Limit.h"
 #include "DataNode/DataNodeSession.h"
 #include "Msg/DataNode/MsgChmod.h"
 #include "Msg/DataNode/MsgChown.h"
@@ -318,7 +319,7 @@ namespace efs {
 			}
 
 			OpenFileHandler& fh = this->open_files[p_in_msg->fd];
-			int32_t max_read_size = std::min(p_in_msg->read_size, p_executor->config.max_msg_size);
+			int32_t max_read_size = std::min(p_in_msg->read_size, EFS_MAX_READ_SIZE);
 			p_out_msg->data = std::string(max_read_size, 0);
 
 			int32_t read_size = fread(p_out_msg->data.data(), 1, max_read_size, fh.fp);
@@ -425,7 +426,7 @@ namespace efs {
 				break;
 			}
 
-			if (p_in_msg->read_size > p_executor->config.max_msg_size) {
+			if (p_in_msg->read_size > EFS_MAX_READ_SIZE) {
 				p_out_msg->error_code = ErrorCode::E_OVERFLOW;
 				break;
 			}
@@ -520,8 +521,6 @@ namespace efs {
 
 			fdesc.fsize = fs::fileSize(absolute_path);
 			fdesc.modified_time = fs::modifiedTime(absolute_path);
-
-			std::cout << p_in_msg->data.size() << " " << write_size << " " << fdesc.fsize << std::endl;
 
 			if ((ec = p_executor->setFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ec;

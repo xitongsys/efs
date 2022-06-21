@@ -7,12 +7,13 @@
 
 #include "Error.h"
 #include "Serialize.h"
+#include "Limit.h"
 
 namespace efs {
 	class Conn
 	{
 	public:
-		static const int32_t BUF_SIZE = 4096;
+		static char buf[EFS_BUFFER_SIZE];
 	public:
 		boost::asio::io_context& io_context;
 		boost::asio::ip::tcp::socket sock;
@@ -31,14 +32,13 @@ namespace efs {
 		template<class MSG, class MSG_RESP>
 		void query(const MSG& msg, MSG_RESP& msg_resp)
 		{
-			char buf[BUF_SIZE];
 			int32_t msg_size = msg.size();
-			if (serialize::serialize(msg_size, buf, BUF_SIZE) <= 0) {
+			if (serialize::serialize(msg_size, buf, EFS_BUFFER_SIZE) <= 0) {
 				msg_resp.error_code = ErrorCode::E_SERIALIZE;
 				return;
 			}
 
-			if (msg.serialize(buf + 4, BUF_SIZE - 4) <= 0) {
+			if (msg.serialize(buf + 4, EFS_BUFFER_SIZE - 4) <= 0) {
 				msg_resp.error_code = ErrorCode::E_SERIALIZE;
 				return;
 			}
@@ -52,7 +52,7 @@ namespace efs {
 				return;
 			}
 
-			if (msg_resp_size > BUF_SIZE) {
+			if (msg_resp_size > EFS_BUFFER_SIZE) {
 				msg_resp.error_code = ErrorCode::E_OVERFLOW;
 				return;
 			}

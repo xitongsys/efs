@@ -1,4 +1,5 @@
 #include "DataNode/DataNode.h"
+#include "Limit.h"
 
 namespace efs {
 
@@ -11,7 +12,7 @@ DataNode::DataNode(const DataNodeConfig& config)
 
 std::shared_ptr<DataNodeSession> DataNode::new_session(boost::asio::ip::tcp::socket socket)
 {
-    return std::make_shared<DataNodeSession>(config.buffer_size, std::move(socket), p_executor);
+    return std::make_shared<DataNodeSession>(int32_t(EFS_BUFFER_SIZE), std::move(socket), p_executor);
 }
 
 }

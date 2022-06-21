@@ -183,6 +183,7 @@
     <ClInclude Include="src\FS.h" />
     <ClInclude Include="src\GroupDesc.h" />
     <ClInclude Include="src\HostDesc.h" />
+    <ClInclude Include="src\Limit.h" />
     <ClInclude Include="src\Msg\DataNode\MsgChmod.h" />
     <ClInclude Include="src\Msg\DataNode\MsgChown.h" />
     <ClInclude Include="src\Msg\DataNode\MsgClose.h" />

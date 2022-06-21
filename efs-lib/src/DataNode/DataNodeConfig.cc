@@ -5,6 +5,7 @@
 #include "Error.h"
 #include "FS.h"
 #include "Util.h"
+#include "Limit.h"
 
 namespace efs {
 DataNodeConfig::DataNodeConfig() { }
@@ -23,17 +24,6 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
     log_path = fs::formatPath(node["log_path"].as<std::string>());
     disk_size = node["disk_size"].as<uint64_t>();
 
-    buffer_size = node["buffer_size"].as<int32_t>();
-    max_msg_size = node["max_msg_size"].as<int32_t>();
-
-    if (!util::isPower2(buffer_size)) {
-        throw ErrorCode::E_BUFFER_SIZE;
-    }
-
-    if (max_msg_size > (buffer_size >> 1)) {
-        throw ErrorCode::E_BUFFER_SIZE;
-    }
-
     name_node_ip = node["name_node_ip"].as<std::string>();
     name_node_port = node["name_node_port"].as<uint16_t>();
 
@@ -50,8 +40,6 @@ DataNodeConfig::DataNodeConfig(const DataNodeConfig& config)
     root_path = config.root_path;
     log_path = config.log_path;
     disk_size = config.disk_size;
-    buffer_size = config.buffer_size;
-    max_msg_size = config.max_msg_size;
     name_node_ip = config.name_node_ip;
     name_node_port = config.name_node_port;
     paths = config.paths;

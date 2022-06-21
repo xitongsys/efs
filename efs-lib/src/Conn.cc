@@ -1,6 +1,9 @@
 #include "Conn.h"
+#include "Limit.h"
 
 namespace efs {
+	char Conn::buf[EFS_BUFFER_SIZE];
+
 	Conn::Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port) :
 		io_context(io_context),
 		sock(io_context),

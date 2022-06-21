@@ -17,9 +17,6 @@ public:
 
     uint64_t disk_size;
 
-    int32_t buffer_size;
-    int32_t max_msg_size;
-
     std::string name_node_ip;
     uint16_t name_node_port;
 
