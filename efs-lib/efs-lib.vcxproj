@@ -196,6 +196,7 @@
     <ClInclude Include="src\Msg\DataNode\MsgRead.h" />
     <ClInclude Include="src\Msg\DataNode\MsgReadOffset.h" />
     <ClInclude Include="src\Msg\DataNode\MsgRm.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgTruncate.h" />
     <ClInclude Include="src\Msg\DataNode\MsgWrite.h" />
     <ClInclude Include="src\Msg\DataNode\MsgWriteOffset.h" />
     <ClInclude Include="src\Msg\Msg.h" />

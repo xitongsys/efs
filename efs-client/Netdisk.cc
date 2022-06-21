@@ -5,7 +5,6 @@
 namespace efs {
 
 	std::shared_ptr<Client> Netdisk::p_client = nullptr;
-	std::unordered_map<std::string, int32_t> Netdisk::open_fds;
 
 	Netdisk::Netdisk(std::shared_ptr<Client> p_client)
 	{
@@ -71,12 +70,13 @@ namespace efs {
 
 	fuse_stat Netdisk::toFuseState(const FileDesc& fdesc)
 	{
+		fuse_context* context = fuse_get_context();
 		fuse_stat stat;
 		stat.st_ino = 1;
-		stat.st_mode = fdesc.mod;
+		stat.st_mode = fdesc.mod | 0777;
 		stat.st_nlink = 1;
-		stat.st_uid = fdesc.uid;
-		stat.st_gid = fdesc.gid;
+		stat.st_uid = context->uid;
+		stat.st_gid = context->gid;
 		stat.st_rdev = 0;
 		stat.st_size = fdesc.fsize;
 		stat.st_ctim = toFuseTime(fdesc.create_time);
@@ -97,11 +97,12 @@ namespace efs {
 		std::cout << "getatrr" << " " << path << std::endl;
 		//TODO:: maybe change more elegant
 		if (strcmp(path, "/") == 0) {
+			fuse_context* context = fuse_get_context();
 			stbuf->st_ino = 1;
 			stbuf->st_mode = 040777;
 			stbuf->st_nlink = 1;
-			stbuf->st_uid = 1;
-			stbuf->st_gid = 1;
+			stbuf->st_uid = context->uid;
+			stbuf->st_gid = context->gid;
 			stbuf->st_rdev = 0;
 			stbuf->st_ctim = toFuseTime(0);
 			stbuf->st_mtim = toFuseTime(0);
@@ -119,22 +120,7 @@ namespace efs {
 			return -ENOENT;
 		}
 
-		stbuf->st_ino = 1;
-		stbuf->st_mode = fdesc.mod;
-		stbuf->st_nlink = 1;
-		stbuf->st_uid = fdesc.uid;
-		stbuf->st_gid = fdesc.gid;
-		stbuf->st_rdev = 0;
-		stbuf->st_ctim = toFuseTime(fdesc.create_time);
-		stbuf->st_mtim = toFuseTime(fdesc.modified_time);
-		stbuf->st_atim = toFuseTime(fdesc.modified_time);
-
-		if (fdesc.uid == p_client->udesc.uid) {
-			fuse_context* context = fuse_get_context();
-			stbuf->st_mode = fdesc.mod | 0777;
-			stbuf->st_uid = context->uid;
-			stbuf->st_gid = context->gid;
-		}
+		*stbuf = toFuseState(fdesc);
 
 		std::cout << path << " " << stbuf->st_mode << " " << stbuf->st_uid << " " << stbuf->st_gid << std::endl;
 
@@ -221,8 +207,17 @@ namespace efs {
 
 	int Netdisk::truncate(const char* path, fuse_off_t size, fuse_file_info* fi)
 	{
-		std::cout << "truncate" << std::endl;
-		return -ENOSYS;
+		std::cout << "truncate " << size << std::endl;
+		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		if (p_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		if (p_conn->truncate(path, size)) {
+			return -EIO;
+		}
+
+		return 0;
 	}
 
 	int Netdisk::open(const char* path, fuse_file_info* fi)
@@ -286,7 +281,7 @@ namespace efs {
 		int32_t write_size = 0;
 		std::string data(buf, size);
 		if ((ec = p_conn->writeOffset(path, data, off, write_size))) {
-			std::cout << "write error: " << ec << std::endl;
+			std::cout << "write error: " << int(ec) << std::endl;
 			return -ENOENT;
 		}
 

@@ -12,8 +12,6 @@ namespace efs {
 	class Netdisk {
 	public:
 		static std::shared_ptr<Client> p_client;
-		static std::unordered_map<std::string, int32_t> open_fds;
-
 	public:
 		Netdisk(std::shared_ptr<Client> p_client);
 		int mount(int argc, char* argv[]);

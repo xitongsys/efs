@@ -200,5 +200,8 @@
     <ClInclude Include="src\Msg\DataNode\MsgOpenOffset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Msg\DataNode\MsgTruncate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -61,6 +61,9 @@ enum MsgType : uint8_t {
     READOFFSET,
     READOFFSET_RESP,
 
+    TRUNCATE,
+    TRUNCATE_RESP,
+
 };
 
 struct Msg {

@@ -11,6 +11,7 @@
 #include "Msg/DataNode/MsgOpenOffset.h"
 #include "Msg/DataNode/MsgReadOffset.h"
 #include "Msg/DataNode/MsgWriteOffset.h"
+#include "Msg/DataNode/MsgTruncate.h"
 
 namespace efs {
 	DataNodeConn::DataNodeConn(
@@ -160,5 +161,16 @@ namespace efs {
 		query<MsgWriteOffset, MsgWriteOffsetResp>(m_writeoffset, m_writeoffset_resp);
 		write_size = m_writeoffset_resp.write_size;
 		return ErrorCode(m_writeoffset_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::truncate(const std::string& path, const int64_t offset)
+	{
+		MsgTruncate m_truncate;
+		m_truncate.path = path;
+		m_truncate.offset = offset;
+
+		MsgTruncateResp m_truncate_resp;
+		query<MsgTruncate, MsgTruncateResp>(m_truncate, m_truncate_resp);
+		return ErrorCode(m_truncate_resp.error_code);
 	}
 }

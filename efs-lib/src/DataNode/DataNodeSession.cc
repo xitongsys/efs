@@ -16,6 +16,7 @@
 #include "Msg/DataNode/MsgOpenOffset.h"
 #include "Msg/DataNode/MsgReadOffset.h"
 #include "Msg/DataNode/MsgWriteOffset.h"
+#include "Msg/DataNode/MsgTruncate.h"
 
 namespace efs {
 	DataNodeSession::DataNodeSession(int32_t buffer_size,
@@ -142,6 +143,11 @@ namespace efs {
 				RECV_IN_MSG(readOffset);
 				break;
 			}
+			case MsgType::TRUNCATE: {
+				std::shared_ptr<MsgTruncate> p_msg = std::make_shared<MsgTruncate>();
+				RECV_IN_MSG(truncate);
+				break;
+			}
 			default:
 				return ErrorCode::E_MSG_UNKNOWN;
 			}
@@ -236,6 +242,11 @@ namespace efs {
 			}
 			case MsgType::WRITEOFFSET_RESP: {
 				std::shared_ptr<MsgWriteOffsetResp> p_msg = std::static_pointer_cast<MsgWriteOffsetResp>(p_out_msg);
+				SEND_OUT_MSG;
+				break;
+			}
+			case MsgType::TRUNCATE_RESP: {
+				std::shared_ptr<MsgTruncateResp> p_msg = std::static_pointer_cast<MsgTruncateResp>(p_out_msg);
 				SEND_OUT_MSG;
 				break;
 			}

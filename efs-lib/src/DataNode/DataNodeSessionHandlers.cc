@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #include "FS.h"
 #include "DataNode/DataNodeSession.h"
@@ -19,6 +20,7 @@
 #include "Msg/DataNode/MsgReadOffset.h"
 #include "Msg/DataNode/MsgWriteOffset.h"
 #include "Msg/DataNode/MsgOpenOffset.h"
+#include "Msg/DataNode/MsgTruncate.h"
 
 namespace efs {
 	void DataNodeSession::login()
@@ -440,9 +442,11 @@ namespace efs {
 				break;
 			}
 
-			if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
-				p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
-				break;
+			if (p_in_msg->offset > 0) {
+				if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
+					p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
+					break;
+				}
 			}
 
 			p_out_msg->data = std::string(p_in_msg->read_size, 0);
@@ -481,7 +485,7 @@ namespace efs {
 
 			Permission perm = fdesc.perm(this->udesc.uid, this->udesc.gid);
 
-			if (!(perm & Permission::R)) {
+			if (!(perm & Permission::W)) {
 				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
 				break;
 			}
@@ -497,9 +501,11 @@ namespace efs {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
 			}
-			if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
-				p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
-				break;
+			if (p_in_msg->offset > 0) {
+				if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
+					p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
+					break;
+				}
 			}
 
 			int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fp);
@@ -515,6 +521,8 @@ namespace efs {
 			fdesc.fsize = fs::fileSize(absolute_path);
 			fdesc.modified_time = fs::modifiedTime(absolute_path);
 
+			std::cout << p_in_msg->data.size() << " " << write_size << " " << fdesc.fsize << std::endl;
+
 			if ((ec = p_executor->setFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ec;
 				break;
@@ -523,5 +531,49 @@ namespace efs {
 		} while (0);
 
 		this->p_out_msg = p_out_msg;
+	}
+	void DataNodeSession::truncate()
+	{
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<MsgTruncate> p_in_msg = std::static_pointer_cast<MsgTruncate>(this->p_in_msg);
+		std::shared_ptr<MsgTruncateResp> p_out_msg = std::make_shared<MsgTruncateResp>();
+
+		do {
+			FileDesc fdesc;
+			if ((ec = p_executor->getFileDesc(p_in_msg->path, fdesc))) {
+				p_out_msg->error_code = ErrorCode::E_FILE_NOT_FOUND;
+				break;
+			}
+
+			Permission perm = fdesc.perm(this->udesc.uid, this->udesc.gid);
+
+			if (!(perm & Permission::W)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+				break;
+			}
+
+			std::string absolute_path;
+			if ((ec = p_executor->absolutePath(p_in_msg->path, absolute_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			boost::system::error_code bec;
+			boost::filesystem::resize_file(absolute_path, p_in_msg->offset, bec);
+			if (bec) {
+				p_out_msg->error_code = ErrorCode::E_FILE_TRUNCATE;
+				break;
+			}
+
+			fdesc.fsize = p_in_msg->offset;
+			if ((ec = p_executor->setFileDesc(p_in_msg->path, fdesc))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+		} while (0);
+
+		this->p_out_msg = p_out_msg;
+
 	}
 }
