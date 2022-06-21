@@ -18,7 +18,7 @@ namespace efs {
 			0, //Netdisk::readlink,
 			Netdisk::mknod,
 			Netdisk::mkdir,
-			0, //Netdisk::unlink,
+			Netdisk::unlink,
 			Netdisk::rmdir,
 			0, //Netdisk::symlink,
 			Netdisk::rename,
@@ -132,7 +132,7 @@ namespace efs {
 	{
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
-		return -ENOENT;
+		return -ENOSYS;
 	}
 
 	int Netdisk::mknod(const char* path, fuse_mode_t mode, fuse_dev_t dev)
@@ -154,7 +154,7 @@ namespace efs {
 		}
 
 		if (p_conn->mkdir(path)) {
-			return -ENOENT;
+			return -EIO;
 		}
 		return 0;
 	}
@@ -163,6 +163,16 @@ namespace efs {
 	{
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
+
+		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+
+		if (p_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		if (p_conn->rm(path)) {
+			return -EIO;
+		}
 
 		return 0;
 	}
