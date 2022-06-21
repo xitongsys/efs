@@ -94,7 +94,6 @@ namespace efs {
 
 	int Netdisk::getattr(const char* path, fuse_stat* stbuf, fuse_file_info* fi)
 	{
-		std::cout << "getatrr" << " " << path << std::endl;
 		//TODO:: maybe change more elegant
 		if (strcmp(path, "/") == 0) {
 			fuse_context* context = fuse_get_context();
@@ -122,27 +121,21 @@ namespace efs {
 
 		*stbuf = toFuseState(fdesc);
 
-		std::cout << path << " " << stbuf->st_mode << " " << stbuf->st_uid << " " << stbuf->st_gid << std::endl;
-
 		return 0;
 	}
 
 	int Netdisk::readlink(const char* path, char* buf, size_t size)
 	{
-		std::cout << "readlink" << " " << path << std::endl;
 		return -ENOENT;
 	}
 
 	int Netdisk::mknod(const char* path, fuse_mode_t mode, fuse_dev_t dev)
 	{
-		std::cout << "mknode " << path << " " << mode << std::endl;
-
 		return 0;
 	}
 
 	int Netdisk::mkdir(const char* path, fuse_mode_t mode)
 	{
-		std::cout << "mkdir " << path << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 
 		if (p_conn == nullptr) {
@@ -157,13 +150,11 @@ namespace efs {
 
 	int Netdisk::unlink(const char* path)
 	{
-		std::cout << "unlink" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::rmdir(const char* path)
 	{
-		std::cout << "rmdir" << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
@@ -177,45 +168,38 @@ namespace efs {
 
 	int Netdisk::symlink(const char* dstpath, const char* srcpath)
 	{
-		std::cout << "symlink" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::rename(const char* oldpath, const char* newpath, unsigned int flags)
 	{
-		std::cout << "rename" << std::endl;
 		return -ENOSYS;
 	}
 
 	int Netdisk::link(const char* oldpath, const char* newpath)
 	{
-		std::cout << "link" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::chmod(const char* path, fuse_mode_t mode, fuse_file_info* fi)
 	{
-		std::cout << "chmod" << std::endl;
 		return -ENOSYS;
 	}
 
 	int Netdisk::chown(const char* path, fuse_uid_t uid, fuse_gid_t gid, fuse_file_info* fi)
 	{
-		std::cout << "chown" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::truncate(const char* path, fuse_off_t size, fuse_file_info* fi)
 	{
 		ErrorCode ec = ErrorCode::NONE;
-		std::cout << "truncate " << size << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
 
 		if ((ec = p_conn->truncate(path, size))) {
-			std::cout << "truncate error: " << int(ec) << std::endl;
 			return -EIO;
 		}
 
@@ -224,31 +208,21 @@ namespace efs {
 
 	int Netdisk::open(const char* path, fuse_file_info* fi)
 	{
-		std::cout << "open " << path << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-
 
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
 
-		std::cout << "open hehe" << std::endl;
-
 		if (p_conn->openOffset(path)) {
 			return -ENOENT;
 		}
 
-		std::cout << "open haha" << std::endl;
-
-		std::cout << fi->fh << std::endl;
-
-		//fi->fh = 10001;
 		return 0;
 	}
 
 	int Netdisk::read(const char* path, char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		std::cout << "read " << path << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
@@ -258,15 +232,14 @@ namespace efs {
 		std::string data;
 
 		while (i < size) {
-			int64_t rs = i + std::min(size - i, size_t(EFS_MAX_READ_SIZE));
-			ErrorCode ec = p_conn->readOffset(path, rs, off + i, data);
+			int64_t rs = std::min(size - i, size_t(EFS_MAX_READ_SIZE));
+			int32_t real_read_size = 0;
+			ErrorCode ec = p_conn->readOffset(path, rs, off + i, buf + i, real_read_size);
 			if (ec && ec != ErrorCode::E_FILE_EOF) {
 				return -ENOENT;
 			}
 
-			rs = data.size();
-			std::memcpy(buf + i, data.c_str(), rs);
-			i += data.size();
+			i += real_read_size;
 			if (ec == ErrorCode::E_FILE_EOF) {
 				break;
 			}
@@ -277,8 +250,6 @@ namespace efs {
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		std::cout << "write " << path << " " << size << " " << off << std::endl;
-
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
@@ -286,77 +257,61 @@ namespace efs {
 		}
 
 		int64_t i = 0;
-		int32_t write_size = 0;
 		while (i < size) {
-			int64_t b = i, e = i + std::min(size - i, size_t(EFS_MAX_READ_SIZE));
-			std::string data(buf + i, e - b);
-			int32_t ws = 0;
-			if ((ec = p_conn->writeOffset(path, data, off + i, ws))) {
-
-				std::cout << "write error: " << int(ec) << std::endl;
-
+			int32_t ws = std::min(size - i, size_t(EFS_MAX_READ_SIZE));
+			int32_t real_write_size = 0;
+			if ((ec = p_conn->writeOffset(path, buf + i, ws, off + i, real_write_size))) {
 				return -EIO;
 			}
-			i = e;
-			write_size += ws;
+			i += real_write_size;
 		}
 
-		return write_size;
+		return i;
 	}
 
 	int Netdisk::statfs(const char* path, fuse_statvfs* stbuf)
 	{
-		std::cout << "statfs" << std::endl;
 		std::memset(stbuf, 0, sizeof(*stbuf));
 		return 0;
 	}
 
 	int Netdisk::flush(const char* path, fuse_file_info* fi)
 	{
-		std::cout << "flush" << std::endl;
 		return -ENOSYS;
 	}
 
 	int Netdisk::release(const char* path, fuse_file_info* fi)
 	{
-		std::cout << "release" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::setxattr(const char* path, const char* name0, const char* value, size_t size, int flags)
 	{
-		std::cout << "setxattr" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::getxattr(const char* path, const char* name0, char* value, size_t size)
 	{
-		std::cout << "getxattr" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::listxattr(const char* path, char* namebuf, size_t size)
 	{
-		std::cout << "listxattr" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::removexattr(const char* path, const char* name0)
 	{
-		std::cout << "removexattr" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::opendir(const char* path, fuse_file_info* fi)
 	{
-		std::cout << "opendir" << std::endl;
-		//fi->fh = 16895;
 		return 0;
 	}
 
 	void* Netdisk::init(fuse_conn_info* conn, fuse_config* conf)
 	{
-		std::cout << "init" << std::endl;
 		conn->want |= (conn->capable & FUSE_CAP_READDIRPLUS);
 		return getself();
 	}
@@ -365,8 +320,6 @@ namespace efs {
 		fuse_fill_dir_t filler,
 		fuse_off_t off, fuse_file_info* fi, enum fuse_readdir_flags)
 	{
-		std::cout << "======readdir" << " " << path << std::endl;
-
 		std::vector<std::shared_ptr<DataNodeConn>> p_conns;
 		if (strcmp(path, "/") == 0) {
 			p_client->getAllDataNodeConns(p_conns);
@@ -400,13 +353,11 @@ namespace efs {
 
 	int Netdisk::releasedir(const char* path, fuse_file_info* fi)
 	{
-		std::cout << "releasedir" << std::endl;
 		return 0;
 	}
 
 	int Netdisk::utimens(const char* path, const fuse_timespec tmsp[2], fuse_file_info* fi)
 	{
-		std::cout << "utimens" << std::endl;
 		return 0;
 	}
 }

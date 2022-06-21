@@ -163,6 +163,33 @@ namespace efs {
 		return ErrorCode(m_writeoffset_resp.error_code);
 	}
 
+	ErrorCode DataNodeConn::readOffset(const std::string& path, const int32_t& read_size, const int64_t& offset, char* data, int32_t& real_read_size)
+	{
+		MsgReadOffset m_readoffset;
+		m_readoffset.path = path;
+		m_readoffset.read_size = read_size;
+		m_readoffset.offset = offset;
+
+		MsgReadOffsetResp m_readoffset_resp;
+		query<MsgReadOffset, MsgReadOffsetResp>(m_readoffset, m_readoffset_resp);
+		real_read_size = m_readoffset_resp.data.size();
+		memcpy(data, m_readoffset_resp.data.c_str(), real_read_size);
+		return ErrorCode(m_readoffset_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::writeOffset(const std::string& path, const char* data, int32_t write_size, const int64_t& offset, int32_t& real_write_size)
+	{
+		MsgWriteOffset m_writeoffset;
+		m_writeoffset.path = path;
+		m_writeoffset.data = std::string(data, write_size);
+		m_writeoffset.offset = offset;
+
+		MsgWriteOffsetResp m_writeoffset_resp;
+		query<MsgWriteOffset, MsgWriteOffsetResp>(m_writeoffset, m_writeoffset_resp);
+		real_write_size = m_writeoffset_resp.write_size;
+		return ErrorCode(m_writeoffset_resp.error_code);
+	}
+
 	ErrorCode DataNodeConn::truncate(const std::string& path, const int64_t offset)
 	{
 		MsgTruncate m_truncate;

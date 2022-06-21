@@ -9,9 +9,6 @@ root_path: "data"
 
 disk_size: 1024
 
-buffer_size: 4194304
-max_msg_size: 2097152
-
 name_node_ip: "127.0.0.1"
 name_node_port: 20000
 

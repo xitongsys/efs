@@ -34,6 +34,10 @@ namespace efs {
 		ErrorCode openOffset(const std::string& path);
 		ErrorCode readOffset(const std::string& path, const int32_t& read_size, const int64_t& offset, std::string& data);
 		ErrorCode writeOffset(const std::string& path, const std::string& data, const int64_t& offset, int32_t& write_size);
+
+		ErrorCode readOffset(const std::string& path, const int32_t& read_size, const int64_t& offset, char* data, int32_t& real_read_size);
+		ErrorCode writeOffset(const std::string& path, const char* data, int32_t write_size, const int64_t& offset, int32_t& real_write_size);
+
 		ErrorCode truncate(const std::string& path, const int64_t offset);
 	};
 }

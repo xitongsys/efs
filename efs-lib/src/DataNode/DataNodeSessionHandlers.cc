@@ -437,14 +437,17 @@ namespace efs {
 				break;
 			}
 
-			FILE* fp = fopen(absolute_path.c_str(), "r");
+			FILE* fp = fopen(absolute_path.c_str(), "rb");
 			if (fp == nullptr) {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
 			}
 
 			if (p_in_msg->offset > 0) {
-				if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
+				fpos_t pos = 0;
+				fgetpos(fp, &pos);
+				pos += p_in_msg->offset;
+				if (fsetpos(fp, &pos)) {
 					p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
 					break;
 				}
@@ -497,13 +500,16 @@ namespace efs {
 				break;
 			}
 
-			FILE* fp = fopen(absolute_path.c_str(), "r+");
+			FILE* fp = fopen(absolute_path.c_str(), "rb+");
 			if (fp == nullptr) {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
 			}
+			fpos_t pos = 0;
+			fgetpos(fp, &pos);
+			pos += p_in_msg->offset;
 			if (p_in_msg->offset > 0) {
-				if (fseek(fp, p_in_msg->offset, SEEK_SET)) {
+				if (fsetpos(fp, &pos)) {
 					p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
 					break;
 				}
