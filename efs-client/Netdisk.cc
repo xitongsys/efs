@@ -207,13 +207,15 @@ namespace efs {
 
 	int Netdisk::truncate(const char* path, fuse_off_t size, fuse_file_info* fi)
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		std::cout << "truncate " << size << std::endl;
 		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
 		if (p_conn == nullptr) {
 			return -ENOENT;
 		}
 
-		if (p_conn->truncate(path, size)) {
+		if ((ec = p_conn->truncate(path, size))) {
+			std::cout << "truncate error: " << int(ec) << std::endl;
 			return -EIO;
 		}
 

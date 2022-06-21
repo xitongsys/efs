@@ -141,6 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>C:\Users\zxt\workspace\efs\x64\Release\efs-lib.lib;C:\app\vcpkg\packages\rocksdb_x64-windows\lib\rocksdb.lib;C:\app\vcpkg\packages\yaml-cpp_x64-windows\lib\yaml-cpp.lib;C:\app\vcpkg\packages\zlib_x64-windows\lib\zlib.lib;Rpcrt4.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\app\boost_1_79_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
