@@ -206,5 +206,8 @@
     <ClInclude Include="src\Limit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Msg\DataNode\MsgMv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

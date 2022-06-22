@@ -201,10 +201,30 @@ namespace efs {
 		return 0;
 	}
 
-	int Netdisk::rename(const char* oldpath, const char* newpath, unsigned int flags)
+	int Netdisk::rename(const char* from_path, const char* to_path, unsigned int flags)
 	{
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
+
+		std::shared_ptr<DataNodeConn> p_from_conn = getConn(from_path);
+		std::shared_ptr<DataNodeConn> p_to_conn = getConn(to_path);
+
+		if (p_from_conn == nullptr || p_to_conn == nullptr) {
+			return -ENOENT;
+		}
+
+		if (p_from_conn == p_to_conn) {
+			if (p_from_conn->mv(from_path, to_path)) {
+				return -EIO;
+			}
+			return 0;
+		}
+		else {
+
+			FileDesc from_fdesc;
+
+		}
+
 
 		return -ENOSYS;
 	}

@@ -39,6 +39,7 @@ public:
 
     ErrorCode getFileDesc(const std::string& path, FileDesc& fdesc);
     ErrorCode setFileDesc(const std::string& path, const FileDesc& fdesc);
+    ErrorCode rmFileDesc(const std::string& path);
     ErrorCode getFileDescFromDisk(const std::string& path, FileDesc& fdesc);
 
     ErrorCode login(const std::string& user, const std::string& password, UserDesc& udesc);

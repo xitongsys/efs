@@ -17,6 +17,7 @@
 #include "Msg/DataNode/MsgReadOffset.h"
 #include "Msg/DataNode/MsgWriteOffset.h"
 #include "Msg/DataNode/MsgTruncate.h"
+#include "Msg/DataNode/MsgMv.h"
 
 namespace efs {
 	DataNodeSession::DataNodeSession(int32_t buffer_size,
@@ -81,6 +82,11 @@ namespace efs {
 			case MsgType::RM: {
 				std::shared_ptr<MsgRm> p_msg = std::make_shared<MsgRm>();
 				RECV_IN_MSG(rm);
+				break;
+			}
+			case MsgType::MV: {
+				std::shared_ptr<MsgMv> p_msg = std::make_shared<MsgMv>();
+				RECV_IN_MSG(mv);
 				break;
 			}
 			case MsgType::CHOWN: {
@@ -182,6 +188,11 @@ namespace efs {
 			}
 			case MsgType::RM_RESP: {
 				std::shared_ptr<MsgRmResp> p_msg = std::static_pointer_cast<MsgRmResp>(p_out_msg);
+				SEND_OUT_MSG;
+				break;
+			}
+			case MsgType::MV_RESP: {
+				std::shared_ptr<MsgMvResp> p_msg = std::static_pointer_cast<MsgMvResp>(p_out_msg);
 				SEND_OUT_MSG;
 				break;
 			}

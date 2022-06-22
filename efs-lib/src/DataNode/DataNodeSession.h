@@ -36,6 +36,7 @@ public:
     void getFileDesc();
     void ls();
     void rm();
+    void mv();
     void chown();
     void chmod();
     void mkdir();

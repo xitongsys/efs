@@ -177,6 +177,11 @@ namespace efs {
 		return db.put(path, value);
 	}
 
+	ErrorCode DataNodeExecutor::rmFileDesc(const std::string& path)
+	{
+		return db.del(path);
+	}
+
 	ErrorCode DataNodeExecutor::getFileDescFromDisk(const std::string& path, FileDesc& fdesc)
 	{
 		ErrorCode ec = ErrorCode::NONE;
@@ -249,13 +254,20 @@ namespace efs {
 			return ec;
 		}
 
-		for (const auto& entry : std::filesystem::directory_iterator(absolute_path)) {
+		std::error_code std_ec;
+		auto its = std::filesystem::directory_iterator(absolute_path, std_ec);
+		if (std_ec) {
+			return ErrorCode::E_FILE_LS;
+		}
+
+		for (const auto& entry : its) {
 			std::string relative_path;
 			if ((ec = relativePath(entry.path().string(), relative_path))) {
 				return ec;
 			}
 			FileDesc fdesc;
 			if ((ec = getFileDesc(relative_path, fdesc))) {
+				return ec;
 			}
 			else {
 				fs.push_back(fdesc);
@@ -270,15 +282,21 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		if ((ec = db.del(path))) {
 			ec = ErrorCode::E_FILE_RM;
+			return ec;
 		}
+
 		std::string absolute_path;
 		if ((ec = absolutePath(path, absolute_path))) {
 			return ec;
 		}
 
-		if (!std::filesystem::remove_all(absolute_path.c_str())) {
+		std::error_code std_ec;
+		std::filesystem::remove_all(absolute_path.c_str(), std_ec);
+
+		if (std_ec) {
 			ec = ErrorCode::E_FILE_RM;
 		}
+
 		return ec;
 	}
 
@@ -394,9 +412,13 @@ namespace efs {
 			return ec;
 		}
 
-		if (!std::filesystem::create_directory(absolute_path)) {
+		std::error_code std_ec;
+		std::filesystem::create_directory(absolute_path, std_ec);
+
+		if (std_ec) {
 			ec = ErrorCode::E_FILE_MKDIR;
 		}
+
 		return ec;
 	}
 

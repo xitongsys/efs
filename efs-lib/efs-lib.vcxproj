@@ -191,6 +191,7 @@
     <ClInclude Include="src\Msg\DataNode\MsgLogin.h" />
     <ClInclude Include="src\Msg\DataNode\MsgLs.h" />
     <ClInclude Include="src\Msg\DataNode\MsgMkdir.h" />
+    <ClInclude Include="src\Msg\DataNode\MsgMv.h" />
     <ClInclude Include="src\Msg\DataNode\MsgOpen.h" />
     <ClInclude Include="src\Msg\DataNode\MsgOpenOffset.h" />
     <ClInclude Include="src\Msg\DataNode\MsgPerm.h" />

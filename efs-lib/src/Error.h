@@ -21,7 +21,9 @@ enum ErrorCode : int8_t {
 
     E_FILE_OPEN,
     E_FILE_RM,
+    E_FILE_MV,
     E_FILE_MKDIR,
+    E_FILE_LS,
     E_FILE_WRITE,
     E_FILE_READ,
     E_FILE_EOF,

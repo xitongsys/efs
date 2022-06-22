@@ -22,6 +22,7 @@
 #include "Msg/DataNode/MsgWriteOffset.h"
 #include "Msg/DataNode/MsgOpenOffset.h"
 #include "Msg/DataNode/MsgTruncate.h"
+#include "Msg/DataNode/MsgMv.h"
 
 namespace efs {
 	void DataNodeSession::login()
@@ -83,60 +84,149 @@ namespace efs {
 		this->p_out_msg = p_out_msg;
 	}
 
+	void DataNodeSession::mv()
+	{
+		ErrorCode ec;
+		std::shared_ptr<MsgMv> p_in_msg = std::static_pointer_cast<MsgMv>(this->p_in_msg);
+		std::shared_ptr<MsgMvResp> p_out_msg = std::make_shared<MsgMvResp>();
+
+		do {
+			Permission from_perm = Permission::EMPTY;
+			Permission to_perm = Permission::EMPTY;
+
+			if ((ec = p_executor->permission(p_in_msg->from_path, this->udesc.uid, this->udesc.gid, from_perm))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			std::string to_parent_path = "";
+			if ((ec = p_executor->parentPath(p_in_msg->to_path, to_parent_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			if ((ec = p_executor->permission(to_parent_path, this->udesc.uid, this->udesc.gid, to_perm))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			if (!(from_perm & Permission::W) || !(to_perm & Permission::W)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+				break;
+
+			}
+
+			std::string from_absolute_path = "";
+			if ((ec = p_executor->absolutePath(p_in_msg->from_path, from_absolute_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			std::string to_absolute_path = "";
+			if ((ec = p_executor->absolutePath(p_in_msg->to_path, to_absolute_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			FileDesc fdesc;
+			if ((ec = p_executor->getFileDesc(p_in_msg->from_path, fdesc))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			fdesc.path = p_in_msg->to_path;
+			if ((ec = p_executor->setFileDesc(p_in_msg->to_path, fdesc))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			std::error_code std_ec;
+			std::filesystem::rename(from_absolute_path, to_absolute_path, std_ec);
+			if (std_ec) {
+				p_out_msg->error_code = ErrorCode::E_FILE_MV;
+				break;
+			}
+
+			if ((ec = p_executor->rmFileDesc(p_in_msg->from_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+		} while (0);
+
+		this->p_out_msg = p_out_msg;
+	}
+
 	void DataNodeSession::chown()
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgChown> p_in_msg = std::static_pointer_cast<MsgChown>(this->p_in_msg);
 		std::shared_ptr<MsgChownResp> p_out_msg = std::make_shared<MsgChownResp>();
 
-		Permission perm = Permission::EMPTY;
-		ErrorCode ec;
-		if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
-			p_out_msg->error_code = ec;
+		do {
+			Permission perm = Permission::EMPTY;
+			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
 
-		}
-		else if ((perm & Permission::W)) {
-			ec = p_executor->rm(p_in_msg->path);
-			p_out_msg->error_code = ec;
+			if (!(perm & Permission::W)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+				break;
+			}
 
-		}
-		else {
-			p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
-		}
+			UserDesc udesc;
+			if ((ec = p_executor->getUser(p_in_msg->user, udesc))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			if ((ec = p_executor->chown(p_in_msg->path, udesc.uid, udesc.gid))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+		} while (0);
 
 		this->p_out_msg = p_out_msg;
 	}
 
 	void DataNodeSession::chmod()
 	{
+		ErrorCode ec;
 		std::shared_ptr<MsgChmod> p_in_msg = std::static_pointer_cast<MsgChmod>(this->p_in_msg);
 		std::shared_ptr<MsgChmodResp> p_out_msg = std::make_shared<MsgChmodResp>();
 
-		Permission perm = Permission::EMPTY;
-		ErrorCode ec;
-		if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
-			p_out_msg->error_code = ec;
+		do {
+			Permission perm = Permission::EMPTY;
 
-		}
-		else if ((perm & Permission::W)) {
-			ec = p_executor->chmod(p_in_msg->path, p_in_msg->mod);
-			p_out_msg->error_code = ec;
+			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+			if (!(perm & Permission::W)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+				break;
+			}
 
-		}
-		else {
-			p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
-		}
+			if ((ec = p_executor->chmod(p_in_msg->path, p_in_msg->mod))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+		} while (0);
 
 		this->p_out_msg = p_out_msg;
 	}
 
 	void DataNodeSession::perm()
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgPerm> p_in_msg = std::static_pointer_cast<MsgPerm>(this->p_in_msg);
 		std::shared_ptr<MsgPermResp> p_out_msg = std::make_shared<MsgPermResp>();
 
 		do {
 			Permission perm = Permission::EMPTY;
-			ErrorCode ec;
 			FileDesc fdesc;
 			UserDesc udesc;
 			GroupDesc gdesc;
@@ -579,6 +669,5 @@ namespace efs {
 		} while (0);
 
 		this->p_out_msg = p_out_msg;
-
 	}
 }

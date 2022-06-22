@@ -12,6 +12,7 @@
 #include "Msg/DataNode/MsgReadOffset.h"
 #include "Msg/DataNode/MsgWriteOffset.h"
 #include "Msg/DataNode/MsgTruncate.h"
+#include "Msg/DataNode/MsgMv.h"
 
 namespace efs {
 	DataNodeConn::DataNodeConn(
@@ -65,6 +66,18 @@ namespace efs {
 		query<MsgRm, MsgRmResp>(m_rm, m_rm_resp);
 
 		return ErrorCode(m_rm_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::mv(const std::string& from_path, const std::string& to_path)
+	{
+		MsgMv m_mv;
+		m_mv.from_path = from_path;
+		m_mv.to_path = to_path;
+
+		MsgMvResp m_mv_resp;
+		query<MsgMv, MsgMvResp>(m_mv, m_mv_resp);
+
+		return ErrorCode(m_mv_resp.error_code);
 	}
 
 	ErrorCode DataNodeConn::open(const std::string& path, const std::string& open_mod, int32_t& fd)

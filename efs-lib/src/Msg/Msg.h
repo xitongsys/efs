@@ -36,6 +36,9 @@ enum MsgType : uint8_t {
     RM,
     RM_RESP,
 
+    MV,
+    MV_RESP,
+
     CHMOD,
     CHMOD_RESP,
 
