@@ -3,7 +3,6 @@
 #include <tuple>
 
 #include "Netdisk.h"
-#include "compat.h"
 #include "FS.h"
 
 namespace efs {
