@@ -35,8 +35,12 @@ public:
     void login();
     void getFileDesc();
     void ls();
+
+    //can only rm file or empty dir
     void rm();
+    //can only mv file or empty dir
     void mv();
+
     void chown();
     void chmod();
     void mkdir();

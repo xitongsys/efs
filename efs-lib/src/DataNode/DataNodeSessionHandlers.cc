@@ -94,22 +94,34 @@ namespace efs {
 		std::shared_ptr<MsgRmResp> p_out_msg = std::make_shared<MsgRmResp>();
 
 		do {
-			Permission perm = Permission::EMPTY;
-
 			if ((ec = fs::checkPath(p_in_msg->path))) {
 				p_out_msg->error_code = ec;
 				break;
 			}
 
-			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
+			FileDesc fdesc;
+			if ((ec = p_executor->getFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ec;
 				break;
-
 			}
 
+			Permission perm = fdesc.perm(this->udesc.uid, this->udesc.gid);
 			if (!(perm & Permission::W)) {
 				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
 				break;
+			}
+
+			if (fdesc.mod & FileType::F_IFDIR) {
+				std::vector<FileDesc> files;
+				if ((ec = p_executor->ls(p_in_msg->path, files))) {
+					p_out_msg->error_code = ec;
+					break;
+				}
+
+				if (files.size()) {
+					p_out_msg->error_code = ErrorCode::E_FILE_RM;
+					break;
+				}
 			}
 
 			if ((ec = p_executor->rm(p_in_msg->path))) {
