@@ -8,6 +8,7 @@
 namespace efs {
 
 	std::shared_ptr<Client> Netdisk::p_client = nullptr;
+	char Netdisk::buffer[EFS_BUFFER_SIZE] = {0,};
 
 	Netdisk::Netdisk(std::shared_ptr<Client> p_client)
 	{
@@ -90,6 +91,23 @@ namespace efs {
 
 	ErrorCode Netdisk::copyFile(const char* from_path, const char* to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn)
 	{
+		ErrorCode ec = ErrorCode::NONE;
+		int64_t offset = 0;
+		while (!ec) {
+			int32_t rs = 0;
+			ec = p_from_conn->readOffset(from_path, EFS_MAX_READ_SIZE, offset, buffer, rs);
+			if ((ec && ec != ErrorCode::E_FILE_EOF) || rs < 0) {
+				return ec;
+			}
+
+			int32_t ws = 0;
+			ec = p_to_conn->writeOffset(to_path, buffer, rs, offset, ws);
+			if (ec || ws != rs) {
+				return ec;
+			}
+
+			offset += ws;
+		}
 
 		return ErrorCode::NONE;
 	}

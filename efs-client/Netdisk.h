@@ -16,6 +16,8 @@ namespace efs {
 
 	public:
 		static std::shared_ptr<Client> p_client;
+		static char buffer[EFS_BUFFER_SIZE];
+
 	public:
 		Netdisk(std::shared_ptr<Client> p_client);
 		int mount(int argc, char* argv[]);
