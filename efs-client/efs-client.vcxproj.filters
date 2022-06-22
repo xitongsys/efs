@@ -38,8 +38,5 @@
     <ClInclude Include="Netdisk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="compat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

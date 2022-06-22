@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <tuple>
 
 #include <boost/asio.hpp>
 
@@ -20,7 +21,8 @@ namespace efs {
 		UserDesc udesc;
 		std::vector<HostDesc> hosts;
 
-		std::unordered_map<std::string, std::shared_ptr<DataNodeConn>> p_conns;
+		// <path, host idx, p_conn>
+		std::vector<std::tuple<std::string, int, std::shared_ptr<DataNodeConn>>> p_conns;
 
 	public:
 		Client(const ClientConfig& config);

@@ -19,9 +19,10 @@ namespace efs {
 			return ec;
 		}
 
-		for (auto it = p_conns.begin(); it != p_conns.end(); it++) {
-			if (it->second) {
-				it->second->closeConn();
+		for (auto& p : p_conns) {
+			auto& p_conn = std::get<2>(p);
+			if (p_conn) {
+				p_conn->closeConn();
 			}
 		}
 		p_conns.clear();
@@ -41,9 +42,14 @@ namespace efs {
 				if (path[n - 1] != '/') {
 					path = path + "/";
 				}
-				p_conns[path] = p_conn;
+
+				p_conns.push_back({ path, i, p_conn });
 			}
 		}
+
+		std::sort(p_conns.begin(), p_conns.end(), [&](const auto& a, const auto& b) {
+			return std::get<0>(a).size() > std::get<0>(b).size();
+			});
 
 		return ec;
 	}
@@ -51,20 +57,22 @@ namespace efs {
 	ErrorCode Client::getDataNodeConn(const std::string& path, std::shared_ptr<DataNodeConn>& p_conn)
 	{
 		for (auto it = p_conns.begin(); it != p_conns.end(); it++) {
-			const std::string& pre = it->first;
+			const std::string& pre = std::get<0>(*it);
 			if ((pre.size() <= path.size() && pre == path.substr(0, pre.size())) ||
 				pre.size() == path.size() + 1 && pre == (path + "/")) {
-				p_conn = it->second;
+				p_conn = std::get<2>(*it);
 				return ErrorCode::NONE;
 			}
 		}
+		return ErrorCode::E_NOT_FOUND;
 
 	}
+
 	ErrorCode Client::getAllDataNodeConns(std::vector<std::shared_ptr<DataNodeConn>>& p_conns)
 	{
 		std::set<std::shared_ptr<DataNodeConn>> st;
 		for (auto it = this->p_conns.begin(); it != this->p_conns.end(); it++) {
-			st.insert(it->second);
+			st.insert(std::get<2>(*it));
 		}
 
 		p_conns = std::vector<std::shared_ptr<DataNodeConn>>(st.begin(), st.end());

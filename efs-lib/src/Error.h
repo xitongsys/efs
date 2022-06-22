@@ -5,6 +5,7 @@ enum ErrorCode : int8_t {
     NONE = 0,
     E_OVERFLOW = -127,
     E_BUFFER_SIZE,
+    E_NOT_FOUND,
 
     E_PANIC,
 

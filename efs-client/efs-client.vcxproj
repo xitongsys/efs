@@ -151,7 +151,6 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientConfig.h" />
-    <ClInclude Include="compat.h" />
     <ClInclude Include="Netdisk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
