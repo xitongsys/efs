@@ -1,3 +1,6 @@
+#include <stack>
+#include <string>
+
 #include "Netdisk.h"
 #include "compat.h"
 #include "FS.h"
@@ -83,6 +86,12 @@ namespace efs {
 		stat.st_mtim = toFuseTime(fdesc.modified_time);
 		stat.st_atim = toFuseTime(fdesc.modified_time);
 		return stat;
+	}
+
+	ErrorCode Netdisk::copyFile(const char* from_path, const char* to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn)
+	{
+
+		return ErrorCode::NONE;
 	}
 
 	std::shared_ptr<DataNodeConn> Netdisk::getConn(const std::string& path)
@@ -203,8 +212,13 @@ namespace efs {
 
 	int Netdisk::rename(const char* from_path, const char* to_path, unsigned int flags)
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
+
+		if (strcmp(from_path, to_path) == 0) {
+			return 0;
+		}
 
 		std::shared_ptr<DataNodeConn> p_from_conn = getConn(from_path);
 		std::shared_ptr<DataNodeConn> p_to_conn = getConn(to_path);
@@ -213,20 +227,86 @@ namespace efs {
 			return -ENOENT;
 		}
 
-		if (p_from_conn == p_to_conn) {
-			if (p_from_conn->mv(from_path, to_path)) {
-				return -EIO;
+		FileDesc from_fdesc;
+		if ((ec = p_from_conn->getFileDesc(from_path, from_fdesc))) {
+			return -ENOENT;
+		}
+
+		// single file
+		if (from_fdesc.mod & FileType::F_IFREG) {
+			if (p_from_conn == p_to_conn) {
+				if ((ec = p_from_conn->mv(from_path, to_path))) {
+					return -EIO;
+				}
+				return 0;
 			}
+			else {
+				if ((ec = Netdisk::copyFile(from_path, to_path, p_from_conn, p_to_conn))) {
+					return -EIO;
+				}
+
+				if ((ec = p_from_conn->rm(from_path))) {
+					return -EIO;
+				}
+
+				return 0;
+			}
+		}
+		else if (from_fdesc.mod & FileType::F_IFDIR) {
+			std::stack<std::pair<FileDesc, std::string>> stk;
+			stk.push({ from_fdesc, to_path });
+
+			while (stk.size()) {
+				auto p = stk.top();
+				stk.pop();
+
+				const std::string& cur_from_path(p.first.path);
+				const std::string& cur_to_path(p.second);
+
+				if (p.first.mod & FileType::F_IFDIR) {
+					if ((ec = p_to_conn->mkdir(p.second))) {
+						return -EIO;
+					}
+
+					std::vector<FileDesc> files;
+					if ((ec = p_from_conn->ls(cur_from_path, files))) {
+						return -EIO;
+					}
+
+					for (const FileDesc& fdesc : files) {
+						const std::string& cur_from_path2 = fdesc.path;
+						std::string filename = fs::basename(cur_from_path2);
+						std::string cur_to_path2 = fs::formatPath(cur_to_path + "/" + filename);
+
+						stk.push({ fdesc, cur_to_path2 });
+					}
+				}
+				else if (p.first.mod & FileType::F_IFREG) {
+					if (p_from_conn == p_to_conn) {
+						if ((ec = p_from_conn->mv(cur_from_path, cur_to_path))) {
+							return -EIO;
+						}
+					}
+					else {
+						if ((ec = Netdisk::copyFile(cur_from_path.c_str(), cur_to_path.c_str(), p_from_conn, p_to_conn))) {
+							return -EIO;
+						}
+
+						if ((ec = p_from_conn->rm(cur_from_path))) {
+							return -EIO;
+						}
+					}
+				}
+				else {
+					return -EIO;
+				}
+			}
+
 			return 0;
 		}
 		else {
-
-			FileDesc from_fdesc;
-
+			return -EIO;
 		}
-
-
-		return -ENOSYS;
 	}
 
 	int Netdisk::link(const char* oldpath, const char* newpath)
