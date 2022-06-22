@@ -348,7 +348,8 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::memset(stbuf, 0, sizeof(*stbuf));
+		// TODO:: change to meaningful value in future
+		std::memset(stbuf, 1, sizeof(*stbuf));
 		return 0;
 	}
 
