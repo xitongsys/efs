@@ -140,6 +140,13 @@ namespace efs {
 				break;
 			}
 
+			FileDesc to_fdesc;
+			if (!(ec = p_executor->getFileDesc(p_in_msg->to_path, to_fdesc))) {
+				//to file exists
+				p_out_msg->error_code = ErrorCode::E_FILE_MV;
+				break;
+			}
+
 			Permission from_perm = Permission::EMPTY;
 			Permission to_perm = Permission::EMPTY;
 
@@ -177,14 +184,21 @@ namespace efs {
 				break;
 			}
 
-			FileDesc fdesc;
-			if ((ec = p_executor->getFileDesc(p_in_msg->from_path, fdesc))) {
+			FileDesc from_fdesc;
+			if ((ec = p_executor->getFileDesc(p_in_msg->from_path, from_fdesc))) {
 				p_out_msg->error_code = ec;
 				break;
 			}
 
-			fdesc.path = p_in_msg->to_path;
-			if ((ec = p_executor->setFileDesc(p_in_msg->to_path, fdesc))) {
+			// mv can only used for regular file
+			if (!(from_fdesc.mod & FileType::F_IFREG)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_MV;
+				break;
+			}
+
+			to_fdesc = from_fdesc;
+			to_fdesc.path = p_in_msg->to_path;
+			if ((ec = p_executor->setFileDesc(p_in_msg->to_path, to_fdesc))) {
 				p_out_msg->error_code = ec;
 				break;
 			}
