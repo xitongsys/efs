@@ -5,12 +5,14 @@
 #include <chrono>
 #include <filesystem>
 
+#include "Error.h"
+
 namespace efs {
 	namespace fs {
 		constexpr std::array<uint8_t, (1 << 8)> CS{
 			[]() constexpr {
 				std::array<uint8_t, (1 << 8)> res {};
-		constexpr char cs[] = "0123456789abcdefghijklmnopqrstuvwxyz_-.() @!~`#$%^&+={}[]|;,";
+		constexpr char cs[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-.() @!~`#$%^&+={}[]|;,";
 		const char* p = cs;
 		while (*p) {
 			res[*p] = 1;
@@ -18,6 +20,16 @@ namespace efs {
 		}
 		return res;
 	}() };
+
+		inline ErrorCode checkPath(const std::string& path) 
+		{
+			for (char c : path) {
+				if ((CS[c] == 0) && (c != '/') && (c != '\\')) {
+					return ErrorCode::E_FILE_INVALID_PATH;
+				}
+			}
+			return ErrorCode::NONE;
+		}
 
 		inline std::string basename(const std::string& path)
 		{

@@ -34,6 +34,7 @@ enum ErrorCode : int8_t {
     E_FILE_PERM,
     E_FILE_SEEK,
     E_FILE_TRUNCATE,
+    E_FILE_INVALID_PATH,
 
     E_DB_OPEN,
     E_DB_GET,

@@ -36,61 +36,110 @@ namespace efs {
 
 	void DataNodeSession::getFileDesc()
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgGetFileDesc> p_in_msg = std::static_pointer_cast<MsgGetFileDesc>(this->p_in_msg);
 		std::shared_ptr<MsgGetFileDescResp> p_out_msg = std::make_shared<MsgGetFileDescResp>();
-		p_out_msg->error_code = p_executor->getFileDesc(p_in_msg->path, p_out_msg->fdesc);
+
+		do {
+			if (ec = fs::checkPath(p_in_msg->path)) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			p_out_msg->error_code = p_executor->getFileDesc(p_in_msg->path, p_out_msg->fdesc);
+
+		} while (0);
+
 		this->p_out_msg = p_out_msg;
 	}
 
 	void DataNodeSession::ls()
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgLs> p_in_msg = std::static_pointer_cast<MsgLs>(this->p_in_msg);
 		std::shared_ptr<MsgLsResp> p_out_msg = std::make_shared<MsgLsResp>();
 
-		Permission perm = Permission::EMPTY;
-		ErrorCode ec;
-		if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
-			p_out_msg->error_code = ec;
+		do {
+			Permission perm = Permission::EMPTY;
 
-		}
-		else if (perm & Permission::R) {
-			ec = p_executor->ls(p_in_msg->path, p_out_msg->files);
-			p_out_msg->error_code = ec;
-		}
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			if (!(perm & Permission::R)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+				break;
+			}
+
+			if ((ec = p_executor->ls(p_in_msg->path, p_out_msg->files))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+		} while (0);
 
 		this->p_out_msg = p_out_msg;
 	}
 
 	void DataNodeSession::rm()
 	{
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgRm> p_in_msg = std::static_pointer_cast<MsgRm>(this->p_in_msg);
 		std::shared_ptr<MsgRmResp> p_out_msg = std::make_shared<MsgRmResp>();
 
-		Permission perm = Permission::EMPTY;
-		ErrorCode ec;
-		if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
-			p_out_msg->error_code = ec;
+		do {
+			Permission perm = Permission::EMPTY;
 
-		}
-		else if ((perm & Permission::W)) {
-			ec = p_executor->rm(p_in_msg->path);
-			p_out_msg->error_code = ec;
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
 
-		}
-		else {
-			p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
-		}
+			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
+				p_out_msg->error_code = ec;
+				break;
+
+			}
+
+			if (!(perm & Permission::W)) {
+				p_out_msg->error_code = ErrorCode::E_FILE_PERMISSION;
+				break;
+			}
+
+			if ((ec = p_executor->rm(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+		} while (0);
 
 		this->p_out_msg = p_out_msg;
 	}
 
 	void DataNodeSession::mv()
 	{
-		ErrorCode ec;
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgMv> p_in_msg = std::static_pointer_cast<MsgMv>(this->p_in_msg);
 		std::shared_ptr<MsgMvResp> p_out_msg = std::make_shared<MsgMvResp>();
 
 		do {
+
+			if ((ec = fs::checkPath(p_in_msg->from_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
+			if ((ec = fs::checkPath(p_in_msg->to_path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			Permission from_perm = Permission::EMPTY;
 			Permission to_perm = Permission::EMPTY;
 
@@ -164,6 +213,11 @@ namespace efs {
 		std::shared_ptr<MsgChownResp> p_out_msg = std::make_shared<MsgChownResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			Permission perm = Permission::EMPTY;
 			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
 				p_out_msg->error_code = ec;
@@ -193,11 +247,16 @@ namespace efs {
 
 	void DataNodeSession::chmod()
 	{
-		ErrorCode ec;
+		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgChmod> p_in_msg = std::static_pointer_cast<MsgChmod>(this->p_in_msg);
 		std::shared_ptr<MsgChmodResp> p_out_msg = std::make_shared<MsgChmodResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			Permission perm = Permission::EMPTY;
 
 			if ((ec = p_executor->permission(p_in_msg->path, this->udesc.uid, this->udesc.gid, perm))) {
@@ -226,6 +285,11 @@ namespace efs {
 		std::shared_ptr<MsgPermResp> p_out_msg = std::make_shared<MsgPermResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			Permission perm = Permission::EMPTY;
 			FileDesc fdesc;
 			UserDesc udesc;
@@ -278,6 +342,11 @@ namespace efs {
 		std::shared_ptr<MsgMkdirResp> p_out_msg = std::make_shared<MsgMkdirResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			std::string parent_path;
 			if ((ec = p_executor->parentPath(p_in_msg->path, parent_path))) {
 				p_out_msg->error_code = ec;
@@ -314,6 +383,11 @@ namespace efs {
 		const std::string& open_mod = p_in_msg->open_mod;
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			if (this->open_files.size() >= DataNodeSession::MAX_OPEN_FILE_NUM) {
 				p_out_msg->error_code = E_FILE_TOO_MANY;
 				break;
@@ -462,6 +536,11 @@ namespace efs {
 		const std::string& path = p_in_msg->path;
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			FileDesc fdesc;
 			if ((ec = p_executor->getFileDesc(path, fdesc))) {
 				std::string parent_path;
@@ -503,6 +582,11 @@ namespace efs {
 		std::shared_ptr<MsgReadOffsetResp> p_out_msg = std::make_shared<MsgReadOffsetResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			FileDesc fdesc;
 			if ((ec = p_executor->getFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ErrorCode::E_FILE_NOT_FOUND;
@@ -571,6 +655,11 @@ namespace efs {
 		std::shared_ptr<MsgWriteOffsetResp> p_out_msg = std::make_shared<MsgWriteOffsetResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			FileDesc fdesc;
 			if ((ec = p_executor->getFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ErrorCode::E_FILE_NOT_FOUND;
@@ -634,6 +723,11 @@ namespace efs {
 		std::shared_ptr<MsgTruncateResp> p_out_msg = std::make_shared<MsgTruncateResp>();
 
 		do {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
+				p_out_msg->error_code = ec;
+				break;
+			}
+
 			FileDesc fdesc;
 			if ((ec = p_executor->getFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ErrorCode::E_FILE_NOT_FOUND;
