@@ -1,5 +1,6 @@
 #include <stack>
 #include <string>
+#include <tuple>
 
 #include "Netdisk.h"
 #include "compat.h"
@@ -8,7 +9,7 @@
 namespace efs {
 
 	std::shared_ptr<Client> Netdisk::p_client = nullptr;
-	char Netdisk::buffer[EFS_BUFFER_SIZE] = {0,};
+	char Netdisk::buffer[EFS_BUFFER_SIZE] = { 0, };
 
 	Netdisk::Netdisk(std::shared_ptr<Client> p_client)
 	{
@@ -270,19 +271,31 @@ namespace efs {
 				return 0;
 			}
 		}
+		// directory
 		else if (from_fdesc.mod & FileType::F_IFDIR) {
-			std::stack<std::pair<FileDesc, std::string>> stk;
-			stk.push({ from_fdesc, to_path });
+			std::stack<std::tuple<FileDesc, std::string, int8_t>> stk;
+			stk.push({ from_fdesc, to_path, 0 });
 
 			while (stk.size()) {
 				auto p = stk.top();
 				stk.pop();
 
-				const std::string& cur_from_path(p.first.path);
-				const std::string& cur_to_path(p.second);
+				const FileDesc& fdesc = std::get<0>(p);
+				const std::string& cur_from_path(fdesc.path);
+				const std::string& cur_to_path(std::get<1>(p));
+				int8_t t = std::get<2>(p);
 
-				if (p.first.mod & FileType::F_IFDIR) {
-					if ((ec = p_to_conn->mkdir(p.second))) {
+				if (fdesc.mod & FileType::F_IFDIR) {
+					if (t > 0) {
+						if ((ec = p_from_conn->rm(cur_from_path))) {
+							return -EIO;
+						}
+						continue;
+					}
+
+					stk.push({ fdesc, cur_from_path, 1 });
+
+					if ((ec = p_to_conn->mkdir(cur_to_path))) {
 						return -EIO;
 					}
 
@@ -291,15 +304,17 @@ namespace efs {
 						return -EIO;
 					}
 
-					for (const FileDesc& fdesc : files) {
-						const std::string& cur_from_path2 = fdesc.path;
+					for (const FileDesc& fdesc2 : files) {
+						const std::string& cur_from_path2 = fdesc2.path;
 						std::string filename = fs::basename(cur_from_path2);
 						std::string cur_to_path2 = fs::formatPath(cur_to_path + "/" + filename);
 
-						stk.push({ fdesc, cur_to_path2 });
+						stk.push({ fdesc2, cur_to_path2, 0 });
 					}
+
+					
 				}
-				else if (p.first.mod & FileType::F_IFREG) {
+				else if (fdesc.mod & FileType::F_IFREG) {
 					if (p_from_conn == p_to_conn) {
 						if ((ec = p_from_conn->mv(cur_from_path, cur_to_path))) {
 							return -EIO;
