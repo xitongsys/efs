@@ -7,12 +7,15 @@
 
 namespace efs {
 
-	std::shared_ptr<Client> Netdisk::p_client = nullptr;
-	char Netdisk::buffer[EFS_BUFFER_SIZE] = { 0, };
-
 	Netdisk::Netdisk(std::shared_ptr<Client> p_client)
 	{
-		Netdisk::p_client = p_client;
+		this->p_client = p_client;
+		buffer = new char[EFS_BUFFER_SIZE];
+	}
+
+	Netdisk::~Netdisk() 
+	{
+		delete[] buffer;
 	}
 
 	int Netdisk::mount(int argc, char* argv[])
@@ -111,7 +114,7 @@ namespace efs {
 		}
 
 		FileDesc fdesc;
-		if ((ec = Netdisk::p_client->getFileDesc(path, fdesc))) {
+		if ((ec = self->p_client->getFileDesc(path, fdesc))) {
 			return -ENOENT;
 		}
 
@@ -136,12 +139,12 @@ namespace efs {
 
 	int Netdisk::mkdir(const char* path, fuse_mode_t mode)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
 
-		if ((ec = Netdisk::p_client->mkdir(path))) {
+		if ((ec = self->p_client->mkdir(path))) {
 			return -EIO;
 		}
 
@@ -150,11 +153,11 @@ namespace efs {
 
 	int Netdisk::unlink(const char* path)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		if ((ec = Netdisk::p_client->rm(path))) {
+		if ((ec = self->p_client->rm(path))) {
 			return -EIO;
 		}
 
@@ -163,11 +166,11 @@ namespace efs {
 
 	int Netdisk::rmdir(const char* path)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		if ((ec = Netdisk::p_client->rm(path))) {
+		if ((ec = self->p_client->rm(path))) {
 			return -EIO;
 		}
 
@@ -185,10 +188,10 @@ namespace efs {
 	int Netdisk::rename(const char* from_path, const char* to_path, unsigned int flags)
 	{
 		ErrorCode ec = ErrorCode::NONE;
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
-		if ((ec = Netdisk::p_client->mv(from_path, to_path))) {
+		if ((ec = self->p_client->mv(from_path, to_path))) {
 			return -EIO;
 		}
 		return 0;
@@ -220,11 +223,11 @@ namespace efs {
 
 	int Netdisk::truncate(const char* path, fuse_off_t size, fuse_file_info* fi)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		if ((ec = Netdisk::p_client->truncate(path, size))) {
+		if ((ec = self->p_client->truncate(path, size))) {
 			return -EIO;
 		}
 
@@ -233,11 +236,11 @@ namespace efs {
 
 	int Netdisk::open(const char* path, fuse_file_info* fi)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		if ((ec = Netdisk::p_client->openOffset(path))) {
+		if ((ec = self->p_client->openOffset(path))) {
 			return -EIO;
 		}
 
@@ -246,12 +249,12 @@ namespace efs {
 
 	int Netdisk::read(const char* path, char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
 		int64_t real_read_size = 0;
-		if ((ec = Netdisk::p_client->readOffset(path, size, off, buf, real_read_size))) {
+		if ((ec = self->p_client->readOffset(path, size, off, buf, real_read_size))) {
 			return -EIO;
 		}
 		return real_read_size;
@@ -259,12 +262,12 @@ namespace efs {
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
 		int64_t real_write_size = 0;
-		if ((ec = Netdisk::p_client->writeOffset(path, buf, size, off, real_write_size))) {
+		if ((ec = self->p_client->writeOffset(path, buf, size, off, real_write_size))) {
 			return -EIO;
 		}
 		return real_write_size;
@@ -349,13 +352,13 @@ namespace efs {
 		fuse_fill_dir_t filler,
 		fuse_off_t off, fuse_file_info* fi, enum fuse_readdir_flags)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
 		std::vector<FileDesc> fdescs;
 
-		if ((ec = Netdisk::p_client->ls(path, fdescs))) {
+		if ((ec = self->p_client->ls(path, fdescs))) {
 			return -EIO;
 		}
 
