@@ -21,6 +21,7 @@ namespace efs {
 
 		UserDesc udesc;
 		std::vector<HostDesc> hosts;
+		std::vector<UserDesc> users;
 
 		// <path, host idx, p_conn>
 		std::vector<std::tuple<std::string, int, std::shared_ptr<DataNodeConn>>> p_conns;

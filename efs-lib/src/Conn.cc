@@ -2,8 +2,6 @@
 #include "Limit.h"
 
 namespace efs {
-	char Conn::buf[EFS_BUFFER_SIZE];
-
 	Conn::Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port) :
 		io_context(io_context),
 		sock(io_context),
@@ -12,11 +10,20 @@ namespace efs {
 		port(port)
 	{
 		boost::asio::connect(sock, resolver.resolve(ip, std::to_string(port)));
+		buf = new char[EFS_BUFFER_SIZE];
+	}
+
+	Conn::~Conn()
+	{
+		boost::system::error_code b_ec;
+		sock.close(b_ec);
+		delete[] buf;
 	}
 
 	ErrorCode Conn::closeConn()
 	{
-		sock.close();
+		boost::system::error_code b_ec;
+		sock.close(b_ec);
 		return ErrorCode::NONE;
 	}
 }

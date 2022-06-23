@@ -10,12 +10,14 @@
 #include "FileDesc.h"
 #include "Msg/NameNode/MsgAccount.h"
 #include "Util.h"
+#include "NameNodeConn/NameNodeConn.h"
 
 namespace efs {
 	DataNodeExecutor::DataNodeExecutor(const DataNodeConfig& config)
 		: db(config.log_path)
 	{
 		this->config = config;
+		hdesc.host_type = HostType::DataNodeHost;
 		hdesc.ip = config.ip;
 		hdesc.port = config.port;
 		hdesc.token = config.token;
@@ -57,43 +59,26 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 
 		boost::asio::io_context io_context;
-		boost::asio::ip::tcp::socket sock(io_context);
-		boost::asio::ip::tcp::resolver resolver(io_context);
-		boost::asio::connect(sock, resolver.resolve(config.name_node_ip, std::to_string(config.name_node_port)));
+		NameNodeConn namenode_conn(io_context, config.name_node_ip, config.name_node_port, config.token);
 
-		constexpr int32_t BUF_SIZE = 4096;
-		char buf[BUF_SIZE];
-		MsgAccount msg_account;
-		msg_account.hdesc = hdesc;
-		int32_t msg_account_size = msg_account.size();
-		serialize::serialize(msg_account_size, buf, BUF_SIZE);
-		msg_account.serialize(buf + 4, BUF_SIZE - 4);
-		boost::asio::write(sock, boost::asio::buffer(buf, msg_account_size + 4));
-
-		MsgAccountResp msg_account_resp;
-		int32_t read_size = 0;
-		read_size += boost::asio::read(sock, boost::asio::buffer(buf + read_size, 4));
-		int32_t msg_size = 0;
-		serialize::deserialize(msg_size, buf, 4);
-
-		read_size += boost::asio::read(sock, boost::asio::buffer(buf, msg_size));
-		sock.close();
-
-		if (msg_account_resp.deserialize(buf, read_size) <= 0) {
-			throw ErrorCode::E_PANIC;
+		std::vector<UserDesc> users;
+		std::vector<GroupDesc> groups;
+		if ((ec = namenode_conn.accounts(hdesc, users, groups))) {
+			return ec;
 		}
 
-		groups.clear();
-		for (auto& group : msg_account_resp.groups) {
-			groups[group.group] = group;
+		this->users.clear();
+		this->groups.clear();
+
+		for (auto& user : users) {
+			this->users[user.user] = user;
 		}
 
-		users.clear();
-		for (auto& user : msg_account_resp.users) {
-			users[user.user] = user;
+		for (auto& group : groups) {
+			this->groups[group.group] = group;
 		}
 
-		return ec;
+		return ErrorCode::NONE;
 	}
 
 	ErrorCode DataNodeExecutor::getUser(const std::string& name, UserDesc& udesc)

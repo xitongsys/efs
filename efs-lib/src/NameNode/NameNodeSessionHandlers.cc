@@ -12,16 +12,25 @@ namespace efs {
 	{
 		std::shared_ptr<MsgAccount> p_in_msg = std::static_pointer_cast<MsgAccount>(this->p_in_msg);
 		std::shared_ptr<MsgAccountResp> p_out_msg = std::make_shared<MsgAccountResp>();
+
 		do {
-			if (namenode.config.tokens.count(p_in_msg->hdesc.token) == 0) {
-				p_out_msg->error_code = ErrorCode::E_TOKEN_ERROR;
+			if (p_in_msg->hdesc.host_type == HostType::ClientHost) {
+				p_out_msg->users = namenode.config.users;
+				p_out_msg->groups = namenode.config.groups;
+
+				for (auto& user : p_out_msg->users) {
+					user.password = "";
+				}
+			}
+			else if (p_in_msg->hdesc.host_type == HostType::DataNodeHost && namenode.config.tokens.count(p_in_msg->hdesc.token) > 0) {
+				p_out_msg->users = namenode.config.users;
+				p_out_msg->groups = namenode.config.groups;
+				namenode.hosts[p_in_msg->hdesc.name] = p_in_msg->hdesc;
+			}
+			else {
+				p_out_msg->error_code = ErrorCode::E_NOT_FOUND;
 				break;
 			}
-
-			namenode.hosts[p_in_msg->hdesc.name] = p_in_msg->hdesc;
-
-			p_out_msg->users = namenode.config.users;
-			p_out_msg->groups = namenode.config.groups;
 
 		} while (0);
 

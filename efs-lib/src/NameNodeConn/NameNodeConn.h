@@ -23,6 +23,8 @@ namespace efs {
 			const std::string& token);
 
 		ErrorCode hosts(const std::string& user, const std::string& password, std::vector<HostDesc>& hosts, UserDesc& udesc);
+		ErrorCode accounts(const HostDesc& hdesc, std::vector<UserDesc>& users, std::vector<GroupDesc>& groups);
+		ErrorCode close();
 	};
 
 }

@@ -22,4 +22,16 @@ namespace efs {
 		udesc = m_host_resp.udesc;
 		return ErrorCode(m_host_resp.error_code);
 	}
+
+	ErrorCode NameNodeConn::accounts(const HostDesc& hdesc, std::vector<UserDesc>& users, std::vector<GroupDesc>& groups)
+	{
+		MsgAccount m_account;
+		MsgAccountResp m_account_resp;
+		m_account.hdesc = hdesc;
+		query<MsgAccount, MsgAccountResp>(m_account, m_account_resp);
+		users = m_account_resp.users;
+		groups = m_account_resp.groups;
+
+		return ErrorCode(m_account_resp.error_code);
+	}
 }
