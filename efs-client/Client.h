@@ -15,6 +15,7 @@ namespace efs {
 	class Client
 	{
 	public:
+		std::mutex mutex;
 		boost::asio::io_context io_context;
 		ClientConfig config;
 

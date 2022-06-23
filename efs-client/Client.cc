@@ -90,6 +90,7 @@ namespace efs {
 
 	ErrorCode Client::getFileDesc(const std::string& path, FileDesc& fdesc)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 		if ((ec = getDataNodeConn(path, p_conn))) {
@@ -106,6 +107,7 @@ namespace efs {
 
 	ErrorCode Client::mkdir(const std::string& path)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 
@@ -122,6 +124,7 @@ namespace efs {
 
 	ErrorCode Client::rm(const std::string& path)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 
@@ -138,6 +141,7 @@ namespace efs {
 
 	ErrorCode Client::mv(const std::string& from_path, const std::string& to_path)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		if (from_path == to_path) {
 			return ErrorCode::NONE;
@@ -253,6 +257,7 @@ namespace efs {
 
 	ErrorCode Client::ls(const std::string& path, std::vector<FileDesc>& fdescs)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::vector<std::shared_ptr<DataNodeConn>> p_conns;
 		if (path == "/") {
@@ -311,6 +316,7 @@ namespace efs {
 
 	ErrorCode Client::openOffset(const std::string& path)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 
@@ -327,6 +333,7 @@ namespace efs {
 
 	ErrorCode Client::readOffset(const std::string& path, const int64_t& read_size, const int64_t& offset, char* data, int64_t& real_read_size)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 		if ((ec = getDataNodeConn(path, p_conn))) {
@@ -353,6 +360,7 @@ namespace efs {
 	}
 	ErrorCode Client::writeOffset(const std::string& path, const char* data, int64_t write_size, const int64_t& offset, int64_t& real_write_size)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 		if ((ec = getDataNodeConn(path, p_conn))) {
@@ -375,6 +383,7 @@ namespace efs {
 
 	ErrorCode Client::truncate(const std::string& path, const int64_t offset)
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 		if ((ec = getDataNodeConn(path, p_conn))) {
