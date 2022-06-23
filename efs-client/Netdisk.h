@@ -25,7 +25,6 @@ namespace efs {
 		static Netdisk* getself();
 		static fuse_timespec toFuseTime(int64_t t);
 		static fuse_stat toFuseState(const FileDesc& fdesc);
-		static std::shared_ptr<DataNodeConn> getConn(const std::string& path);
 
 		static int getattr(const char* path, struct fuse_stat* stbuf, struct fuse_file_info* fi);
 		static int readlink(const char* path, char* buf, size_t size);
