@@ -89,29 +89,6 @@ namespace efs {
 		return stat;
 	}
 
-	ErrorCode Netdisk::copyFile(const char* from_path, const char* to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn)
-	{
-		ErrorCode ec = ErrorCode::NONE;
-		int64_t offset = 0;
-		while (!ec) {
-			int32_t rs = 0;
-			ec = p_from_conn->readOffset(from_path, EFS_MAX_READ_SIZE, offset, buffer, rs);
-			if ((ec && ec != ErrorCode::E_FILE_EOF) || rs < 0) {
-				return ec;
-			}
-
-			int32_t ws = 0;
-			ec = p_to_conn->writeOffset(to_path, buffer, rs, offset, ws);
-			if (ec || ws != rs) {
-				return ec;
-			}
-
-			offset += ws;
-		}
-
-		return ErrorCode::NONE;
-	}
-
 	std::shared_ptr<DataNodeConn> Netdisk::getConn(const std::string& path)
 	{
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
@@ -140,13 +117,8 @@ namespace efs {
 			return 0;
 		}
 
-		std::shared_ptr<DataNodeConn> p_conn = Netdisk::getConn(path);
-		if (p_conn == nullptr) {
-			return -ENOENT;
-		}
-
 		FileDesc fdesc;
-		if ((ec = p_conn->getFileDesc(path, fdesc))) {
+		if ((ec = Netdisk::p_client->getFileDesc(path, fdesc))) {
 			return -ENOENT;
 		}
 
@@ -174,15 +146,12 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
+		ErrorCode ec = ErrorCode::NONE;
 
-		if (p_conn == nullptr) {
-			return -ENOENT;
-		}
-
-		if (p_conn->mkdir(path)) {
+		if ((ec = Netdisk::p_client->mkdir(path))) {
 			return -EIO;
 		}
+
 		return 0;
 	}
 
@@ -191,13 +160,8 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-
-		if (p_conn == nullptr) {
-			return -ENOENT;
-		}
-
-		if (p_conn->rm(path)) {
+		ErrorCode ec = ErrorCode::NONE;
+		if ((ec = Netdisk::p_client->rm(path))) {
 			return -EIO;
 		}
 
@@ -209,14 +173,11 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-		if (p_conn == nullptr) {
-			return -ENOENT;
+		ErrorCode ec = ErrorCode::NONE;
+		if ((ec = Netdisk::p_client->rm(path))) {
+			return -EIO;
 		}
 
-		if (p_conn->rm(path)) {
-			return -ENOENT;
-		}
 		return 0;
 	}
 
@@ -234,111 +195,10 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		if (strcmp(from_path, to_path) == 0) {
-			return 0;
-		}
-
-		std::shared_ptr<DataNodeConn> p_from_conn = getConn(from_path);
-		std::shared_ptr<DataNodeConn> p_to_conn = getConn(to_path);
-
-		if (p_from_conn == nullptr || p_to_conn == nullptr) {
-			return -ENOENT;
-		}
-
-		FileDesc from_fdesc;
-		if ((ec = p_from_conn->getFileDesc(from_path, from_fdesc))) {
-			return -ENOENT;
-		}
-
-		// single file
-		if (from_fdesc.mod & FileType::F_IFREG) {
-			if (p_from_conn == p_to_conn) {
-				if ((ec = p_from_conn->mv(from_path, to_path))) {
-					return -EIO;
-				}
-				return 0;
-			}
-			else {
-				if ((ec = Netdisk::copyFile(from_path, to_path, p_from_conn, p_to_conn))) {
-					return -EIO;
-				}
-
-				if ((ec = p_from_conn->rm(from_path))) {
-					return -EIO;
-				}
-
-				return 0;
-			}
-		}
-		// directory
-		else if (from_fdesc.mod & FileType::F_IFDIR) {
-			std::stack<std::tuple<FileDesc, std::string, int8_t>> stk;
-			stk.push({ from_fdesc, to_path, 0 });
-
-			while (stk.size()) {
-				auto p = stk.top();
-				stk.pop();
-
-				const FileDesc& fdesc = std::get<0>(p);
-				const std::string& cur_from_path(fdesc.path);
-				const std::string& cur_to_path(std::get<1>(p));
-				int8_t t = std::get<2>(p);
-
-				if (fdesc.mod & FileType::F_IFDIR) {
-					if (t > 0) {
-						if ((ec = p_from_conn->rm(cur_from_path))) {
-							return -EIO;
-						}
-						continue;
-					}
-
-					stk.push({ fdesc, cur_from_path, 1 });
-
-					if ((ec = p_to_conn->mkdir(cur_to_path))) {
-						return -EIO;
-					}
-
-					std::vector<FileDesc> files;
-					if ((ec = p_from_conn->ls(cur_from_path, files))) {
-						return -EIO;
-					}
-
-					for (const FileDesc& fdesc2 : files) {
-						const std::string& cur_from_path2 = fdesc2.path;
-						std::string filename = fs::basename(cur_from_path2);
-						std::string cur_to_path2 = fs::formatPath(cur_to_path + "/" + filename);
-
-						stk.push({ fdesc2, cur_to_path2, 0 });
-					}
-
-					
-				}
-				else if (fdesc.mod & FileType::F_IFREG) {
-					if (p_from_conn == p_to_conn) {
-						if ((ec = p_from_conn->mv(cur_from_path, cur_to_path))) {
-							return -EIO;
-						}
-					}
-					else {
-						if ((ec = Netdisk::copyFile(cur_from_path.c_str(), cur_to_path.c_str(), p_from_conn, p_to_conn))) {
-							return -EIO;
-						}
-
-						if ((ec = p_from_conn->rm(cur_from_path))) {
-							return -EIO;
-						}
-					}
-				}
-				else {
-					return -EIO;
-				}
-			}
-
-			return 0;
-		}
-		else {
+		if ((ec = Netdisk::p_client->mv(from_path, to_path))) {
 			return -EIO;
 		}
+		return 0;
 	}
 
 	int Netdisk::link(const char* oldpath, const char* newpath)
@@ -371,12 +231,7 @@ namespace efs {
 		std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-		if (p_conn == nullptr) {
-			return -ENOENT;
-		}
-
-		if ((ec = p_conn->truncate(path, size))) {
+		if ((ec = Netdisk::p_client->truncate(path, size))) {
 			return -EIO;
 		}
 
@@ -388,14 +243,9 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-
-		if (p_conn == nullptr) {
-			return -ENOENT;
-		}
-
-		if (p_conn->openOffset(path)) {
-			return -ENOENT;
+		ErrorCode ec = ErrorCode::NONE;
+		if ((ec = Netdisk::p_client->openOffset(path))) {
+			return -EIO;
 		}
 
 		return 0;
@@ -406,29 +256,12 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-		if (p_conn == nullptr) {
-			return -ENOENT;
+		ErrorCode ec = ErrorCode::NONE;
+		int64_t real_read_size = 0;
+		if ((ec = Netdisk::p_client->readOffset(path, size, off, buf, real_read_size))) {
+			return -EIO;
 		}
-
-		int64_t i = 0;
-		std::string data;
-
-		while (i < size) {
-			int64_t rs = std::min(size - i, size_t(EFS_MAX_READ_SIZE));
-			int32_t real_read_size = 0;
-			ErrorCode ec = p_conn->readOffset(path, rs, off + i, buf + i, real_read_size);
-			if (ec && ec != ErrorCode::E_FILE_EOF) {
-				return -ENOENT;
-			}
-
-			i += real_read_size;
-			if (ec == ErrorCode::E_FILE_EOF) {
-				break;
-			}
-		}
-
-		return i;
+		return real_read_size;
 	}
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
@@ -437,22 +270,11 @@ namespace efs {
 		std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-		if (p_conn == nullptr) {
-			return -ENOENT;
+		int64_t real_write_size = 0;
+		if ((ec = Netdisk::p_client->writeOffset(path, buf, size, off, real_write_size))) {
+			return -EIO;
 		}
-
-		int64_t i = 0;
-		while (i < size) {
-			int32_t ws = std::min(size - i, size_t(EFS_MAX_READ_SIZE));
-			int32_t real_write_size = 0;
-			if ((ec = p_conn->writeOffset(path, buf + i, ws, off + i, real_write_size))) {
-				return -EIO;
-			}
-			i += real_write_size;
-		}
-
-		return i;
+		return real_write_size;
 	}
 
 	int Netdisk::statfs(const char* path, fuse_statvfs* stbuf)
@@ -537,34 +359,20 @@ namespace efs {
 		auto self = getself();
 		std::lock_guard<std::mutex> lock(self->mutex);
 
-		std::vector<std::shared_ptr<DataNodeConn>> p_conns;
-		if (strcmp(path, "/") == 0) {
-			p_client->getAllDataNodeConns(p_conns);
+		ErrorCode ec = ErrorCode::NONE;
+		std::vector<FileDesc> fdescs;
+
+		if ((ec = Netdisk::p_client->ls(path, fdescs))) {
+			return -EIO;
 		}
-		else {
-			std::shared_ptr<DataNodeConn> p_conn = getConn(path);
-			if (p_conn) {
-				p_conns.push_back(p_conn);
+
+		for (auto& fdesc : fdescs) {
+			fuse_stat fstat = toFuseState(fdesc);
+			if (filler(buf, fs::basename(fdesc.path).c_str(), &fstat, 0, FUSE_FILL_DIR_PLUS)) {
+				break;
 			}
 		}
 
-		if (p_conns.size() == 0) {
-			return -ENOENT;
-		}
-
-		for (auto& p_conn : p_conns) {
-			std::vector<FileDesc> fdescs;
-			if (p_conn->ls(path, fdescs)) {
-				return -ENOENT;
-			}
-
-			for (auto& fdesc : fdescs) {
-				fuse_stat fstat = toFuseState(fdesc);
-				if (filler(buf, fs::basename(fdesc.path).c_str(), &fstat, 0, FUSE_FILL_DIR_PLUS)) {
-					break;
-				}
-			}
-		}
 		return 0;
 	}
 

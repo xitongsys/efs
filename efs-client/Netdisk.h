@@ -26,7 +26,6 @@ namespace efs {
 		static fuse_timespec toFuseTime(int64_t t);
 		static fuse_stat toFuseState(const FileDesc& fdesc);
 		static std::shared_ptr<DataNodeConn> getConn(const std::string& path);
-		static ErrorCode copyFile(const char* from_path, const char* to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn);
 
 		static int getattr(const char* path, struct fuse_stat* stbuf, struct fuse_file_info* fi);
 		static int readlink(const char* path, char* buf, size_t size);
