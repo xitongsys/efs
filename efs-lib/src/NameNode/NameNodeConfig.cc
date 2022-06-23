@@ -34,8 +34,6 @@ NameNodeConfig::NameNodeConfig(const std::string& file)
     }
 
     log_path = node["log_path"].as<std::string>();
-
-    buffer_size = node["buffer_size"].as<int32_t>();
 }
 
 NameNodeConfig::NameNodeConfig(const NameNodeConfig& config)
@@ -46,7 +44,6 @@ NameNodeConfig::NameNodeConfig(const NameNodeConfig& config)
     users = config.users;
     groups = config.groups;
     log_path = config.log_path;
-    buffer_size = config.buffer_size;
 }
 
 }

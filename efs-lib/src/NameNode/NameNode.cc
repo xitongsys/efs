@@ -1,4 +1,5 @@
 #include "NameNode/NameNode.h"
+#include "Limit.h"
 
 namespace efs {
 
@@ -10,7 +11,7 @@ NameNode::NameNode(const NameNodeConfig& config)
 
 std::shared_ptr<NameNodeSession> NameNode::new_session(boost::asio::ip::tcp::socket socket)
 {
-    return std::make_shared<NameNodeSession>(config.buffer_size, std::move(socket), *this);
+    return std::make_shared<NameNodeSession>(EFS_BUFFER_SIZE, std::move(socket), *this);
 }
 
 }
