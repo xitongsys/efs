@@ -9,7 +9,6 @@ namespace efs {
 		ip(ip),
 		port(port)
 	{
-		boost::asio::connect(sock, resolver.resolve(ip, std::to_string(port)));
 		buf = new char[EFS_BUFFER_SIZE];
 	}
 
@@ -18,6 +17,16 @@ namespace efs {
 		boost::system::error_code b_ec;
 		sock.close(b_ec);
 		delete[] buf;
+	}
+
+	ErrorCode Conn::openConn()
+	{
+		boost::system::error_code b_ec;
+		boost::asio::connect(sock, resolver.resolve(ip, std::to_string(port)), b_ec);
+		if (b_ec) {
+			return E_NETWORK;
+		}
+		return ErrorCode::NONE;
 	}
 
 	ErrorCode Conn::closeConn()

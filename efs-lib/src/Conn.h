@@ -28,6 +28,7 @@ namespace efs {
 		Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port);
 		~Conn();
 
+		ErrorCode openConn();
 		ErrorCode closeConn();
 
 		template<class MSG, class MSG_RESP>
@@ -44,11 +45,19 @@ namespace efs {
 				return;
 			}
 
-			boost::asio::write(sock, boost::asio::buffer(buf, msg_size + 4));
+			boost::system::error_code b_ec;
+			boost::asio::write(sock, boost::asio::buffer(buf, msg_size + 4), b_ec);
+			if (b_ec) {
+				msg_resp.error_code = ErrorCode::E_NETWORK;
+				return;
+			}
 
 			int32_t msg_resp_size = 0;
-
-			boost::asio::read(sock, boost::asio::buffer(buf, 4));
+			boost::asio::read(sock, boost::asio::buffer(buf, 4), b_ec);
+			if (b_ec) {
+				msg_resp.error_code = ErrorCode::E_NETWORK;
+				return;
+			}
 
 			if (serialize::deserialize(msg_resp_size, buf, 4) <= 0) {
 				msg_resp.error_code = ErrorCode::E_DESERIALIZE;
@@ -60,10 +69,13 @@ namespace efs {
 				return;
 			}
 
-			boost::asio::read(sock, boost::asio::buffer(buf, msg_resp_size));
+			boost::asio::read(sock, boost::asio::buffer(buf, msg_resp_size), b_ec);
+			if (b_ec) {
+				msg_resp.error_code = ErrorCode::E_NETWORK;
+				return;
+			}
 
 			if (msg_resp.deserialize(buf, msg_resp_size) < 0) {
-
 				msg_resp.error_code = E_DESERIALIZE;
 				return;
 			}

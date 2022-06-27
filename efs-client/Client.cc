@@ -12,17 +12,34 @@ namespace efs {
 		config(config)
 	{
 		buffer = new char[EFS_BUFFER_SIZE];
-		getDataNodes();
 	}
 
 	Client::~Client() {
 		delete[] buffer;
 	}
 
+	ErrorCode Client::connect()
+	{
+		ErrorCode ec = ErrorCode::NONE;
+		if ((ec = getDataNodes())) {
+			return ec;
+		}
+
+		if ((ec = getAccounts())) {
+			return ec;
+		}
+
+		return ErrorCode::NONE;
+	}
+
 	ErrorCode Client::getDataNodes()
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		NameNodeConn conn(io_context, config.namenode_ip, config.namenode_port, "");
+		if ((ec = conn.openConn())) {
+			return ec;
+		}
+
 		if ((ec = conn.hosts(config.user, config.password, hosts, udesc))) {
 			return ec;
 		}
@@ -40,6 +57,10 @@ namespace efs {
 				io_context,
 				hosts[i].ip, hosts[i].port,
 				config.user, config.password);
+
+			if ((ec = p_conn->openConn())) {
+				continue;
+			}
 
 			if ((ec = p_conn->login())) {
 				continue;
@@ -84,6 +105,22 @@ namespace efs {
 		}
 
 		p_conns = std::vector<std::shared_ptr<DataNodeConn>>(st.begin(), st.end());
+		return ErrorCode::NONE;
+	}
+
+	ErrorCode Client::getAccounts()
+	{
+		ErrorCode ec = ErrorCode::NONE;
+		NameNodeConn conn(io_context, config.namenode_ip, config.namenode_port, "");
+		if ((ec = conn.openConn())) {
+			return ec;
+		}
+
+		HostDesc hdesc;
+		hdesc.host_type = HostType::ClientHost;
+		if ((ec = conn.accounts(hdesc, users, groups))) {
+			return ec;
+		}
 		return ErrorCode::NONE;
 	}
 

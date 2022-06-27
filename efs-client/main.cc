@@ -38,6 +38,9 @@ int main(int argc, char* argv[])
 		else if (cmd == "mv") {
 			efs::CliHandlers::mvHandler(tokens);
 		}
+		else if (cmd == "perm") {
+			efs::CliHandlers::permHandler(tokens);
+		}
 		else if (cmd == "hosts") {
 			efs::CliHandlers::hostsHandler(tokens);
 		}

@@ -61,6 +61,10 @@ namespace efs {
 		boost::asio::io_context io_context;
 		NameNodeConn namenode_conn(io_context, config.name_node_ip, config.name_node_port, config.token);
 
+		if ((ec = namenode_conn.openConn())) {
+			return ec;
+		}
+
 		std::vector<UserDesc> users;
 		std::vector<GroupDesc> groups;
 		if ((ec = namenode_conn.accounts(hdesc, users, groups))) {

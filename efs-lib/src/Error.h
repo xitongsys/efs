@@ -7,6 +7,7 @@ enum ErrorCode : int8_t {
     E_BUFFER_SIZE,
     E_NOT_FOUND,
     E_UNKNOWN_TYPE,
+    E_NETWORK,
 
     E_PANIC,
 

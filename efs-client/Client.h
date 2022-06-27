@@ -22,6 +22,7 @@ namespace efs {
 		UserDesc udesc;
 		std::vector<HostDesc> hosts;
 		std::vector<UserDesc> users;
+		std::vector<GroupDesc> groups;
 
 		// <path, host idx, p_conn>
 		std::vector<std::tuple<std::string, int, std::shared_ptr<DataNodeConn>>> p_conns;
@@ -32,9 +33,13 @@ namespace efs {
 		Client(const ClientConfig& config);
 		~Client();
 
+		ErrorCode connect();
+
 		ErrorCode getDataNodes();
 		ErrorCode getDataNodeConn(const std::string& path, std::shared_ptr<DataNodeConn>& p_datanode);
 		ErrorCode getAllDataNodeConns(std::vector<std::shared_ptr<DataNodeConn>>& p_conns);
+
+		ErrorCode getAccounts();
 
 	public:
 		ErrorCode getFileDesc(const std::string& path, FileDesc& fdesc);

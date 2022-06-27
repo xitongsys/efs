@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <format>
 
 #include "CliHandlers.h"
 #include "Global.h"
@@ -12,12 +14,19 @@ namespace efs {
 			return;
 		}
 
+		ErrorCode ec = ErrorCode::NONE;
+
 		Global::config.namenode_ip = tokens[1];
 		Global::config.namenode_port = std::stoi(tokens[2]);
 		Global::config.user = tokens[3];
 		Global::config.password = tokens[4];
 
 		Global::p_client = std::make_shared<efs::Client>(Global::config);
+
+		if ((ec = Global::p_client->connect())) {
+			CliHandlers::errorHandler(ec);
+			return;
+		}
 	}
 
 	void CliHandlers::lsHandler(const std::vector<std::string>& tokens)
@@ -91,10 +100,26 @@ namespace efs {
 
 	void CliHandlers::hostsHandler(const std::vector<std::string>& tokens)
 	{
+		for (const HostDesc& hdesc : Global::p_client->hosts) {
+			std::cout << hdesc.name << std::endl;
+			std::cout << hdesc.ip << ":" << hdesc.port << std::endl;
+			for (const std::string& path : hdesc.paths) {
+				std::cout << path << std::endl;
+			}
+		}
 	}
 
 	void CliHandlers::usersHandler(const std::vector<std::string>& tokens)
 	{
+		std::cout << "users" << std::endl;
+		for (const UserDesc& udesc : Global::p_client->users) {
+			std::cout << udesc.user << "," << udesc.uid << "," << udesc.gid << "," << udesc.root_path << std::endl;
+		}
+
+		std::cout << "groups" << std::endl;
+		for (const GroupDesc& gdesc : Global::p_client->groups) {
+			std::cout << gdesc.group << "," << gdesc.gid << std::endl;
+		}
 	}
 
 	void CliHandlers::wrongParas()
