@@ -158,19 +158,19 @@ namespace efs {
 				std::cout << path << std::endl;
 			}
 		}
-		std::cout << "---           ---" << std::endl;
+		std::cout << "-----------------" << std::endl;
 
 		std::cout << "--- users ---" << std::endl;
 		for (const UserDesc& udesc : Global::p_client->users) {
 			std::cout << udesc.user << "," << udesc.uid << "," << udesc.gid << "," << udesc.root_path << std::endl;
 		}
-		std::cout << "---       ---" << std::endl;
+		std::cout << "-------------" << std::endl;
 
 		std::cout << "--- groups ---" << std::endl;
 		for (const GroupDesc& gdesc : Global::p_client->groups) {
 			std::cout << gdesc.group << "," << gdesc.gid << std::endl;
 		}
-		std::cout << "---        ---" << std::endl;
+		std::cout << "--------------" << std::endl;
 	}
 
 	void CliHandlers::wrongParas()
