@@ -5,6 +5,7 @@
 
 #include "CliHandlers.h"
 #include "Global.h"
+#include "FS.h"
 
 namespace efs {
 
@@ -40,7 +41,7 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = tokens[1];
+		std::string path = fs::formatPath(tokens[1]);
 		std::vector<FileDesc> fdescs;
 		if ((ec = Global::p_client->ls(path, fdescs))) {
 			errorHandler(ec);
@@ -60,7 +61,7 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = tokens[1];
+		std::string path = fs::formatPath(tokens[1]);
 		if ((ec = Global::p_client->rmRecursive(path))) {
 			errorHandler(ec);
 			return;
@@ -75,7 +76,7 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = tokens[1];
+		std::string path = fs::formatPath(tokens[1]);
 		if ((ec = Global::p_client->mkdir(path))) {
 			errorHandler(ec);
 			return;
@@ -90,7 +91,7 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string from_path = tokens[1], to_path = tokens[2];
+		std::string from_path = fs::formatPath(tokens[1]), to_path = fs::formatPath(tokens[2]);
 		if ((ec = Global::p_client->mv(from_path, to_path))) {
 			errorHandler(ec);
 			return;
@@ -105,7 +106,7 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = tokens[1];
+		std::string path = fs::formatPath(tokens[1]);
 		PermType perm_type = Global::strToPermType(tokens[2]);
 		std::string name = tokens[3];
 		Permission perm = Global::strToPerm(tokens[4]);
@@ -124,7 +125,7 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string from_path = tokens[1], to_path = tokens[2];
+		std::string from_path = fs::formatPath(tokens[1]), to_path = fs::formatPath(tokens[2]);
 
 		if ((ec = Global::p_client->cpRecursive(from_path, to_path))) {
 			errorHandler(ec);
