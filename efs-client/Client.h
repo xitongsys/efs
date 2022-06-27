@@ -44,10 +44,17 @@ namespace efs {
 	public:
 		ErrorCode getFileDesc(const std::string& path, FileDesc& fdesc);
 		ErrorCode mkdir(const std::string& path);
+
 		ErrorCode rm(const std::string& path);
+		ErrorCode rmRecursive(const std::string& path);
+
 		ErrorCode mv(const std::string& from_path, const std::string& to_path);
 		ErrorCode ls(const std::string& path, std::vector<FileDesc>& fdescs);
+
+		
+		ErrorCode cpRecursive(const std::string& from_path, const std::string& to_path);
 		ErrorCode cp(const std::string& from_path, const std::string& to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn);
+
 		ErrorCode perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm, const bool& recursive);
 
 
@@ -57,6 +64,9 @@ namespace efs {
 		ErrorCode writeOffset(const std::string& path, const char* data, int64_t write_size, const int64_t& offset, int64_t& real_write_size);
 
 		ErrorCode truncate(const std::string& path, const int64_t offset);
+
+	private:
+		ErrorCode _cp(const std::string& from_path, const std::string& to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn);
 	};
 }
 

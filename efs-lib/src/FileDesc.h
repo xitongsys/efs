@@ -15,9 +15,10 @@ namespace efs {
 	};
 
 	enum PermType : uint8_t {
-		USER = 0,
-		GROUP = 3,
-		OTHER = 6,
+		DEFAULT_PERMTYPE = 0,
+		USER = 1,
+		GROUP = 2,
+		OTHER = 3,
 	};
 
 	enum FileType : uint16_t {

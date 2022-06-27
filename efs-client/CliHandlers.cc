@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <format>
+#include <thread>
 
 #include "CliHandlers.h"
 #include "Global.h"
@@ -27,6 +28,8 @@ namespace efs {
 			CliHandlers::errorHandler(ec);
 			return;
 		}
+
+		Global::p_netdisk = std::make_shared<Netdisk>(Global::p_client);
 	}
 
 	void CliHandlers::lsHandler(const std::vector<std::string>& tokens)
@@ -45,7 +48,7 @@ namespace efs {
 		}
 
 		for (const FileDesc& fdesc : fdescs) {
-			std::cout << fdesc.path << std::endl;
+			std::cout << fdesc.path << "," << Global::modToStr(fdesc.mod) << "," << fdesc.fsize << "," << fdesc.modified_time << std::endl;
 		}
 	}
 
@@ -58,7 +61,7 @@ namespace efs {
 
 		ErrorCode ec = ErrorCode::NONE;
 		std::string path = tokens[1];
-		if ((ec = Global::p_client->rm(path))) {
+		if ((ec = Global::p_client->rmRecursive(path))) {
 			errorHandler(ec);
 			return;
 		}
@@ -96,30 +99,77 @@ namespace efs {
 
 	void CliHandlers::permHandler(const std::vector<std::string>& tokens)
 	{
+		if (tokens.size() != 5) {
+			wrongParas();
+			return;
+		}
+
+		ErrorCode ec = ErrorCode::NONE;
+		std::string path = tokens[1], name = tokens[2];
+		PermType perm_type = Global::strToPermType(tokens[3]);
+		Permission perm = Global::strToPerm(tokens[4]);
+
+
+		if ((ec = Global::p_client->perm(path, name, perm_type, Permission(perm), true))) {
+			errorHandler(ec);
+			return;
+		}
 	}
 
-	void CliHandlers::hostsHandler(const std::vector<std::string>& tokens)
+	void CliHandlers::cpHandler(const std::vector<std::string>& tokens)
 	{
+		if (tokens.size() != 3) {
+			wrongParas();
+			return;
+		}
+
+		ErrorCode ec = ErrorCode::NONE;
+		std::string from_path = tokens[1], to_path = tokens[2];
+
+		if ((ec = Global::p_client->cpRecursive(from_path, to_path))) {
+			errorHandler(ec);
+			return;
+		}
+	}
+
+	void CliHandlers::mountHandler(const std::vector<std::string>& tokens)
+	{
+		ErrorCode ec = ErrorCode::NONE;
+		if (Global::argv[0] == nullptr) {
+			Global::argv[0] = new char[100];
+			Global::argv[0][0] = 0;
+		}
+
+		Global::p_mount_thread = std::make_shared<std::thread>(std::bind(&Netdisk::mount, Global::p_netdisk, Global::argc, Global::argv));
+		Global::p_mount_thread->detach();
+	}
+
+	void CliHandlers::unmountHandler(const std::vector<std::string>& tokens)
+	{
+	}
+
+	void CliHandlers::infoHandler(const std::vector<std::string>& tokens)
+	{
+		std::cout << "--- datanodes ---" << std::endl;
 		for (const HostDesc& hdesc : Global::p_client->hosts) {
-			std::cout << hdesc.name << std::endl;
-			std::cout << hdesc.ip << ":" << hdesc.port << std::endl;
+			std::cout << hdesc.name << "," << hdesc.ip << "," << hdesc.port << std::endl;
 			for (const std::string& path : hdesc.paths) {
 				std::cout << path << std::endl;
 			}
 		}
-	}
+		std::cout << "---           ---" << std::endl;
 
-	void CliHandlers::usersHandler(const std::vector<std::string>& tokens)
-	{
-		std::cout << "users" << std::endl;
+		std::cout << "--- users ---" << std::endl;
 		for (const UserDesc& udesc : Global::p_client->users) {
 			std::cout << udesc.user << "," << udesc.uid << "," << udesc.gid << "," << udesc.root_path << std::endl;
 		}
+		std::cout << "---       ---" << std::endl;
 
-		std::cout << "groups" << std::endl;
+		std::cout << "--- groups ---" << std::endl;
 		for (const GroupDesc& gdesc : Global::p_client->groups) {
 			std::cout << gdesc.group << "," << gdesc.gid << std::endl;
 		}
+		std::cout << "---        ---" << std::endl;
 	}
 
 	void CliHandlers::wrongParas()

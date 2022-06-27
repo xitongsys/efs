@@ -58,8 +58,6 @@ namespace efs {
 		};
 
 		return fuse_main(argc, argv, &ops, this);
-
-
 	}
 
 	Netdisk* Netdisk::getself()
@@ -95,7 +93,7 @@ namespace efs {
 	int Netdisk::getattr(const char* path, fuse_stat* stbuf, fuse_file_info* fi)
 	{
 		auto self = getself();
-		std::lock_guard<std::mutex> lock(self->mutex);
+		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
 		//TODO:: maybe change more elegant

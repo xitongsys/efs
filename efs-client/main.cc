@@ -26,29 +26,45 @@ int main(int argc, char* argv[])
 		if (cmd == "login") {
 			efs::CliHandlers::loginHandler(tokens);
 		}
-		else if (cmd == "ls") {
-			efs::CliHandlers::lsHandler(tokens);
-		}
-		else if (cmd == "mkdir") {
-			efs::CliHandlers::mkdirHandler(tokens);
-		}
-		else if (cmd == "rm") {
-			efs::CliHandlers::rmHandler(tokens);
-		}
-		else if (cmd == "mv") {
-			efs::CliHandlers::mvHandler(tokens);
-		}
-		else if (cmd == "perm") {
-			efs::CliHandlers::permHandler(tokens);
-		}
-		else if (cmd == "hosts") {
-			efs::CliHandlers::hostsHandler(tokens);
-		}
-		else if (cmd == "users") {
-			efs::CliHandlers::usersHandler(tokens);
-		}
 		else {
-			std::cout << "unknown command" << std::endl;
+			if (efs::Global::p_client == nullptr) {
+				std::cout << "no client" << std::endl;
+				continue;
+			}
+
+			if (cmd == "ls") {
+				efs::CliHandlers::lsHandler(tokens);
+			}
+			else if (cmd == "mkdir") {
+				efs::CliHandlers::mkdirHandler(tokens);
+			}
+			else if (cmd == "rm") {
+				efs::CliHandlers::rmHandler(tokens);
+			}
+			else if (cmd == "mv") {
+				efs::CliHandlers::mvHandler(tokens);
+			}
+			else if (cmd == "perm") {
+				efs::CliHandlers::permHandler(tokens);
+			}
+			else if (cmd == "cp") {
+				efs::CliHandlers::cpHandler(tokens);
+			}
+			else if (cmd == "mount") {
+				efs::CliHandlers::mountHandler(tokens);
+			}
+			else if (cmd == "unmount") {
+				efs::CliHandlers::unmountHandler(tokens);
+			}
+			else if (cmd == "info") {
+				efs::CliHandlers::infoHandler(tokens);
+			}
+			else if (cmd == "exit") {
+				exit(0);
+			}
+			else {
+				std::cout << "unknown command" << std::endl;
+			}
 		}
 	}
 

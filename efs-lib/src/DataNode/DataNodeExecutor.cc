@@ -17,6 +17,7 @@ namespace efs {
 		: db(config.log_path)
 	{
 		this->config = config;
+		hdesc.name = config.name;
 		hdesc.host_type = HostType::DataNodeHost;
 		hdesc.ip = config.ip;
 		hdesc.port = config.port;

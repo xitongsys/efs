@@ -132,7 +132,7 @@ namespace efs {
 		if ((ec = getDataNodeConn(path, p_conn))) {
 			return ec;
 		}
-		
+
 		if ((ec = p_conn->getFileDesc(path, fdesc))) {
 			return ec;
 		}
@@ -175,6 +175,64 @@ namespace efs {
 		return ec;
 	}
 
+	ErrorCode Client::rmRecursive(const std::string& path)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
+		if ((ec = getDataNodeConn(path, p_conn))) {
+			return ec;
+		}
+
+		FileDesc fdesc;
+		if ((ec = p_conn->getFileDesc(path, fdesc))) {
+			return ec;
+		}
+
+		std::stack<std::tuple<FileDesc, int8_t>> stk;
+		stk.push({ fdesc, 0 });
+
+		while (stk.size()) {
+			auto p = stk.top();
+			stk.pop();
+
+			const FileDesc& fdesc = std::get<0>(p);
+			const std::string& cur_path(fdesc.path);
+			int8_t t = std::get<1>(p);
+
+			if (fdesc.mod & FileType::F_IFDIR) {
+				if (t > 0) {
+					if ((ec = p_conn->rm(cur_path))) {
+						return ec;
+					}
+					continue;
+				}
+
+				stk.push({ fdesc, 1 });
+
+				std::vector<FileDesc> files;
+				if ((ec = p_conn->ls(cur_path, files))) {
+					return ec;
+				}
+
+				for (const FileDesc& fdesc2 : files) {
+					stk.push({ fdesc2, 0 });
+				}
+			}
+			else if (fdesc.mod & FileType::F_IFREG) {
+				if ((ec = p_conn->rm(cur_path))) {
+					return ec;
+				}
+			}
+			else {
+				return E_FILE_UNKNOWN_TYPE;
+			}
+		}
+
+		return ErrorCode::NONE;
+	}
+
 	ErrorCode Client::mv(const std::string& from_path, const std::string& to_path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
@@ -185,7 +243,7 @@ namespace efs {
 
 		std::shared_ptr<DataNodeConn> p_from_conn = nullptr;
 		std::shared_ptr<DataNodeConn> p_to_conn = nullptr;
-		
+
 		if ((ec = getDataNodeConn(from_path, p_from_conn))) {
 			return ec;
 		}
@@ -199,95 +257,69 @@ namespace efs {
 			return ec;
 		}
 
-		// single file
-		if (from_fdesc.mod & FileType::F_IFREG) {
-			if (p_from_conn == p_to_conn) {
-				if ((ec = p_from_conn->mv(from_path, to_path))) {
-					return ec;
-				}
-				return ErrorCode::NONE;
-			}
-			else {
-				if ((ec = cp(from_path, to_path, p_from_conn, p_to_conn))) {
-					return ec;
-				}
+		std::stack<std::tuple<FileDesc, std::string, int8_t>> stk;
+		stk.push({ from_fdesc, to_path, 0 });
 
-				if ((ec = p_from_conn->rm(from_path))) {
-					return ec;
-				}
+		while (stk.size()) {
+			auto p = stk.top();
+			stk.pop();
 
-				return ErrorCode::NONE;
-			}
-		}
-		// directory
-		else if (from_fdesc.mod & FileType::F_IFDIR) {
-			std::stack<std::tuple<FileDesc, std::string, int8_t>> stk;
-			stk.push({ from_fdesc, to_path, 0 });
+			const FileDesc& fdesc = std::get<0>(p);
+			const std::string& cur_from_path(fdesc.path);
+			const std::string& cur_to_path(std::get<1>(p));
+			int8_t t = std::get<2>(p);
 
-			while (stk.size()) {
-				auto p = stk.top();
-				stk.pop();
-
-				const FileDesc& fdesc = std::get<0>(p);
-				const std::string& cur_from_path(fdesc.path);
-				const std::string& cur_to_path(std::get<1>(p));
-				int8_t t = std::get<2>(p);
-
-				if (fdesc.mod & FileType::F_IFDIR) {
-					if (t > 0) {
-						if ((ec = p_from_conn->rm(cur_from_path))) {
-							return ec;
-						}
-						continue;
-					}
-
-					stk.push({ fdesc, cur_from_path, 1 });
-
-					if ((ec = p_to_conn->mkdir(cur_to_path))) {
+			if (fdesc.mod & FileType::F_IFDIR) {
+				if (t > 0) {
+					if ((ec = p_from_conn->rm(cur_from_path))) {
 						return ec;
 					}
-
-					std::vector<FileDesc> files;
-					if ((ec = p_from_conn->ls(cur_from_path, files))) {
-						return ec;
-					}
-
-					for (const FileDesc& fdesc2 : files) {
-						const std::string& cur_from_path2 = fdesc2.path;
-						std::string filename = fs::basename(cur_from_path2);
-						std::string cur_to_path2 = fs::formatPath(cur_to_path + "/" + filename);
-
-						stk.push({ fdesc2, cur_to_path2, 0 });
-					}
-
-
+					continue;
 				}
-				else if (fdesc.mod & FileType::F_IFREG) {
-					if (p_from_conn == p_to_conn) {
-						if ((ec = p_from_conn->mv(cur_from_path, cur_to_path))) {
-							return ec;
-						}
-					}
-					else {
-						if ((ec = cp(cur_from_path.c_str(), cur_to_path.c_str(), p_from_conn, p_to_conn))) {
-							return ec;
-						}
 
-						if ((ec = p_from_conn->rm(cur_from_path))) {
-							return ec;
-						}
+				stk.push({ fdesc, cur_from_path, 1 });
+
+				if ((ec = p_to_conn->mkdir(cur_to_path))) {
+					return ec;
+				}
+
+				std::vector<FileDesc> files;
+				if ((ec = p_from_conn->ls(cur_from_path, files))) {
+					return ec;
+				}
+
+				for (const FileDesc& fdesc2 : files) {
+					const std::string& cur_from_path2 = fdesc2.path;
+					std::string filename = fs::basename(cur_from_path2);
+					std::string cur_to_path2 = fs::formatPath(cur_to_path + "/" + filename);
+
+					stk.push({ fdesc2, cur_to_path2, 0 });
+				}
+
+
+			}
+			else if (fdesc.mod & FileType::F_IFREG) {
+				if (p_from_conn == p_to_conn) {
+					if ((ec = p_from_conn->mv(cur_from_path, cur_to_path))) {
+						return ec;
 					}
 				}
 				else {
-					return E_FILE_UNKNOWN_TYPE;
+					if ((ec = _cp(cur_from_path.c_str(), cur_to_path.c_str(), p_from_conn, p_to_conn))) {
+						return ec;
+					}
+
+					if ((ec = p_from_conn->rm(cur_from_path))) {
+						return ec;
+					}
 				}
 			}
+			else {
+				return E_FILE_UNKNOWN_TYPE;
+			}
+		}
 
-			return ErrorCode::NONE;
-		}
-		else {
-			return E_FILE_UNKNOWN_TYPE;
-		}
+		return ErrorCode::NONE;
 	}
 
 
@@ -327,7 +359,91 @@ namespace efs {
 		return ErrorCode::NONE;
 	}
 
+	ErrorCode Client::cpRecursive(const std::string& from_path, const std::string& to_path)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+
+		ErrorCode ec = ErrorCode::NONE;
+		if (from_path == to_path) {
+			return ErrorCode::NONE;
+		}
+
+		std::shared_ptr<DataNodeConn> p_from_conn = nullptr;
+		std::shared_ptr<DataNodeConn> p_to_conn = nullptr;
+
+		if ((ec = getDataNodeConn(from_path, p_from_conn))) {
+			return ec;
+		}
+
+		if ((ec = getDataNodeConn(to_path, p_to_conn))) {
+			return ec;
+		}
+
+		FileDesc from_fdesc;
+		if ((ec = p_from_conn->getFileDesc(from_path, from_fdesc))) {
+			return ec;
+		}
+
+		std::stack<std::tuple<FileDesc, std::string, int8_t>> stk;
+		stk.push({ from_fdesc, to_path, 0 });
+
+		while (stk.size()) {
+			auto p = stk.top();
+			stk.pop();
+
+			const FileDesc& fdesc = std::get<0>(p);
+			const std::string& cur_from_path(fdesc.path);
+			const std::string& cur_to_path(std::get<1>(p));
+			int8_t t = std::get<2>(p);
+
+			if (fdesc.mod & FileType::F_IFDIR) {
+				if (t > 0) {
+					continue;
+				}
+
+				stk.push({ fdesc, cur_from_path, 1 });
+
+				if ((ec = p_to_conn->mkdir(cur_to_path))) {
+					return ec;
+				}
+
+				std::vector<FileDesc> files;
+				if ((ec = p_from_conn->ls(cur_from_path, files))) {
+					return ec;
+				}
+
+				for (const FileDesc& fdesc2 : files) {
+					const std::string& cur_from_path2 = fdesc2.path;
+					std::string filename = fs::basename(cur_from_path2);
+					std::string cur_to_path2 = fs::formatPath(cur_to_path + "/" + filename);
+
+					stk.push({ fdesc2, cur_to_path2, 0 });
+				}
+			}
+			else if (fdesc.mod & FileType::F_IFREG) {
+				if ((ec = p_to_conn->openOffset(cur_to_path))) {
+					return ec;
+				}
+
+				if ((ec = _cp(cur_from_path, cur_to_path, p_from_conn, p_to_conn))) {
+					return ec;
+				}
+			}
+			else {
+				return E_FILE_UNKNOWN_TYPE;
+			}
+		}
+
+		return ErrorCode::NONE;
+	}
+
 	ErrorCode Client::cp(const std::string& from_path, const std::string& to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		return _cp(from_path, to_path, p_from_conn, p_to_conn);
+	}
+
+	ErrorCode Client::_cp(const std::string& from_path, const std::string& to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn)
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		int64_t offset = 0;
@@ -345,6 +461,10 @@ namespace efs {
 			}
 
 			offset += ws;
+
+			if (ec == ErrorCode::E_FILE_EOF || rs == 0) {
+				break;
+			}
 		}
 
 		return ErrorCode::NONE;
@@ -472,7 +592,7 @@ namespace efs {
 		if ((ec = getDataNodeConn(path, p_conn))) {
 			return ec;
 		}
-		
+
 		int64_t i = 0;
 		while (i < write_size) {
 			int32_t ws = std::min(write_size - i, int64_t(EFS_MAX_READ_SIZE));
