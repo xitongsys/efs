@@ -13,6 +13,7 @@
 #include "Msg/DataNode/MsgWriteOffset.h"
 #include "Msg/DataNode/MsgTruncate.h"
 #include "Msg/DataNode/MsgMv.h"
+#include "Msg/DataNode/MsgPerm.h"
 
 namespace efs {
 	DataNodeConn::DataNodeConn(
@@ -138,6 +139,19 @@ namespace efs {
 		query<MsgLs, MsgLsResp>(m_ls, m_ls_resp);
 		fdescs = m_ls_resp.files;
 		return ErrorCode(m_ls_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm)
+	{
+		MsgPerm m_perm;
+		m_perm.path = path;
+		m_perm.name = name;
+		m_perm.perm_type = perm_type;
+		m_perm.perm = perm;
+
+		MsgPermResp m_perm_resp;
+		query<MsgPerm, MsgPermResp>(m_perm, m_perm_resp);
+		return ErrorCode(m_perm_resp.error_code);
 	}
 
 	ErrorCode DataNodeConn::openOffset(const std::string& path)

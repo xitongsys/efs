@@ -314,6 +314,76 @@ namespace efs {
 		return ErrorCode::NONE;
 	}
 
+	ErrorCode Client::perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm, const bool& recursive)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
+		if ((ec = getDataNodeConn(path, p_conn))) {
+			return ec;
+		}
+
+		if (!recursive) {
+			if ((ec = p_conn->perm(path, name, perm_type, perm))) {
+				return ec;
+			}
+			return ErrorCode::NONE;
+		}
+		else {
+			FileDesc fdesc;
+			if ((ec = p_conn->getFileDesc(path, fdesc))) {
+				return ec;
+			}
+
+			std::stack<std::tuple<FileDesc, std::string, int8_t>> stk;
+			stk.push({ fdesc, path, 0 });
+
+			while (stk.size()) {
+				auto p = stk.top();
+				stk.pop();
+
+				const FileDesc& fdesc = std::get<0>(p);
+				const std::string& cur_from_path(fdesc.path);
+				const std::string& cur_to_path(std::get<1>(p));
+				int8_t t = std::get<2>(p);
+
+				if (fdesc.mod & FileType::F_IFDIR) {
+					if (t > 0) {
+						if ((ec = p_conn->perm(path, name, perm_type, perm))) {
+							return ec;
+						}
+						continue;
+					}
+
+					stk.push({ fdesc, cur_from_path, 1 });
+
+					std::vector<FileDesc> files;
+					if ((ec = p_conn->ls(cur_from_path, files))) {
+						return ec;
+					}
+
+					for (const FileDesc& fdesc2 : files) {
+						const std::string& cur_path2 = fdesc2.path;
+						stk.push({ fdesc2, cur_path2, 0 });
+					}
+				}
+				else if (fdesc.mod & FileType::F_IFREG) {
+					if ((ec = p_conn->perm(path, name, perm_type, perm))) {
+						return ec;
+					}
+				}
+				else {
+					return E_FILE_UNKNOWN_TYPE;
+				}
+			}
+
+			return ErrorCode::NONE;
+		}
+
+		return ErrorCode::NONE;
+	}
+
 	ErrorCode Client::openOffset(const std::string& path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);

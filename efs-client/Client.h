@@ -43,6 +43,8 @@ namespace efs {
 		ErrorCode mv(const std::string& from_path, const std::string& to_path);
 		ErrorCode ls(const std::string& path, std::vector<FileDesc>& fdescs);
 		ErrorCode cp(const std::string& from_path, const std::string& to_path, std::shared_ptr<DataNodeConn> p_from_conn, std::shared_ptr<DataNodeConn> p_to_conn);
+		ErrorCode perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm, const bool& recursive);
+
 
 		ErrorCode openOffset(const std::string& path);
 
