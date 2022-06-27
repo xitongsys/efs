@@ -1,33 +1,52 @@
 #include <iostream>
 #include <memory>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <iostream>
 
 #include "ClientConfig.h"
 #include "Netdisk.h"
+#include "CliHandlers.h"
+#include "Global.h"
+#include "LineParser.h"
 
 int main(int argc, char* argv[])
 {
-	efs::ErrorCode ec = efs::ErrorCode::NONE;
-	efs::ClientConfig config;
-	config.namenode_ip = "127.0.0.1";
-	config.namenode_port = 20000;
-	config.user = "zxt";
-	config.password = "zxtpwd";
+	while (1) {
+		char* line = readline("> ");
+		add_history(line);
+		std::vector<std::string> tokens = LineParser(std::string(line)).Parse();
+		free(line);
 
-	std::shared_ptr<efs::Client> p_client = std::make_shared<efs::Client>(config);
-
-	try {
-
-		efs::Netdisk netdisk(p_client);
-
-		netdisk.mount(argc, argv);
-
-		while (1) {
-			Sleep(1000);
+		if (tokens.size() == 0) {
+			continue;
 		}
 
-	}
-	catch (boost::system::error_code ec) {
-		std::cout << ec.message() << std::endl;
+		std::string cmd = tokens[0];
+		if (cmd == "login") {
+			efs::CliHandlers::loginHandler(tokens);
+		}
+		else if (cmd == "ls") {
+			efs::CliHandlers::lsHandler(tokens);
+		}
+		else if (cmd == "mkdir") {
+			efs::CliHandlers::mkdirHandler(tokens);
+		}
+		else if (cmd == "rm") {
+			efs::CliHandlers::rmHandler(tokens);
+		}
+		else if (cmd == "mv") {
+			efs::CliHandlers::mvHandler(tokens);
+		}
+		else if (cmd == "hosts") {
+			efs::CliHandlers::hostsHandler(tokens);
+		}
+		else if (cmd == "users") {
+			efs::CliHandlers::usersHandler(tokens);
+		}
+		else {
+			std::cout << "unknown command" << std::endl;
+		}
 	}
 
 	return 0;

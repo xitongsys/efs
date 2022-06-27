@@ -7,7 +7,6 @@
 #include "FS.h"
 
 
-
 namespace efs {
 	Client::Client(const ClientConfig& config) :
 		config(config)

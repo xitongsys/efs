@@ -27,6 +27,12 @@
     <ClCompile Include="Netdisk.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CliHandlers.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Global.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -36,6 +42,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Netdisk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CliHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LineParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
