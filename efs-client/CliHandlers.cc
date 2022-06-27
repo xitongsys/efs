@@ -105,10 +105,10 @@ namespace efs {
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = tokens[1], name = tokens[2];
-		PermType perm_type = Global::strToPermType(tokens[3]);
+		std::string path = tokens[1];
+		PermType perm_type = Global::strToPermType(tokens[2]);
+		std::string name = tokens[3];
 		Permission perm = Global::strToPerm(tokens[4]);
-
 
 		if ((ec = Global::p_client->perm(path, name, perm_type, Permission(perm), true))) {
 			errorHandler(ec);

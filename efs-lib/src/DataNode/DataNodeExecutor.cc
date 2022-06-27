@@ -244,6 +244,15 @@ namespace efs {
 			return ec;
 		}
 
+		FileDesc fdesc;
+		if ((ec = getFileDesc(path, fdesc))) {
+			return ec;
+		}
+		if (!(fdesc.mod & F_IFDIR)) {
+			fs = { fdesc };
+			return ErrorCode::NONE;
+		}
+
 		std::error_code std_ec;
 		auto its = std::filesystem::directory_iterator(absolute_path, std_ec);
 		if (std_ec) {
