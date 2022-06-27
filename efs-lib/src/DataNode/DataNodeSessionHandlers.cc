@@ -731,7 +731,7 @@ namespace efs {
 			fclose(fp);
 
 			fdesc.fsize = fs::fileSize(absolute_path);
-			fdesc.modified_time = fs::modifiedTime(absolute_path);
+			fdesc.modified_time = util::now();
 
 			if ((ec = p_executor->setFileDesc(p_in_msg->path, fdesc))) {
 				p_out_msg->error_code = ec;

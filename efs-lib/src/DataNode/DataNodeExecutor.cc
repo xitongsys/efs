@@ -393,6 +393,8 @@ namespace efs {
 		fdesc.uid = uid;
 		fdesc.gid = gid;
 		fdesc.mod = parent_desc.mod;
+		fdesc.modified_time = util::now();
+		fdesc.create_time = util::now();
 
 		if (path == "/") {
 			setFileDesc(path, fdesc);
