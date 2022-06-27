@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include "Error.h"
 
@@ -9,6 +10,9 @@ namespace efs {
 
 	class CliHandlers
 	{
+	public:
+		static std::map<std::string, std::string> helpTexts;
+
 	public:
 		static void loginHandler(const std::vector<std::string>& tokens);
 		static void lsHandler(const std::vector<std::string>& tokens);
@@ -20,6 +24,7 @@ namespace efs {
 		static void mountHandler(const std::vector<std::string>& tokens);
 		static void unmountHandler(const std::vector<std::string>& tokens);
 		static void infoHandler(const std::vector<std::string>& tokens);
+		static void helpHandler(const std::vector<std::string>& tokens);
 
 	public:
 		static void wrongParas();

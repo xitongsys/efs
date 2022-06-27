@@ -9,6 +9,18 @@
 
 namespace efs {
 
+	std::map<std::string, std::string> CliHandlers::helpTexts = {
+		std::make_pair("login", "login example:\nlogin namenode_ip namenode_port username password\n\n"),
+		std::make_pair("info", "show info\n\n"),
+		std::make_pair("mount", "mount to local disk\n\n"),
+		std::make_pair("perm", "modifiy permission\nperm /guest/a.txt user user01 rwx\nperm /guest/b.txt group users rwx\n\n"),
+		std::make_pair("mkdir", "mkdir path\n\n"),
+		std::make_pair("rm", "rm path\n\n"),
+		std::make_pair("cp", "cp from_path to_path\n\n"),
+		std::make_pair("mv", "mv from_path to_path\n\n"),
+
+	};
+
 	void CliHandlers::loginHandler(const std::vector<std::string>& tokens)
 	{
 		if (tokens.size() != 5) {
@@ -151,6 +163,13 @@ namespace efs {
 
 	void CliHandlers::infoHandler(const std::vector<std::string>& tokens)
 	{
+		std::cout << "--- account ---" << std::endl;
+		std::cout << "namenode_ip: " << Global::config.namenode_ip << std::endl;
+		std::cout << "namdenode_port: " << Global::config.namenode_port << std::endl;
+		std::cout << "user: " << Global::config.user << std::endl;
+		std::cout << "password: " << Global::config.password << std::endl;
+		std::cout << "---------------" << std::endl;
+
 		std::cout << "--- datanodes ---" << std::endl;
 		for (const HostDesc& hdesc : Global::p_client->hosts) {
 			std::cout << hdesc.name << "," << hdesc.ip << "," << hdesc.port << std::endl;
@@ -171,6 +190,13 @@ namespace efs {
 			std::cout << gdesc.group << "," << gdesc.gid << std::endl;
 		}
 		std::cout << "--------------" << std::endl;
+	}
+
+	void CliHandlers::helpHandler(const std::vector<std::string>& tokens)
+	{
+		for (auto it = helpTexts.begin(); it != helpTexts.end(); it++) {
+			std::cout << it->first << std::endl << it->second << std::endl;
+		}
 	}
 
 	void CliHandlers::wrongParas()

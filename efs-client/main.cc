@@ -26,6 +26,9 @@ int main(int argc, char* argv[])
 		if (cmd == "login") {
 			efs::CliHandlers::loginHandler(tokens);
 		}
+		else if (cmd == "help") {
+			efs::CliHandlers::helpHandler(tokens);
+		}
 		else {
 			if (efs::Global::p_client == nullptr) {
 				std::cout << "no client" << std::endl;
