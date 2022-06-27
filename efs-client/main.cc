@@ -12,6 +12,7 @@
 
 int main(int argc, char* argv[])
 {
+	std::cout << "--- welcome to efs ---" << std::endl;
 	while (1) {
 		char* line = readline("> ");
 		add_history(line);
@@ -31,7 +32,7 @@ int main(int argc, char* argv[])
 		}
 		else {
 			if (efs::Global::p_client == nullptr) {
-				std::cout << "no client" << std::endl;
+				std::cout << "please login first" << std::endl;
 				continue;
 			}
 

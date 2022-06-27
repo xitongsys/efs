@@ -10,14 +10,14 @@
 namespace efs {
 
 	std::map<std::string, std::string> CliHandlers::helpTexts = {
-		std::make_pair("login", "login example:\nlogin namenode_ip namenode_port username password\n\n"),
-		std::make_pair("info", "show info\n\n"),
-		std::make_pair("mount", "mount to local disk\n\n"),
-		std::make_pair("perm", "modifiy permission\nperm /guest/a.txt user user01 rwx\nperm /guest/b.txt group users rwx\n\n"),
-		std::make_pair("mkdir", "mkdir path\n\n"),
-		std::make_pair("rm", "rm path\n\n"),
-		std::make_pair("cp", "cp from_path to_path\n\n"),
-		std::make_pair("mv", "mv from_path to_path\n\n"),
+		std::make_pair("login", "login namenode_ip namenode_port username password\n"),
+		std::make_pair("info", "show info\n"),
+		std::make_pair("mount", "mount to local disk\n"),
+		std::make_pair("perm", "modifiy permission\nperm /guest/a.txt user user01 rwx\nperm /guest/b.txt group users rwx\n"),
+		std::make_pair("mkdir", "mkdir path\n"),
+		std::make_pair("rm", "rm path\n"),
+		std::make_pair("cp", "cp from_path to_path\n"),
+		std::make_pair("mv", "mv from_path to_path\n"),
 
 	};
 
