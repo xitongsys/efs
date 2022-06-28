@@ -97,8 +97,6 @@ namespace efs {
 		std::shared_ptr<MsgRmResp> p_out_msg = std::static_pointer_cast<MsgRmResp>(p_msgs[MsgType::RM_RESP]);
 		p_out_msg->error_code = ErrorCode::NONE;
 
-		std::cout << p_in_msg->path << " " << p_in_msg->path.size() << std::endl;
-
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
 				p_out_msg->error_code = ec;
@@ -128,6 +126,17 @@ namespace efs {
 					p_out_msg->error_code = ErrorCode::E_FILE_RM;
 					break;
 				}
+			}
+
+			std::vector<int32_t> removed;
+			for (auto it = open_files.begin(); it != open_files.end(); it++) {
+				if (it->second.fdesc.path == p_in_msg->path) {
+					fclose(it->second.fp);
+					removed.push_back(it->first);
+				}
+			}
+			for (int32_t fd : removed) {
+				open_files.erase(fd);
 			}
 
 			if ((ec = p_executor->rm(p_in_msg->path))) {
