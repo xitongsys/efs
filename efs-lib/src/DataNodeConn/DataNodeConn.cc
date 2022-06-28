@@ -97,7 +97,7 @@ namespace efs {
 	ErrorCode DataNodeConn::write(const int32_t& fd, const std::string& data, const int64_t& offset, int32_t& write_size)
 	{
 		MsgWrite m_write;
-		m_write.data = data;
+		m_write.data = std::move(data);
 		m_write.fd = fd;
 		m_write.offset = offset;
 
@@ -118,7 +118,7 @@ namespace efs {
 		MsgReadResp m_read_resp;
 		query<MsgRead, MsgReadResp>(m_read, m_read_resp);
 
-		data = m_read_resp.data;
+		data = std::move(m_read_resp.data);
 		return ErrorCode(m_read_resp.error_code);
 	}
 

@@ -536,7 +536,7 @@ namespace efs {
 
 			OpenFileHandler& fh = this->open_files[p_in_msg->fd];
 			int32_t max_read_size = std::min(p_in_msg->read_size, EFS_MAX_READ_SIZE);
-			p_out_msg->data = std::string(max_read_size, 0);
+			p_out_msg->data.resize(max_read_size, 0);
 
 			int64_t pos = 0;
 			if (fgetpos(fh.fp, &pos)) {
@@ -713,7 +713,7 @@ namespace efs {
 				}
 			}
 
-			p_out_msg->data.resize(p_in_msg->read_size);
+			p_out_msg->data.resize(p_in_msg->read_size, 0);
 			int32_t read_size = fread(p_out_msg->data.data(), 1, p_in_msg->read_size, fp);
 
 			p_out_msg->data.resize(read_size);
