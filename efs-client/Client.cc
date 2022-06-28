@@ -201,6 +201,8 @@ namespace efs {
 			const std::string& cur_path(fdesc.path);
 			int8_t t = std::get<1>(p);
 
+			std::cout << cur_path << " " << int(t) << " "<<int(fdesc.mod & FileType::F_IFDIR)<<" "<<int((fdesc.mod & FileType::F_IFREG))<<std::endl;
+
 			if (fdesc.mod & FileType::F_IFDIR) {
 				if (t > 0) {
 					if ((ec = p_conn->rm(cur_path))) {

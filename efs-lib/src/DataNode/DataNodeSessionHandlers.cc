@@ -39,6 +39,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgGetFileDesc> p_in_msg = std::static_pointer_cast<MsgGetFileDesc>(this->p_in_msg);
 		std::shared_ptr<MsgGetFileDescResp> p_out_msg = std::static_pointer_cast<MsgGetFileDescResp>(p_msgs[MsgType::GET_FILE_DESC_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if (ec = fs::checkPath(p_in_msg->path)) {
@@ -58,6 +59,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgLs> p_in_msg = std::static_pointer_cast<MsgLs>(this->p_in_msg);
 		std::shared_ptr<MsgLsResp> p_out_msg = std::static_pointer_cast<MsgLsResp>(p_msgs[MsgType::LS_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			Permission perm = Permission::EMPTY;
@@ -93,6 +95,9 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgRm> p_in_msg = std::static_pointer_cast<MsgRm>(this->p_in_msg);
 		std::shared_ptr<MsgRmResp> p_out_msg = std::static_pointer_cast<MsgRmResp>(p_msgs[MsgType::RM_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
+
+		std::cout << p_in_msg->path << " " << p_in_msg->path.size() << std::endl;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -140,6 +145,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgMv> p_in_msg = std::static_pointer_cast<MsgMv>(this->p_in_msg);
 		std::shared_ptr<MsgMvResp> p_out_msg = std::static_pointer_cast<MsgMvResp>(p_msgs[MsgType::MV_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 
@@ -238,6 +244,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgChown> p_in_msg = std::static_pointer_cast<MsgChown>(this->p_in_msg);
 		std::shared_ptr<MsgChownResp> p_out_msg = std::static_pointer_cast<MsgChownResp>(p_msgs[MsgType::CHOWN_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -277,6 +284,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgChmod> p_in_msg = std::static_pointer_cast<MsgChmod>(this->p_in_msg);
 		std::shared_ptr<MsgChmodResp> p_out_msg = std::static_pointer_cast<MsgChmodResp>(p_msgs[MsgType::CHMOD_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -310,6 +318,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgPerm> p_in_msg = std::static_pointer_cast<MsgPerm>(this->p_in_msg);
 		std::shared_ptr<MsgPermResp> p_out_msg = std::static_pointer_cast<MsgPermResp>(p_msgs[MsgType::PERM_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -367,6 +376,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgMkdir> p_in_msg = std::static_pointer_cast<MsgMkdir>(this->p_in_msg);
 		std::shared_ptr<MsgMkdirResp> p_out_msg = std::static_pointer_cast<MsgMkdirResp>(p_msgs[MsgType::MKDIR_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -406,6 +416,8 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgOpen> p_in_msg = std::static_pointer_cast<MsgOpen>(this->p_in_msg);
 		std::shared_ptr<MsgOpenResp> p_out_msg = std::static_pointer_cast<MsgOpenResp>(p_msgs[MsgType::OPEN_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
+
 		const std::string& path = p_in_msg->path;
 		std::uint32_t flag = p_in_msg->flag;
 
@@ -459,7 +471,6 @@ namespace efs {
 			else {
 				OpenFileHandler fh;
 				std::string mode = openFlagToMode(OpenFlag(flag));
-				//std::cout << flag << " " << mode << std::endl;
 				if ((ec = p_executor->open(path, mode, this->udesc.uid, this->udesc.gid, fdesc, fh))) {
 					p_out_msg->error_code = ec;
 					break;
@@ -478,6 +489,7 @@ namespace efs {
 	{
 		std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
 		std::shared_ptr<MsgCloseResp> p_out_msg = std::static_pointer_cast<MsgCloseResp>(p_msgs[MsgType::CLOSE_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		int32_t fd = p_in_msg->fd;
 		if (this->open_files.count(fd)) {
@@ -505,6 +517,8 @@ namespace efs {
 	{
 		std::shared_ptr<MsgRead> p_in_msg = std::static_pointer_cast<MsgRead>(this->p_in_msg);
 		std::shared_ptr<MsgReadResp> p_out_msg = std::static_pointer_cast<MsgReadResp>(p_msgs[MsgType::READ_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
+
 		do {
 			if (this->open_files.count(p_in_msg->fd) == 0) {
 				p_out_msg->error_code = E_FILE_READ;
@@ -549,6 +563,7 @@ namespace efs {
 	{
 		std::shared_ptr<MsgWrite> p_in_msg = std::static_pointer_cast<MsgWrite>(this->p_in_msg);
 		std::shared_ptr<MsgWriteResp> p_out_msg = std::static_pointer_cast<MsgWriteResp>(p_msgs[MsgType::WRITE_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if (this->open_files.count(p_in_msg->fd) == 0) {
@@ -561,22 +576,24 @@ namespace efs {
 
 			int64_t pos = 0;
 			if (fgetpos(fh.fp, &pos)) {
-				p_out_msg->error_code = E_FILE_READ;
+				p_out_msg->error_code = E_FILE_WRITE;
+				p_out_msg->write_size = 0;
 				break;
 			}
 
 			if (pos != p_in_msg->offset) {
 				pos = p_in_msg->offset;
 				if (fsetpos(fh.fp, &pos)) {
-					p_out_msg->error_code = E_FILE_READ;
+					p_out_msg->error_code = E_FILE_WRITE;
+					p_out_msg->write_size = 0;
 					break;
 				}
 			}
 
 			int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fh.fp);
+			p_out_msg->write_size = write_size;
 			if (write_size != int32_t(p_in_msg->data.size())) {
 				p_out_msg->error_code = E_FILE_WRITE;
-				p_out_msg->write_size = write_size;
 				break;
 			}
 
@@ -590,6 +607,8 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgOpenOffset> p_in_msg = std::static_pointer_cast<MsgOpenOffset>(this->p_in_msg);
 		std::shared_ptr<MsgOpenOffsetResp> p_out_msg = std::static_pointer_cast<MsgOpenOffsetResp>(p_msgs[MsgType::OPENOFFSET_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
+
 		const std::string& path = p_in_msg->path;
 
 		do {
@@ -620,7 +639,7 @@ namespace efs {
 				}
 
 				OpenFileHandler fh;
-				if ((ec = p_executor->open(path, "w+", this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
+				if ((ec = p_executor->open(path, "wb+", this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
 					p_out_msg->error_code = ec;
 					break;
 				}
@@ -637,6 +656,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgReadOffset> p_in_msg = std::static_pointer_cast<MsgReadOffset>(this->p_in_msg);
 		std::shared_ptr<MsgReadOffsetResp> p_out_msg = std::static_pointer_cast<MsgReadOffsetResp>(p_msgs[MsgType::READOFFSET_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -710,6 +730,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgWriteOffset> p_in_msg = std::static_pointer_cast<MsgWriteOffset>(this->p_in_msg);
 		std::shared_ptr<MsgWriteOffsetResp> p_out_msg = std::static_pointer_cast<MsgWriteOffsetResp>(p_msgs[MsgType::WRITEOFFSET_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -778,6 +799,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgTruncate> p_in_msg = std::static_pointer_cast<MsgTruncate>(this->p_in_msg);
 		std::shared_ptr<MsgTruncateResp> p_out_msg = std::static_pointer_cast<MsgTruncateResp>(p_msgs[MsgType::TRUNCATE_RESP]);
+		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {

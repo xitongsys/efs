@@ -292,6 +292,8 @@ namespace efs {
 		std::error_code std_ec;
 		std::filesystem::remove_all(absolute_path.c_str(), std_ec);
 
+		std::cout << absolute_path << " " << std_ec << std::endl;
+
 		if (std_ec) {
 			ec = ErrorCode::E_FILE_RM;
 		}
