@@ -31,6 +31,40 @@ namespace efs {
 		p_in_msg = nullptr;
 		p_out_msg = nullptr;
 		this->p_executor = p_executor;
+
+		memset(p_msgs, 0, sizeof(p_msgs));
+		p_msgs[MsgType::LOGIN] = std::make_shared<MsgLogin>();
+		p_msgs[MsgType::LOGIN_RESP] = std::make_shared<MsgLoginResp>();
+		p_msgs[MsgType::GET_FILE_DESC] = std::make_shared<MsgGetFileDesc>();
+		p_msgs[MsgType::GET_FILE_DESC_RESP] = std::make_shared<MsgGetFileDescResp>();
+		p_msgs[MsgType::OPEN] = std::make_shared<MsgOpen>();
+		p_msgs[MsgType::OPEN_RESP] = std::make_shared<MsgOpenResp>();
+		p_msgs[MsgType::CLOSE] = std::make_shared<MsgClose>();
+		p_msgs[MsgType::CLOSE_RESP] = std::make_shared<MsgCloseResp>();
+		p_msgs[MsgType::WRITE] = std::make_shared<MsgWrite>();
+		p_msgs[MsgType::WRITE_RESP] = std::make_shared<MsgWriteResp>();
+		p_msgs[MsgType::READ] = std::make_shared<MsgRead>();
+		p_msgs[MsgType::READ_RESP] = std::make_shared<MsgReadResp>();
+		p_msgs[MsgType::LS] = std::make_shared<MsgLs>();
+		p_msgs[MsgType::LS_RESP] = std::make_shared<MsgLsResp>();
+		p_msgs[MsgType::MKDIR] = std::make_shared<MsgOpen>();
+		p_msgs[MsgType::MKDIR_RESP] = std::make_shared<MsgMkdirResp>();
+		p_msgs[MsgType::RM] = std::make_shared<MsgRm>();
+		p_msgs[MsgType::RM_RESP] = std::make_shared<MsgRmResp>();
+		p_msgs[MsgType::MV] = std::make_shared<MsgMv>();
+		p_msgs[MsgType::MV_RESP] = std::make_shared<MsgMvResp>();
+		p_msgs[MsgType::CHMOD] = std::make_shared<MsgChmod>();
+		p_msgs[MsgType::CHMOD_RESP] = std::make_shared<MsgChmodResp>();
+		p_msgs[MsgType::PERM] = std::make_shared<MsgPerm>();
+		p_msgs[MsgType::PERM_RESP] = std::make_shared<MsgPermResp>();
+		p_msgs[MsgType::OPENOFFSET] = std::make_shared<MsgOpenOffset>();
+		p_msgs[MsgType::OPENOFFSET_RESP] = std::make_shared<MsgOpenOffsetResp>();
+		p_msgs[MsgType::WRITEOFFSET] = std::make_shared<MsgWriteOffset>();
+		p_msgs[MsgType::WRITEOFFSET_RESP] = std::make_shared<MsgWriteOffsetResp>();
+		p_msgs[MsgType::READOFFSET] = std::make_shared<MsgReadOffset>();
+		p_msgs[MsgType::READOFFSET_RESP] = std::make_shared<MsgReadOffsetResp>();
+		p_msgs[MsgType::TRUNCATE] = std::make_shared<MsgTruncate>();
+		p_msgs[MsgType::TRUNCATE_RESP] = std::make_shared<MsgTruncateResp>();
 	}
 
 	DataNodeSession::~DataNodeSession()
@@ -70,87 +104,87 @@ namespace efs {
 
 			switch ((buf + read_size)[0]) {
 			case MsgType::LOGIN: {
-				std::shared_ptr<MsgLogin> p_msg = std::make_shared<MsgLogin>();
+				std::shared_ptr<MsgLogin> p_msg = std::static_pointer_cast<MsgLogin>(p_msgs[MsgType::LOGIN]);
 				RECV_IN_MSG(login);
 				break;
 			}
 			case MsgType::LS: {
-				std::shared_ptr<MsgLs> p_msg = std::make_shared<MsgLs>();
+				std::shared_ptr<MsgLs> p_msg = std::static_pointer_cast<MsgLs>(p_msgs[MsgType::LS]);
 				RECV_IN_MSG(ls);
 				break;
 			}
 			case MsgType::RM: {
-				std::shared_ptr<MsgRm> p_msg = std::make_shared<MsgRm>();
+				std::shared_ptr<MsgRm> p_msg = std::static_pointer_cast<MsgRm>(p_msgs[MsgType::RM]);
 				RECV_IN_MSG(rm);
 				break;
 			}
 			case MsgType::MV: {
-				std::shared_ptr<MsgMv> p_msg = std::make_shared<MsgMv>();
+				std::shared_ptr<MsgMv> p_msg = std::static_pointer_cast<MsgMv>(p_msgs[MsgType::MV]);
 				RECV_IN_MSG(mv);
 				break;
 			}
 			case MsgType::CHOWN: {
-				std::shared_ptr<MsgChown> p_msg = std::make_shared<MsgChown>();
+				std::shared_ptr<MsgChown> p_msg = std::static_pointer_cast<MsgChown>(p_msgs[MsgType::CHOWN]);
 				RECV_IN_MSG(chown);
 				break;
 			}
 			case MsgType::CHMOD: {
-				std::shared_ptr<MsgChmod> p_msg = std::make_shared<MsgChmod>();
+				std::shared_ptr<MsgChmod> p_msg = std::static_pointer_cast<MsgChmod>(p_msgs[MsgType::CHMOD]);
 				RECV_IN_MSG(chmod);
 				break;
 			}
 			case MsgType::MKDIR: {
-				std::shared_ptr<MsgMkdir> p_msg = std::make_shared<MsgMkdir>();
+				std::shared_ptr<MsgMkdir> p_msg = std::static_pointer_cast<MsgMkdir>(p_msgs[MsgType::MKDIR]);
 				RECV_IN_MSG(mkdir);
 				break;
 			}
 			case MsgType::OPEN: {
-				std::shared_ptr<MsgOpen> p_msg = std::make_shared<MsgOpen>();
+				std::shared_ptr<MsgOpen> p_msg = std::static_pointer_cast<MsgOpen>(p_msgs[MsgType::OPEN]);
 				RECV_IN_MSG(open);
 				break;
 			}
 			case MsgType::CLOSE: {
-				std::shared_ptr<MsgClose> p_msg = std::make_shared<MsgClose>();
+				std::shared_ptr<MsgClose> p_msg = std::static_pointer_cast<MsgClose>(p_msgs[MsgType::CLOSE]);
 				RECV_IN_MSG(close);
 				break;
 			}
 			case MsgType::READ: {
-				std::shared_ptr<MsgRead> p_msg = std::make_shared<MsgRead>();
+				std::shared_ptr<MsgRead> p_msg = std::static_pointer_cast<MsgRead>(p_msgs[MsgType::READ]);
 				RECV_IN_MSG(read);
 				break;
 			}
 			case MsgType::WRITE: {
-				std::shared_ptr<MsgWrite> p_msg = std::make_shared<MsgWrite>();
+				std::shared_ptr<MsgWrite> p_msg = std::static_pointer_cast<MsgWrite>(p_msgs[MsgType::WRITE]);
 				RECV_IN_MSG(write);
 				break;
 			}
 			case MsgType::PERM: {
-				std::shared_ptr<MsgPerm> p_msg = std::make_shared<MsgPerm>();
+				std::shared_ptr<MsgPerm> p_msg = std::static_pointer_cast<MsgPerm>(p_msgs[MsgType::PERM]);
 				RECV_IN_MSG(perm);
 				break;
 			}
 			case MsgType::GET_FILE_DESC: {
-				std::shared_ptr<MsgGetFileDesc> p_msg = std::make_shared<MsgGetFileDesc>();
+				std::shared_ptr<MsgGetFileDesc> p_msg = std::static_pointer_cast<MsgGetFileDesc>(p_msgs[MsgType::GET_FILE_DESC]);
 				RECV_IN_MSG(getFileDesc);
 				break;
 			}
 			case MsgType::OPENOFFSET: {
-				std::shared_ptr<MsgOpenOffset> p_msg = std::make_shared<MsgOpenOffset>();
+				std::shared_ptr<MsgOpenOffset> p_msg = std::static_pointer_cast<MsgOpenOffset>(p_msgs[MsgType::OPENOFFSET]);
 				RECV_IN_MSG(openOffset);
 				break;
 			}
 			case MsgType::WRITEOFFSET: {
-				std::shared_ptr<MsgWriteOffset> p_msg = std::make_shared<MsgWriteOffset>();
+				std::shared_ptr<MsgWriteOffset> p_msg = std::static_pointer_cast<MsgWriteOffset>(p_msgs[MsgType::WRITEOFFSET]);
 				RECV_IN_MSG(writeOffset);
 				break;
 			}
 			case MsgType::READOFFSET: {
-				std::shared_ptr<MsgReadOffset> p_msg = std::make_shared<MsgReadOffset>();
+				std::shared_ptr<MsgReadOffset> p_msg = std::static_pointer_cast<MsgReadOffset>(p_msgs[MsgType::READOFFSET]);
 				RECV_IN_MSG(readOffset);
 				break;
 			}
 			case MsgType::TRUNCATE: {
-				std::shared_ptr<MsgTruncate> p_msg = std::make_shared<MsgTruncate>();
+				std::shared_ptr<MsgTruncate> p_msg = std::static_pointer_cast<MsgTruncate>(p_msgs[MsgType::TRUNCATE]);
 				RECV_IN_MSG(truncate);
 				break;
 			}

@@ -140,7 +140,8 @@ namespace serialize {
         if (len > bufsize - size) {
             return -1;
         }
-        a = std::string(buf + size, len);
+        a.resize(len);
+        memcpy(a.data(), buf + size, len);
         size += len;
         return size;
     }

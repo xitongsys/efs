@@ -28,7 +28,7 @@ namespace efs {
 	void DataNodeSession::login()
 	{
 		std::shared_ptr<MsgLogin> p_in_msg = std::static_pointer_cast<MsgLogin>(this->p_in_msg);
-		std::shared_ptr<MsgLoginResp> p_out_msg = std::make_shared<MsgLoginResp>();
+		std::shared_ptr<MsgLoginResp> p_out_msg = std::static_pointer_cast<MsgLoginResp>(p_msgs[MsgType::LOGIN_RESP]);
 		p_out_msg->error_code = p_executor->login(p_in_msg->user, p_in_msg->password, this->udesc);
 
 		this->p_out_msg = p_out_msg;
@@ -38,7 +38,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgGetFileDesc> p_in_msg = std::static_pointer_cast<MsgGetFileDesc>(this->p_in_msg);
-		std::shared_ptr<MsgGetFileDescResp> p_out_msg = std::make_shared<MsgGetFileDescResp>();
+		std::shared_ptr<MsgGetFileDescResp> p_out_msg = std::static_pointer_cast<MsgGetFileDescResp>(p_msgs[MsgType::GET_FILE_DESC_RESP]);
 
 		do {
 			if (ec = fs::checkPath(p_in_msg->path)) {
@@ -57,7 +57,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgLs> p_in_msg = std::static_pointer_cast<MsgLs>(this->p_in_msg);
-		std::shared_ptr<MsgLsResp> p_out_msg = std::make_shared<MsgLsResp>();
+		std::shared_ptr<MsgLsResp> p_out_msg = std::static_pointer_cast<MsgLsResp>(p_msgs[MsgType::LS_RESP]);
 
 		do {
 			Permission perm = Permission::EMPTY;
@@ -77,6 +77,7 @@ namespace efs {
 				break;
 			}
 
+			p_out_msg->files.clear();
 			if ((ec = p_executor->ls(p_in_msg->path, p_out_msg->files))) {
 				p_out_msg->error_code = ec;
 				break;
@@ -91,7 +92,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgRm> p_in_msg = std::static_pointer_cast<MsgRm>(this->p_in_msg);
-		std::shared_ptr<MsgRmResp> p_out_msg = std::make_shared<MsgRmResp>();
+		std::shared_ptr<MsgRmResp> p_out_msg = std::static_pointer_cast<MsgRmResp>(p_msgs[MsgType::RM_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -138,7 +139,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgMv> p_in_msg = std::static_pointer_cast<MsgMv>(this->p_in_msg);
-		std::shared_ptr<MsgMvResp> p_out_msg = std::make_shared<MsgMvResp>();
+		std::shared_ptr<MsgMvResp> p_out_msg = std::static_pointer_cast<MsgMvResp>(p_msgs[MsgType::MV_RESP]);
 
 		do {
 
@@ -236,7 +237,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgChown> p_in_msg = std::static_pointer_cast<MsgChown>(this->p_in_msg);
-		std::shared_ptr<MsgChownResp> p_out_msg = std::make_shared<MsgChownResp>();
+		std::shared_ptr<MsgChownResp> p_out_msg = std::static_pointer_cast<MsgChownResp>(p_msgs[MsgType::CHOWN_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -275,7 +276,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgChmod> p_in_msg = std::static_pointer_cast<MsgChmod>(this->p_in_msg);
-		std::shared_ptr<MsgChmodResp> p_out_msg = std::make_shared<MsgChmodResp>();
+		std::shared_ptr<MsgChmodResp> p_out_msg = std::static_pointer_cast<MsgChmodResp>(p_msgs[MsgType::CHMOD_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -308,7 +309,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgPerm> p_in_msg = std::static_pointer_cast<MsgPerm>(this->p_in_msg);
-		std::shared_ptr<MsgPermResp> p_out_msg = std::make_shared<MsgPermResp>();
+		std::shared_ptr<MsgPermResp> p_out_msg = std::static_pointer_cast<MsgPermResp>(p_msgs[MsgType::PERM_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -365,7 +366,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgMkdir> p_in_msg = std::static_pointer_cast<MsgMkdir>(this->p_in_msg);
-		std::shared_ptr<MsgMkdirResp> p_out_msg = std::make_shared<MsgMkdirResp>();
+		std::shared_ptr<MsgMkdirResp> p_out_msg = std::static_pointer_cast<MsgMkdirResp>(p_msgs[MsgType::MKDIR_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -404,7 +405,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgOpen> p_in_msg = std::static_pointer_cast<MsgOpen>(this->p_in_msg);
-		std::shared_ptr<MsgOpenResp> p_out_msg = std::make_shared<MsgOpenResp>();
+		std::shared_ptr<MsgOpenResp> p_out_msg = std::static_pointer_cast<MsgOpenResp>(p_msgs[MsgType::OPEN_RESP]);
 		const std::string& path = p_in_msg->path;
 		const std::string& open_mod = p_in_msg->open_mod;
 
@@ -474,7 +475,7 @@ namespace efs {
 	void DataNodeSession::close()
 	{
 		std::shared_ptr<MsgClose> p_in_msg = std::static_pointer_cast<MsgClose>(this->p_in_msg);
-		std::shared_ptr<MsgCloseResp> p_out_msg = std::make_shared<MsgCloseResp>();
+		std::shared_ptr<MsgCloseResp> p_out_msg = std::static_pointer_cast<MsgCloseResp>(p_msgs[MsgType::CLOSE_RESP]);
 
 		int32_t fd = p_in_msg->fd;
 		if (this->open_files.count(fd)) {
@@ -501,7 +502,7 @@ namespace efs {
 	void DataNodeSession::read()
 	{
 		std::shared_ptr<MsgRead> p_in_msg = std::static_pointer_cast<MsgRead>(this->p_in_msg);
-		std::shared_ptr<MsgReadResp> p_out_msg = std::make_shared<MsgReadResp>();
+		std::shared_ptr<MsgReadResp> p_out_msg = std::static_pointer_cast<MsgReadResp>(p_msgs[MsgType::READ_RESP]);
 		do {
 			if (this->open_files.count(p_in_msg->fd) == 0) {
 				p_out_msg->error_code = E_FILE_READ;
@@ -531,7 +532,7 @@ namespace efs {
 	void DataNodeSession::write()
 	{
 		std::shared_ptr<MsgWrite> p_in_msg = std::static_pointer_cast<MsgWrite>(this->p_in_msg);
-		std::shared_ptr<MsgWriteResp> p_out_msg = std::make_shared<MsgWriteResp>();
+		std::shared_ptr<MsgWriteResp> p_out_msg = std::static_pointer_cast<MsgWriteResp>(p_msgs[MsgType::WRITE_RESP]);
 
 		do {
 			if (this->open_files.count(p_in_msg->fd) == 0) {
@@ -558,7 +559,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgOpenOffset> p_in_msg = std::static_pointer_cast<MsgOpenOffset>(this->p_in_msg);
-		std::shared_ptr<MsgOpenOffsetResp> p_out_msg = std::make_shared<MsgOpenOffsetResp>();
+		std::shared_ptr<MsgOpenOffsetResp> p_out_msg = std::static_pointer_cast<MsgOpenOffsetResp>(p_msgs[MsgType::OPENOFFSET_RESP]);
 		const std::string& path = p_in_msg->path;
 
 		do {
@@ -605,7 +606,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgReadOffset> p_in_msg = std::static_pointer_cast<MsgReadOffset>(this->p_in_msg);
-		std::shared_ptr<MsgReadOffsetResp> p_out_msg = std::make_shared<MsgReadOffsetResp>();
+		std::shared_ptr<MsgReadOffsetResp> p_out_msg = std::static_pointer_cast<MsgReadOffsetResp>(p_msgs[MsgType::READOFFSET_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -653,7 +654,7 @@ namespace efs {
 				}
 			}
 
-			p_out_msg->data = std::string(p_in_msg->read_size, 0);
+			p_out_msg->data.resize(p_in_msg->read_size);
 			int32_t read_size = fread(p_out_msg->data.data(), 1, p_in_msg->read_size, fp);
 
 			p_out_msg->data.resize(read_size);
@@ -678,7 +679,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgWriteOffset> p_in_msg = std::static_pointer_cast<MsgWriteOffset>(this->p_in_msg);
-		std::shared_ptr<MsgWriteOffsetResp> p_out_msg = std::make_shared<MsgWriteOffsetResp>();
+		std::shared_ptr<MsgWriteOffsetResp> p_out_msg = std::static_pointer_cast<MsgWriteOffsetResp>(p_msgs[MsgType::WRITEOFFSET_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -746,7 +747,7 @@ namespace efs {
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<MsgTruncate> p_in_msg = std::static_pointer_cast<MsgTruncate>(this->p_in_msg);
-		std::shared_ptr<MsgTruncateResp> p_out_msg = std::make_shared<MsgTruncateResp>();
+		std::shared_ptr<MsgTruncateResp> p_out_msg = std::static_pointer_cast<MsgTruncateResp>(p_msgs[MsgType::TRUNCATE_RESP]);
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {

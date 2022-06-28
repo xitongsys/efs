@@ -22,6 +22,10 @@ public:
 
     UserDesc udesc;
 
+private:
+    //improve perf
+    std::shared_ptr<Msg> p_msgs[256];
+
 public:
     DataNodeSession(int32_t buffer_size,
         boost::asio::ip::tcp::socket socket,

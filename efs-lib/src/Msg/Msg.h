@@ -48,13 +48,6 @@ enum MsgType : uint8_t {
     PERM,
     PERM_RESP,
 
-    // NameNode
-    ACCOUNT,
-    ACCOUNT_RESP,
-
-    HOST,
-    HOST_RESP,
-
     OPENOFFSET,
     OPENOFFSET_RESP,
 
@@ -67,6 +60,13 @@ enum MsgType : uint8_t {
     TRUNCATE,
     TRUNCATE_RESP,
 
+
+    // NameNode
+    ACCOUNT,
+    ACCOUNT_RESP,
+
+    HOST,
+    HOST_RESP,
 };
 
 struct Msg {
