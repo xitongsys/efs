@@ -57,9 +57,12 @@ namespace efs {
 
 		ErrorCode perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm, const bool& recursive);
 
+		ErrorCode open(const std::string& path, const int32_t& flag, int32_t& fd);
+		ErrorCode read(const std::string& path, const int32_t& fd, const int32_t& read_size, const int64_t& offset, std::string& data);
+		ErrorCode write(const std::string& path, const int32_t& fd, const std::string& data, const int64_t& offset, int32_t& real_write_size);
+		ErrorCode close(const std::string& path, const int32_t& fd);
 
 		ErrorCode openOffset(const std::string& path);
-
 		ErrorCode readOffset(const std::string& path, const int64_t& read_size, const int64_t& offset, char* data, int64_t& real_read_size);
 		ErrorCode writeOffset(const std::string& path, const char* data, int64_t write_size, const int64_t& offset, int64_t& real_write_size);
 

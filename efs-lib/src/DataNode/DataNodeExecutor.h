@@ -50,7 +50,7 @@ public:
     ErrorCode perm(const std::string& path, uint16_t id, PermType perm_type, Permission p);
     ErrorCode mkdir(const std::string& path, int16_t uid, int16_t gid, const FileDesc& parent_desc);
 
-    ErrorCode open(const std::string& path, const std::string& open_mod, int16_t uid, int16_t gid, const FileDesc& parent_desc, OpenFileHandler& fh);
+    ErrorCode open(const std::string& path, const std::string& mod, int16_t uid, int16_t gid, const FileDesc& parent_desc, OpenFileHandler& fh);
     ErrorCode close(OpenFileHandler& fh);
     ErrorCode write(OpenFileHandler& fh, const char* buf, const int32_t& buf_size, int32_t& write_size);
     ErrorCode read(OpenFileHandler& fh, char* buf, const int32_t& buf_size, int32_t& read_size);

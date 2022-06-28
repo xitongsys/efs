@@ -407,7 +407,7 @@ namespace efs {
 		std::shared_ptr<MsgOpen> p_in_msg = std::static_pointer_cast<MsgOpen>(this->p_in_msg);
 		std::shared_ptr<MsgOpenResp> p_out_msg = std::static_pointer_cast<MsgOpenResp>(p_msgs[MsgType::OPEN_RESP]);
 		const std::string& path = p_in_msg->path;
-		const std::string& open_mod = p_in_msg->open_mod;
+		std::uint32_t flag = p_in_msg->flag;
 
 		do {
 			if ((ec = fs::checkPath(p_in_msg->path))) {
@@ -441,13 +441,13 @@ namespace efs {
 					break;
 				}
 
-				if (open_mod.find('+') == std::string::npos) {
+				if((flag & OpenFlag::O_ACCMODE) == 0) {
 					p_out_msg->error_code = ErrorCode::E_FILE_NOT_FOUND;
 					break;
 				}
 
 				OpenFileHandler fh;
-				if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
+				if ((ec = p_executor->open(path, "w+", this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
 					p_out_msg->error_code = ec;
 					break;
 				}
@@ -458,7 +458,9 @@ namespace efs {
 			}
 			else {
 				OpenFileHandler fh;
-				if ((ec = p_executor->open(path, open_mod, this->udesc.uid, this->udesc.gid, fdesc, fh))) {
+				std::string mode = openFlagToMode(OpenFlag(flag));
+				//std::cout << flag << " " << mode << std::endl;
+				if ((ec = p_executor->open(path, mode, this->udesc.uid, this->udesc.gid, fdesc, fh))) {
 					p_out_msg->error_code = ec;
 					break;
 				}
@@ -513,6 +515,20 @@ namespace efs {
 			int32_t max_read_size = std::min(p_in_msg->read_size, EFS_MAX_READ_SIZE);
 			p_out_msg->data = std::string(max_read_size, 0);
 
+			int64_t pos = 0;
+			if (fgetpos(fh.fp, &pos)) {
+				p_out_msg->error_code = E_FILE_READ;
+				break;
+			}
+
+			if (pos != p_in_msg->offset) {
+				pos = p_in_msg->offset;
+				if (fsetpos(fh.fp, &pos)) {
+					p_out_msg->error_code = E_FILE_READ;
+					break;
+				}
+			}
+
 			int32_t read_size = fread(p_out_msg->data.data(), 1, max_read_size, fh.fp);
 			if (read_size < max_read_size) {
 				p_out_msg->data.resize(read_size);
@@ -542,8 +558,22 @@ namespace efs {
 			}
 
 			OpenFileHandler& fh = this->open_files[p_in_msg->fd];
-			int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fh.fp);
 
+			int64_t pos = 0;
+			if (fgetpos(fh.fp, &pos)) {
+				p_out_msg->error_code = E_FILE_READ;
+				break;
+			}
+
+			if (pos != p_in_msg->offset) {
+				pos = p_in_msg->offset;
+				if (fsetpos(fh.fp, &pos)) {
+					p_out_msg->error_code = E_FILE_READ;
+					break;
+				}
+			}
+
+			int32_t write_size = fwrite(p_in_msg->data.c_str(), 1, p_in_msg->data.size(), fh.fp);
 			if (write_size != int32_t(p_in_msg->data.size())) {
 				p_out_msg->error_code = E_FILE_WRITE;
 				p_out_msg->write_size = write_size;

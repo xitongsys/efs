@@ -32,6 +32,20 @@ namespace efs {
 		F_IFIFO = 0010000,   //FIFO
 	};
 
+	enum OpenFlag : uint32_t {
+		O_RDONLY = 0,
+		O_WRONLY = 1,
+		O_RDWR = 2,
+		O_ACCMODE = 3,
+	};
+
+	inline std::string openFlagToMode(const OpenFlag& flag)
+	{
+		if ((flag & OpenFlag::O_ACCMODE) == 0) {
+			return "rb";
+		}
+		return "rb+";
+	}
 
 	inline Permission getUserPerm(uint16_t mod) {
 		return Permission((mod >> 6) & 0b111);

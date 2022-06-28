@@ -26,9 +26,9 @@ namespace efs {
 		ErrorCode mkdir(const std::string& path);
 		ErrorCode rm(const std::string& path);
 		ErrorCode mv(const std::string& from_path, const std::string& to_path);
-		ErrorCode open(const std::string& path, const std::string& open_mod, int32_t& fd);
-		ErrorCode write(const int32_t& fd, const std::string& data, int32_t& write_size);
-		ErrorCode read(const int32_t& fd, const int32_t& read_size, std::string& data);
+		ErrorCode open(const std::string& path, const int32_t& flag, int32_t& fd);
+		ErrorCode write(const int32_t& fd, const std::string& data, const int64_t& offset, int32_t& write_size);
+		ErrorCode read(const int32_t& fd, const int32_t& read_size, const int64_t& offset, std::string& data);
 		ErrorCode close(const int32_t& fd);
 		ErrorCode ls(const std::string& path, std::vector<FileDesc>& fdescs);
 		ErrorCode perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm);

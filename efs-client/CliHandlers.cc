@@ -199,6 +199,17 @@ namespace efs {
 		}
 	}
 
+	void CliHandlers::testHandler(const std::vector<std::string>& tokens)
+	{
+		std::string data(EFS_MAX_READ_SIZE, 'a');
+		Global::p_client->openOffset("/zxt/a.txt");
+		for (int64_t i = 0; i < 1024; i++) {
+			int64_t rs = 0;
+			Global::p_client->writeOffset("/zxt/a.txt", data.c_str(), data.size(), i * data.size(), rs);
+		}
+		
+	}
+
 	void CliHandlers::wrongParas()
 	{
 		std::cout << "wrong parameters" << std::endl;

@@ -58,6 +58,7 @@ public:
     void openOffset();
     void readOffset();
     void writeOffset();
+
     void truncate();
 };
 }

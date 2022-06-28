@@ -9,6 +9,7 @@ namespace efs {
 struct MsgWrite : Msg {
     int32_t fd;
     std::string data;
+    int64_t offset;
 
     MsgWrite()
     {
@@ -16,11 +17,13 @@ struct MsgWrite : Msg {
         error_code = ErrorCode::NONE;
 
         fd = 0;
+        data = "";
+        offset = 0;
     }
 
     inline int32_t size() const
     {
-        return Msg::size() + serialize::size(fd) + serialize::size(data);
+        return Msg::size() + serialize::size(fd) + serialize::size(data) + serialize::size(offset);
     }
 
     inline int32_t serialize(char* buf, int32_t buf_size) const
@@ -32,6 +35,7 @@ struct MsgWrite : Msg {
         size += Msg::serialize(buf + size, buf_size - size);
         size += serialize::serialize(fd, buf + size, buf_size - size);
         size += serialize::serialize(data, buf + size, buf_size - size);
+        size += serialize::serialize(offset, buf + size, buf_size - size);
         return size;
     }
 
@@ -49,6 +53,11 @@ struct MsgWrite : Msg {
         size += size1;
 
         if ((size1 = serialize::deserialize(data, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(offset, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;

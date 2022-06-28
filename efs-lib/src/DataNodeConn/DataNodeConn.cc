@@ -81,11 +81,11 @@ namespace efs {
 		return ErrorCode(m_mv_resp.error_code);
 	}
 
-	ErrorCode DataNodeConn::open(const std::string& path, const std::string& open_mod, int32_t& fd)
+	ErrorCode DataNodeConn::open(const std::string& path, const int32_t& flag, int32_t& fd)
 	{
 		MsgOpen m_open;
 		m_open.path = path;
-		m_open.open_mod = open_mod;
+		m_open.flag = flag;
 
 		MsgOpenResp m_open_resp;
 		query<MsgOpen, MsgOpenResp>(m_open, m_open_resp);
@@ -94,11 +94,12 @@ namespace efs {
 		return ErrorCode(m_open_resp.error_code);
 	}
 
-	ErrorCode DataNodeConn::write(const int32_t& fd, const std::string& data, int32_t& write_size)
+	ErrorCode DataNodeConn::write(const int32_t& fd, const std::string& data, const int64_t& offset, int32_t& write_size)
 	{
 		MsgWrite m_write;
 		m_write.data = data;
 		m_write.fd = fd;
+		m_write.offset = offset;
 
 		MsgWriteResp m_write_resp;
 		query<MsgWrite, MsgWriteResp>(m_write, m_write_resp);
@@ -107,11 +108,12 @@ namespace efs {
 		return ErrorCode(m_write_resp.error_code);
 	}
 
-	ErrorCode DataNodeConn::read(const int32_t& fd, const int32_t& read_size, std::string& data)
+	ErrorCode DataNodeConn::read(const int32_t& fd, const int32_t& read_size, const int64_t& offset, std::string& data)
 	{
 		MsgRead m_read;
 		m_read.fd = fd;
 		m_read.read_size = read_size;
+		m_read.offset = offset;
 
 		MsgReadResp m_read_resp;
 		query<MsgRead, MsgReadResp>(m_read, m_read_resp);

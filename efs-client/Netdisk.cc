@@ -223,9 +223,11 @@ namespace efs {
 	{
 		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
+		//std::cout << "truncat " << path << fi->fh << " " << size << std::endl;
 
 		ErrorCode ec = ErrorCode::NONE;
 		if ((ec = self->p_client->truncate(path, size))) {
+			//std::cout << "truncate error: " << int(ec) << std::endl;
 			return -EIO;
 		}
 
@@ -238,10 +240,20 @@ namespace efs {
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
+		/*
 		if ((ec = self->p_client->openOffset(path))) {
 			return -EIO;
 		}
+		*/
 
+		int32_t fd = 0;
+		if ((ec = self->p_client->open(path, fi->flags, fd))) {
+			return -EIO;
+		}
+
+		//std::cout << "open " << path << " " << fi->flags << " " << fd << std::endl;
+
+		fi->fh = fd;
 		return 0;
 	}
 
@@ -251,11 +263,21 @@ namespace efs {
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
+		/*
 		int64_t real_read_size = 0;
 		if ((ec = self->p_client->readOffset(path, size, off, buf, real_read_size))) {
 			return -EIO;
 		}
-		return real_read_size;
+		*/
+		//std::cout << "read " << path << " " << fi->fh << " " << off << " " << size << std::endl;
+		std::string data;
+		if ((ec = self->p_client->read(path, fi->fh, size, off, data)) && ec != ErrorCode::E_FILE_EOF) {
+			//std::cout << "error " << int(ec) << std::endl;
+			return -EIO;
+		}
+		//std::cout << "read size: " << data.size() << " " << data << std::endl;
+		memcpy(buf, data.c_str(), data.size());
+		return data.size();
 	}
 
 	int Netdisk::write(const char* path, const char* buf, size_t size, fuse_off_t off, fuse_file_info* fi)
@@ -264,10 +286,22 @@ namespace efs {
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		int64_t real_write_size = 0;
+		
+		int32_t real_write_size = 0;
+		/*
 		if ((ec = self->p_client->writeOffset(path, buf, size, off, real_write_size))) {
 			return -EIO;
 		}
+		*/
+
+		//std::cout << "write " << path << " " << fi->fh << " " << off << " " << size << std::endl;
+
+		std::string data(buf, size);
+		if ((ec = self->p_client->write(path, fi->fh, data, off, real_write_size))) {
+			//std::cout << "error " << int(ec) << std::endl;
+			return -EIO;
+		}
+
 		return real_write_size;
 	}
 
@@ -291,8 +325,16 @@ namespace efs {
 
 	int Netdisk::release(const char* path, fuse_file_info* fi)
 	{
-		//auto self = getself();
+		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
+
+		ErrorCode ec = ErrorCode::NONE;
+		//std::cout << "release " << fi->fh << std::endl;
+
+		if ((ec = self->p_client->close(path, fi->fh))) {
+			//std::cout << "error " << int(ec) << std::endl;
+			return -EIO;
+		}
 
 		return 0;
 	}

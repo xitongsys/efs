@@ -9,6 +9,7 @@ namespace efs {
 struct MsgRead : Msg {
     int32_t fd;
     int32_t read_size;
+    int64_t offset;
 
     MsgRead()
     {
@@ -17,11 +18,12 @@ struct MsgRead : Msg {
 
         fd = 0;
         read_size = 0;
+        offset = 0;
     }
 
     inline int32_t size() const
     {
-        return Msg::size() + serialize::size(fd) + serialize::size(read_size);
+        return Msg::size() + serialize::size(fd) + serialize::size(read_size) + serialize::size(offset);
     }
 
     inline int32_t serialize(char* buf, int32_t buf_size) const
@@ -33,6 +35,7 @@ struct MsgRead : Msg {
         size += Msg::serialize(buf + size, buf_size - size);
         size += serialize::serialize(fd, buf + size, buf_size - size);
         size += serialize::serialize(read_size, buf + size, buf_size - size);
+        size += serialize::serialize(offset, buf + size, buf_size - size);
         return size;
     }
 
@@ -50,6 +53,11 @@ struct MsgRead : Msg {
         size += size1;
 
         if ((size1 = serialize::deserialize(read_size, buf + size, buf_size - size)) < 0) {
+            return -1;
+        }
+        size += size1;
+
+        if ((size1 = serialize::deserialize(offset, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;

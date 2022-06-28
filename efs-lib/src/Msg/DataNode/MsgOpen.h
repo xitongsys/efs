@@ -10,18 +10,18 @@
 namespace efs {
 struct MsgOpen : Msg {
     std::string path;
-    std::string open_mod;
+    uint32_t flag;
 
     MsgOpen()
     {
         msg_type = MsgType::OPEN;
         path = "";
-        open_mod = "";
+        flag = 0;
     }
 
     inline int32_t size() const
     {
-        return Msg::size() + serialize::size(path) + serialize::size(open_mod);
+        return Msg::size() + serialize::size(path) + serialize::size(flag);
     }
 
     inline int32_t serialize(char* buf, int32_t buf_size) const
@@ -32,7 +32,7 @@ struct MsgOpen : Msg {
         int32_t size = 0;
         size += Msg::serialize(buf + size, buf_size - size);
         size += serialize::serialize(path, buf + size, buf_size - size);
-        size += serialize::serialize(open_mod, buf + size, buf_size - size);
+        size += serialize::serialize(flag, buf + size, buf_size - size);
         return size;
     }
 
@@ -49,7 +49,7 @@ struct MsgOpen : Msg {
         }
         size += size1;
 
-        if ((size1 = serialize::deserialize(open_mod, buf + size, buf_size - size)) < 0) {
+        if ((size1 = serialize::deserialize(flag, buf + size, buf_size - size)) < 0) {
             return -1;
         }
         size += size1;

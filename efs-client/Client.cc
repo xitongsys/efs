@@ -540,6 +540,74 @@ namespace efs {
 		return ErrorCode::NONE;
 	}
 
+	ErrorCode Client::open(const std::string& path, const int32_t& flag, int32_t& fd)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
+		if ((ec = getDataNodeConn(path, p_conn))) {
+			return ec;
+		}
+
+		if ((ec = p_conn->open(path, flag, fd))) {
+			return ec;
+		}
+
+		return ErrorCode::NONE;
+	}
+
+	ErrorCode Client::read(const std::string& path, const int32_t& fd, const int32_t& read_size, const int64_t& offset, std::string& data)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
+		if ((ec = getDataNodeConn(path, p_conn))) {
+			return ec;
+		}
+
+		if ((ec = p_conn->read(fd, read_size, offset, data))) {
+			return ec;
+		}
+
+		return ErrorCode::NONE;
+	}
+
+	ErrorCode Client::write(const std::string& path, const int32_t& fd, const std::string& data, const int64_t& offset, int32_t& real_write_size)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
+		if ((ec = getDataNodeConn(path, p_conn))) {
+			return ec;
+		}
+
+		if ((ec = p_conn->write(fd, data, offset, real_write_size))) {
+			return ec;
+		}
+
+		return ErrorCode::NONE;
+	}
+
+	ErrorCode Client::close(const std::string& path, const int32_t& fd)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		ErrorCode ec = ErrorCode::NONE;
+		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
+		if ((ec = getDataNodeConn(path, p_conn))) {
+			return ec;
+		}
+
+		if ((ec = p_conn->close(fd))) {
+			return ec;
+		}
+
+		return ErrorCode::NONE;
+	}
+
 	ErrorCode Client::openOffset(const std::string& path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);

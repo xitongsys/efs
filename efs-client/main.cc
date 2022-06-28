@@ -60,6 +60,9 @@ int main(int argc, char* argv[])
 			else if (cmd == "unmount") {
 				efs::CliHandlers::unmountHandler(tokens);
 			}
+			else if (cmd == "test") {
+				efs::CliHandlers::testHandler(tokens);
+			}
 			else if (cmd == "info") {
 				efs::CliHandlers::infoHandler(tokens);
 			}

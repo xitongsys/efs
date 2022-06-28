@@ -25,6 +25,7 @@ namespace efs {
 		static void unmountHandler(const std::vector<std::string>& tokens);
 		static void infoHandler(const std::vector<std::string>& tokens);
 		static void helpHandler(const std::vector<std::string>& tokens);
+		static void testHandler(const std::vector<std::string>& tokens);
 
 	public:
 		static void wrongParas();
