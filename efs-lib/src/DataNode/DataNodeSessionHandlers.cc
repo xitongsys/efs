@@ -447,7 +447,7 @@ namespace efs {
 				}
 
 				OpenFileHandler fh;
-				if ((ec = p_executor->open(path, "w+", this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
+				if ((ec = p_executor->open(path, "wb+", this->udesc.uid, this->udesc.gid, parent_fdesc, fh))) {
 					p_out_msg->error_code = ec;
 					break;
 				}
