@@ -63,8 +63,6 @@ namespace efs {
 		MsgRm m_rm;
 		m_rm.path = path;
 
-		std::cout << "---------" << path << " "<<path.size()<<std::endl;
-
 		MsgRmResp m_rm_resp;
 		query<MsgRm, MsgRmResp>(m_rm, m_rm_resp);
 
