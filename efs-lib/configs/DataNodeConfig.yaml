@@ -1,16 +1,17 @@
 name: "datanode01"
 token: "abc"
 
-ip: "127.0.0.1"
+ip: "0.0.0.0"
 port: 20001
 
-log_path: "logs"
-root_path: "data"
+index_path: "efs_index"
+log_path: "efs_logs"
+root_path: "efs_root"
 
 disk_size: 1024
 
-name_node_ip: "127.0.0.1"
-name_node_port: 20000
+namenode_addr: "192.168.0.179"
+namenode_port: 20000
 
 paths: ["/zxt", "/root"]
 

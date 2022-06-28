@@ -12,7 +12,7 @@ namespace efs {
 class NameNodeConfig {
 public:
     std::string ip;
-    int16_t port;
+    uint16_t port;
 
     std::unordered_set<std::string> tokens;
 

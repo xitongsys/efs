@@ -18,14 +18,14 @@ namespace efs {
 		boost::asio::ip::tcp::socket sock;
 		boost::asio::ip::tcp::resolver resolver;
 
-		std::string ip;
+		std::string addr;
 		uint16_t port;
 		char *buf;
 
 
 
 	public:
-		Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port);
+		Conn(boost::asio::io_context& io_context, const std::string& addr, uint16_t port);
 		~Conn();
 
 		ErrorCode openConn();

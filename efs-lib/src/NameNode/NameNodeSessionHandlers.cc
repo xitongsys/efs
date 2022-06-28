@@ -25,7 +25,13 @@ namespace efs {
 			else if (p_in_msg->hdesc.host_type == HostType::DataNodeHost && namenode.config.tokens.count(p_in_msg->hdesc.token) > 0) {
 				p_out_msg->users = namenode.config.users;
 				p_out_msg->groups = namenode.config.groups;
-				namenode.hosts[p_in_msg->hdesc.name] = p_in_msg->hdesc;
+
+
+				std::string ip = socket.remote_endpoint().address().to_string();
+				std::string key = p_in_msg->hdesc.name;
+
+				namenode.hosts[key] = p_in_msg->hdesc;
+				namenode.hosts[key].ip = ip;
 			}
 			else {
 				p_out_msg->error_code = ErrorCode::E_NOT_FOUND;

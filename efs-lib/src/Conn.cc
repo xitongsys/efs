@@ -2,11 +2,11 @@
 #include "Limit.h"
 
 namespace efs {
-	Conn::Conn(boost::asio::io_context& io_context, const std::string& ip, uint16_t port) :
+	Conn::Conn(boost::asio::io_context& io_context, const std::string& addr, uint16_t port) :
 		io_context(io_context),
 		sock(io_context),
 		resolver(io_context),
-		ip(ip),
+		addr(addr),
 		port(port)
 	{
 		buf = new char[EFS_BUFFER_SIZE];
@@ -22,7 +22,7 @@ namespace efs {
 	ErrorCode Conn::openConn()
 	{
 		boost::system::error_code b_ec;
-		boost::asio::connect(sock, resolver.resolve(ip, std::to_string(port)), b_ec);
+		boost::asio::connect(sock, resolver.resolve(addr, std::to_string(port)), b_ec);
 		if (b_ec) {
 			return E_NETWORK;
 		}

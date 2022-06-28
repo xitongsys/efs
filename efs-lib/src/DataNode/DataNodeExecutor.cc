@@ -14,7 +14,7 @@
 
 namespace efs {
 	DataNodeExecutor::DataNodeExecutor(const DataNodeConfig& config)
-		: db(config.log_path)
+		: db(config.index_path)
 	{
 		this->config = config;
 		hdesc.name = config.name;
@@ -60,7 +60,7 @@ namespace efs {
 		ErrorCode ec = ErrorCode::NONE;
 
 		boost::asio::io_context io_context;
-		NameNodeConn namenode_conn(io_context, config.name_node_ip, config.name_node_port, config.token);
+		NameNodeConn namenode_conn(io_context, config.namenode_addr, config.namenode_port, config.token);
 
 		if ((ec = namenode_conn.openConn())) {
 			return ec;
@@ -222,18 +222,17 @@ namespace efs {
 
 	ErrorCode DataNodeExecutor::login(const std::string& user, const std::string& password, UserDesc& udesc)
 	{
-		if (users.count(user) == 0) {
-			return ErrorCode::E_LOGIN_USER_NOT_FOUND;
-
+		ErrorCode ec = ErrorCode::NONE;
+		UserDesc udesc0;
+		if ((ec = getUser(user, udesc0))) {
+			return ec;
 		}
-		else if (users[user].password != password) {
+
+		if (udesc0.password != password) {
 			return ErrorCode::E_LOGIN_WRONG_PASSWORD;
-
 		}
-		else {
-			udesc = users[user];
-			return ErrorCode::NONE;
-		}
+		udesc = udesc0;
+		return ErrorCode::NONE;
 	}
 
 	ErrorCode DataNodeExecutor::ls(const std::string& path, std::vector<FileDesc>& fs)
@@ -454,7 +453,7 @@ namespace efs {
 
 		if ((ec = getFileDesc(path, fdesc))) {
 			fdesc.path = path;
-			fdesc.mod = (parent_desc.mod & ((1<<9) - 1)) | FileType::F_IFREG;
+			fdesc.mod = (parent_desc.mod & ((1 << 9) - 1)) | FileType::F_IFREG;
 			fdesc.uid = uid;
 			fdesc.gid = gid;
 			fdesc.create_time = util::now();

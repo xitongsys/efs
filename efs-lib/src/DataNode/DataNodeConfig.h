@@ -12,13 +12,14 @@ public:
     std::string ip;
     uint16_t port;
 
+    std::string index_path;
     std::string log_path;
     std::string root_path;
 
     uint64_t disk_size;
 
-    std::string name_node_ip;
-    uint16_t name_node_port;
+    std::string namenode_addr;
+    uint16_t namenode_port;
 
     std::vector<std::string> paths;
 
