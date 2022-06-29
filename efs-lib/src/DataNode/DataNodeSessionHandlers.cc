@@ -128,6 +128,7 @@ namespace efs {
 				}
 			}
 
+			// close open fd before rm
 			std::vector<int32_t> removed;
 			for (auto it = open_files.begin(); it != open_files.end(); it++) {
 				if (it->second.fdesc.path == p_in_msg->path) {
@@ -138,6 +139,7 @@ namespace efs {
 			for (int32_t fd : removed) {
 				open_files.erase(fd);
 			}
+			/////////////////
 
 			if ((ec = p_executor->rm(p_in_msg->path))) {
 				p_out_msg->error_code = ec;
@@ -171,7 +173,7 @@ namespace efs {
 			FileDesc to_fdesc;
 			if (!(ec = p_executor->getFileDesc(p_in_msg->to_path, to_fdesc))) {
 				//to file exists
-				p_out_msg->error_code = ErrorCode::E_FILE_MV;
+				p_out_msg->error_code = ErrorCode::E_FILE_EXIST;
 				break;
 			}
 
@@ -224,17 +226,30 @@ namespace efs {
 				break;
 			}
 
-			to_fdesc = from_fdesc;
-			to_fdesc.path = p_in_msg->to_path;
-			if ((ec = p_executor->setFileDesc(p_in_msg->to_path, to_fdesc))) {
-				p_out_msg->error_code = ec;
-				break;
+			// close open fd before rename
+			std::vector<int32_t> removed;
+			for (auto it = open_files.begin(); it != open_files.end(); it++) {
+				if (it->second.fdesc.path == p_in_msg->from_path) {
+					fclose(it->second.fp);
+					removed.push_back(it->first);
+				}
 			}
+			for (int32_t fd : removed) {
+				open_files.erase(fd);
+			}
+			/////////////////
 
 			std::error_code std_ec;
 			std::filesystem::rename(from_absolute_path, to_absolute_path, std_ec);
 			if (std_ec) {
 				p_out_msg->error_code = ErrorCode::E_FILE_MV;
+				break;
+			}
+
+			to_fdesc = from_fdesc;
+			to_fdesc.path = p_in_msg->to_path;
+			if ((ec = p_executor->setFileDesc(p_in_msg->to_path, to_fdesc))) {
+				p_out_msg->error_code = ec;
 				break;
 			}
 

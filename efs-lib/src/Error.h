@@ -39,6 +39,7 @@ enum ErrorCode : int8_t {
     E_FILE_TRUNCATE,
     E_FILE_INVALID_PATH,
     E_FILE_UNKNOWN_TYPE,
+    E_FILE_EXIST,
 
     E_DB_OPEN,
     E_DB_GET,
