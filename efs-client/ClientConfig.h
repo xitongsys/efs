@@ -13,7 +13,7 @@ namespace efs {
 	{
 	public:
 		std::string user, password;
-		std::string namenode_ip;
+		std::string namenode_addr;
 		uint16_t namenode_port;
 
 	public:

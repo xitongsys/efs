@@ -12,7 +12,27 @@
 
 int main(int argc, char* argv[])
 {
-	std::cout << "--- welcome to efs ---" << std::endl;
+	std::string config_file = "ClientConfig.yaml";
+	if (argc > 1) {
+		config_file = std::string(argv[1]);
+	}
+
+	efs::Global::config = efs::ClientConfig(config_file);
+
+	std::string icon =
+		"        __      \n"
+		"       / _|     \n"
+		"   ___| |_ ___  \n"
+		"  / _ \  _/ __| \n"
+		" |  __/ | \__ \ \n"
+		"  \___|_| |___/ \n"
+		"\n"
+		;
+
+	std::cout << icon << std::endl;
+
+	efs::CliHandlers::infoHandler({});
+
 	while (1) {
 		char* line = readline("> ");
 		add_history(line);
@@ -29,6 +49,12 @@ int main(int argc, char* argv[])
 		}
 		else if (cmd == "help") {
 			efs::CliHandlers::helpHandler(tokens);
+		}
+		else if (cmd == "info") {
+			efs::CliHandlers::infoHandler(tokens);
+		}
+		else if (cmd == "exit") {
+			exit(0);
 		}
 		else {
 			if (efs::Global::p_client == nullptr) {
@@ -62,12 +88,6 @@ int main(int argc, char* argv[])
 			}
 			else if (cmd == "test") {
 				efs::CliHandlers::testHandler(tokens);
-			}
-			else if (cmd == "info") {
-				efs::CliHandlers::infoHandler(tokens);
-			}
-			else if (cmd == "exit") {
-				exit(0);
 			}
 			else {
 				std::cout << "unknown command" << std::endl;

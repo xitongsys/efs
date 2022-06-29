@@ -35,7 +35,7 @@ namespace efs {
 	ErrorCode Client::getDataNodes()
 	{
 		ErrorCode ec = ErrorCode::NONE;
-		NameNodeConn conn(io_context, config.namenode_ip, config.namenode_port, "");
+		NameNodeConn conn(io_context, config.namenode_addr, config.namenode_port, "");
 		if ((ec = conn.openConn())) {
 			return ec;
 		}
@@ -111,7 +111,7 @@ namespace efs {
 	ErrorCode Client::getAccounts()
 	{
 		ErrorCode ec = ErrorCode::NONE;
-		NameNodeConn conn(io_context, config.namenode_ip, config.namenode_port, "");
+		NameNodeConn conn(io_context, config.namenode_addr, config.namenode_port, "");
 		if ((ec = conn.openConn())) {
 			return ec;
 		}

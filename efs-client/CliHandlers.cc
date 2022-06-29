@@ -23,17 +23,18 @@ namespace efs {
 
 	void CliHandlers::loginHandler(const std::vector<std::string>& tokens)
 	{
-		if (tokens.size() != 5) {
-			CliHandlers::wrongParas();
-			return;
-		}
-
 		ErrorCode ec = ErrorCode::NONE;
 
-		Global::config.namenode_ip = tokens[1];
-		Global::config.namenode_port = std::stoi(tokens[2]);
-		Global::config.user = tokens[3];
-		Global::config.password = tokens[4];
+		if (tokens.size() == 5) {
+			Global::config.namenode_addr = tokens[1];
+			Global::config.namenode_port = std::stoi(tokens[2]);
+			Global::config.user = tokens[3];
+			Global::config.password = tokens[4];
+		}
+		else if (tokens.size() != 1) {
+			wrongParas();
+			return;
+		}
 
 		Global::p_client = std::make_shared<efs::Client>(Global::config);
 
@@ -153,8 +154,10 @@ namespace efs {
 			Global::argv[0][0] = 0;
 		}
 
-		Global::p_mount_thread = std::make_shared<std::thread>(std::bind(&Netdisk::mount, Global::p_netdisk, Global::argc, Global::argv));
-		Global::p_mount_thread->detach();
+		if (Global::p_mount_thread == nullptr) {
+			Global::p_mount_thread = std::make_shared<std::thread>(std::bind(&Netdisk::mount, Global::p_netdisk, Global::argc, Global::argv));
+			Global::p_mount_thread->detach();
+		}
 	}
 
 	void CliHandlers::unmountHandler(const std::vector<std::string>& tokens)
@@ -164,11 +167,15 @@ namespace efs {
 	void CliHandlers::infoHandler(const std::vector<std::string>& tokens)
 	{
 		std::cout << "--- account ---" << std::endl;
-		std::cout << "namenode_ip: " << Global::config.namenode_ip << std::endl;
+		std::cout << "namenode_ip: " << Global::config.namenode_addr << std::endl;
 		std::cout << "namdenode_port: " << Global::config.namenode_port << std::endl;
 		std::cout << "user: " << Global::config.user << std::endl;
 		std::cout << "password: " << Global::config.password << std::endl;
 		std::cout << "---------------" << std::endl;
+
+		if (Global::p_client == nullptr) {
+			return;
+		}
 
 		std::cout << "--- datanodes ---" << std::endl;
 		for (const HostDesc& hdesc : Global::p_client->hosts) {

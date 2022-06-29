@@ -6,6 +6,7 @@
 #include "Msg/NameNode/MsgAccount.h"
 #include "Msg/NameNode/MsgHost.h"
 #include "NameNode/NameNodeSession.h"
+#include "Util.h"
 
 namespace efs {
 	void NameNodeSession::account()
@@ -26,12 +27,12 @@ namespace efs {
 				p_out_msg->users = namenode.config.users;
 				p_out_msg->groups = namenode.config.groups;
 
-
 				std::string ip = socket.remote_endpoint().address().to_string();
 				std::string key = p_in_msg->hdesc.name;
 
 				namenode.hosts[key] = p_in_msg->hdesc;
 				namenode.hosts[key].ip = ip;
+				namenode.hosts[key].timestamp = util::now();
 			}
 			else {
 				p_out_msg->error_code = ErrorCode::E_NOT_FOUND;
