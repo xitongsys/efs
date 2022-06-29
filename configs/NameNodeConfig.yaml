@@ -5,6 +5,12 @@ tokens: ["abc"]
 
 log_path: "efs_logs"
 
-users: ["root,rootpwd,1,1,/root", "zxt,zxtpwd,2,2,/zxt"]
+users: [
+  "root,rootpwd,1,1,/root", 
+  "zxt,zxtpwd,2,2,/zxt"
+  ]
 
-groups: ["root,1", "user,2"]
+groups: [
+  "root,1", 
+  "user,2"
+  ]

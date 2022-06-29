@@ -55,3 +55,47 @@ So it is not a real distributed filesystem: it has no replica and something  lik
 ```
 
 ### efs-client
+
+This is a command line tool to connect and mount EFS. It provide internal command to manipulate the EFS.
+
+```
+./efs-client
+
+       / _|
+   ___| |_ ___
+  / _   _/ __|
+ |  __/ | __
+  ___|_| |___/  Elephas File System
+
+
+--- account ---
+namenode_ip: 192.168.0.141
+namdenode_port: 20000
+user: guest
+password: guest
+---------------
+> login
+> mount
+```
+
+`login` will login the EFS and `mount` will mount the EFS to your local disk 
+
+![mount](doc/disk.png)
+
+* For windows, please install [winfsp](https://github.com/winfsp/winfsp)
+* For Linux, not support yet but it easy to migrate to [libfuse](https://github.com/libfuse/libfuse)
+
+### efs-client-python
+
+You can use `efspy` to connect to EFS directly. It's not fully supported yet.
+
+
+## Dev Plan
+
+1. efs-client support Linux libfuse
+2. efs-client-python implement
+3. efs-client gui
+4. performance improvement
+5. more test ...
+
+Please start to use it and give feedback or just star it! Help is needed and anything is welcome.
