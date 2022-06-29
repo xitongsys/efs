@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 		"   ___| |_ ___  \n"
 		"  / _ \  _/ __| \n"
 		" |  __/ | \__ \ \n"
-		"  \___|_| |___/ \n"
+		"  \___|_| |___/  Elephas File System \n"
 		"\n"
 		;
 

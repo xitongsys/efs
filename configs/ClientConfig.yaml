@@ -1,0 +1,4 @@
+namenode_addr: "192.168.0.179"
+namenode_port: 20000
+user: "zxt"
+password: "zxtpwd"
