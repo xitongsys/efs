@@ -172,7 +172,7 @@ namespace efs {
 
 		std::cout << "--- datanodes ---" << std::endl;
 		for (const HostDesc& hdesc : Global::p_client->hosts) {
-			std::cout << hdesc.name << "," << hdesc.ip << "," << hdesc.port << std::endl;
+			std::cout << hdesc.name << "," << hdesc.ip << "," << hdesc.port << "," << hdesc.timestamp << std::endl;
 			for (const std::string& path : hdesc.paths) {
 				std::cout << path << std::endl;
 			}

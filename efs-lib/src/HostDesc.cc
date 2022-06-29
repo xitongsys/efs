@@ -11,6 +11,7 @@ namespace efs {
 		ip = "";
 		port = 0;
 		paths = {};
+		timestamp = util::now();
 	}
 
 	HostDesc::HostDesc(const HostDesc& hdesc)
@@ -21,6 +22,7 @@ namespace efs {
 		ip = hdesc.ip;
 		port = hdesc.port;
 		paths = hdesc.paths;
+		timestamp = hdesc.timestamp;
 	}
 
 	HostDesc::HostDesc(HostDesc&& hdesc)
@@ -30,6 +32,7 @@ namespace efs {
 		, ip(std::move(hdesc.ip))
 		, port(hdesc.port)
 		, paths(std::move(hdesc.paths))
+		, timestamp(hdesc.timestamp)
 	{
 	}
 
@@ -41,6 +44,7 @@ namespace efs {
 		ip = hdesc.ip;
 		port = hdesc.port;
 		paths = hdesc.paths;
+		timestamp = hdesc.timestamp;
 		return *this;
 	}
 

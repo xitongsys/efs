@@ -22,6 +22,8 @@ namespace efs {
 
 		std::vector<std::string> paths;
 
+		int64_t timestamp;
+
 		HostDesc();
 
 		HostDesc(const HostDesc& hdesc);
@@ -39,6 +41,7 @@ namespace efs {
 			res += serialize::size(ip);
 			res += serialize::size(port);
 			res += serialize::size(paths);
+			res += serialize::size(timestamp);
 			return res;
 		}
 
@@ -54,6 +57,7 @@ namespace efs {
 			size += serialize::serialize(ip, buf + size, buf_size - size);
 			size += serialize::serialize(port, buf + size, buf_size - size);
 			size += serialize::serialize(paths, buf + size, buf_size - size);
+			size += serialize::serialize(timestamp, buf + size, buf_size - size);
 			return size;
 		}
 
@@ -87,6 +91,11 @@ namespace efs {
 			size += size1;
 
 			if ((size1 = serialize::deserialize(paths, buf + size, buf_size - size)) < 0) {
+				return -1;
+			}
+			size += size1;
+
+			if ((size1 = serialize::deserialize(timestamp, buf + size, buf_size - size)) < 0) {
 				return -1;
 			}
 			size += size1;
