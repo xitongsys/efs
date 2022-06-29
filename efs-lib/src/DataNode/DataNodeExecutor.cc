@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "DataNodeExecutor.h"
 #include "FS.h"
@@ -34,7 +36,6 @@ namespace efs {
 	ErrorCode DataNodeExecutor::init()
 	{
 		ErrorCode ec = ErrorCode::NONE;
-		ec = updateAccount();
 		for (auto& init_path : config.init_paths) {
 			std::vector<std::string> vs = util::split(init_path, ',');
 			if (vs.size() != 4) {
@@ -52,13 +53,23 @@ namespace efs {
 				throw ec;
 			}
 		}
+
+		p_heartbeat_thread = std::make_unique<std::thread>(std::bind(&DataNodeExecutor::heartbeat, this));
+		p_heartbeat_thread->detach();
 		return ec;
+	}
+
+	void DataNodeExecutor::heartbeat()
+	{
+		for (;;) {
+			updateAccount();
+			std::this_thread::sleep_for(std::chrono::seconds(60 * 5));
+		}
 	}
 
 	ErrorCode DataNodeExecutor::updateAccount()
 	{
 		ErrorCode ec = ErrorCode::NONE;
-
 		boost::asio::io_context io_context;
 		NameNodeConn namenode_conn(io_context, config.namenode_addr, config.namenode_port, config.token);
 
@@ -71,6 +82,8 @@ namespace efs {
 		if ((ec = namenode_conn.accounts(hdesc, users, groups))) {
 			return ec;
 		}
+
+		std::lock_guard<std::mutex> lock(account_mutex);
 
 		this->users.clear();
 		this->groups.clear();
@@ -88,6 +101,7 @@ namespace efs {
 
 	ErrorCode DataNodeExecutor::getUser(const std::string& name, UserDesc& udesc)
 	{
+		std::lock_guard<std::mutex> lock(account_mutex);
 		if (this->users.count(name)) {
 			udesc = users[name];
 			return ErrorCode::NONE;
@@ -98,6 +112,7 @@ namespace efs {
 
 	ErrorCode DataNodeExecutor::getGroup(const std::string& name, GroupDesc& gdesc)
 	{
+		std::lock_guard<std::mutex> lock(account_mutex);
 		if (this->groups.count(name)) {
 			gdesc = groups[name];
 			return ErrorCode::NONE;

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <mutex>
 
 #include "DBBase.h"
 #include "DataNode/DataNodeConfig.h"
@@ -17,8 +18,11 @@ class DataNodeExecutor {
 public:
     DBBase db;
     HostDesc hdesc;
+
+    std::mutex account_mutex;
     std::unordered_map<std::string, UserDesc> users;
     std::unordered_map<std::string, GroupDesc> groups;
+    std::unique_ptr<std::thread> p_heartbeat_thread;
 
 public:
     DataNodeExecutor(const DataNodeConfig& config);
@@ -27,6 +31,7 @@ public:
 
     ErrorCode init();
     ErrorCode updateAccount();
+    void heartbeat();
 
     ErrorCode getUser(const std::string& name, UserDesc& udesc);
     ErrorCode getGroup(const std::string& name, GroupDesc& gdesc);
