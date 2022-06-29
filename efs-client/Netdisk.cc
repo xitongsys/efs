@@ -7,13 +7,13 @@
 
 namespace efs {
 
-	Netdisk::Netdisk(std::shared_ptr<Client> p_client)
+	Netdisk::Netdisk(std::shared_ptr<Client>& p_client):
+		p_client(p_client)
 	{
-		this->p_client = p_client;
 		buffer = new char[EFS_BUFFER_SIZE];
 	}
 
-	Netdisk::~Netdisk() 
+	Netdisk::~Netdisk()
 	{
 		delete[] buffer;
 	}
@@ -296,7 +296,7 @@ namespace efs {
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
 		ErrorCode ec = ErrorCode::NONE;
-		
+
 		int32_t real_write_size = 0;
 		/*
 		if ((ec = self->p_client->writeOffset(path, buf, size, off, real_write_size))) {

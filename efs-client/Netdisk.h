@@ -13,11 +13,11 @@ namespace efs {
 	class Netdisk {
 	public:
 		std::mutex mutex;
-		std::shared_ptr<Client> p_client;
+		std::shared_ptr<Client>& p_client;
 		char* buffer;
 
 	public:
-		Netdisk(std::shared_ptr<Client> p_client);
+		Netdisk(std::shared_ptr<Client>& p_client);
 		~Netdisk();
 		int mount(int argc, char* argv[]);
 
