@@ -25,6 +25,12 @@
 #include "Msg/DataNode/MsgMv.h"
 
 namespace efs {
+
+#ifdef _MSC_VER
+#define ftell _ftelli64
+#define fseek _fseeki64
+#endif
+
 	void DataNodeSession::login()
 	{
 		std::shared_ptr<MsgLogin> p_in_msg = std::static_pointer_cast<MsgLogin>(this->p_in_msg);
