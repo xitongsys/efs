@@ -13,15 +13,89 @@
 namespace efs {
 
 	std::map<std::string, std::string> CliHandlers::helpTexts = {
-		std::make_pair("login", "login namenode_ip namenode_port username password\n"),
-		std::make_pair("info", "show info\n"),
-		std::make_pair("mount", "mount to local disk\n"),
-		std::make_pair("perm", "modifiy permission\nperm /guest/a.txt user user01 rwx\nperm /guest/b.txt group users rwx\n"),
-		std::make_pair("mkdir", "mkdir path\n"),
-		std::make_pair("rm", "rm path\n"),
-		std::make_pair("cp", "cp from_path to_path\n"),
-		std::make_pair("mv", "mv from_path to_path\n"),
+		std::make_pair("login",
+			"login into EFS\n"
+			"Example 1: specify the login info\n"
+			"login namenode_addr namenode_port username password\n"
+			"\n"
+			"Example 2: use the config file info\n"
+			"login\n"
+		),
 
+		std::make_pair("info",
+			"show info\n"
+			"Example\n"
+			"info\n"
+		),
+
+		std::make_pair("mount",
+			"mount to local disk\n"
+			"Example\n"
+			"mount\n"
+		),
+
+		std::make_pair("perm",
+			"modifiy file or directory permission\n"
+			"Example 1: modify user permission\n"
+			"perm /guest/a.txt user Tom rwx\n"
+			"\n"
+			"Example 2: modify group permission\n"
+			"perm /guest/b.txt group StudentGroup rwx\n"
+			"\n"
+			"Example 3: modify directory permission recursively\n"
+			"perm /guest/dira user Tom rwx r\n"
+		),
+
+		std::make_pair("chown",
+			"change file or directory owner"
+			"Example 1 change one file or directory owner:\n"
+			"chown dir_a user_b\n"
+			"\n"
+			"Example 2 change directory owner recursively:\n"
+			"chown dir_a user_b r\n"
+		),
+
+		std::make_pair("mkdir",
+			"create a new directory\n"
+			"Example:\n"
+			"mkdir dira\n"
+		),
+
+		std::make_pair("rm",
+			"remove file or directory\n"
+			"Example:\n"
+			"rm dira\n"
+		),
+
+		std::make_pair("cp",
+			"copy file or directory\n"
+			"Example:\n"
+			"cp dir_a dir_b\n"
+		),
+
+		std::make_pair("mv",
+			"rename file or directory\n"
+			"Example:\n"
+			"mv dir_a dir_b\n"
+		),
+
+		std::make_pair("pwd",
+			"show current path\n"
+			"Example:\n"
+			"pwd\n"
+		),
+
+		std::make_pair("clear",
+			"clear screen\n"
+			"Example:\n"
+			"clear\n"
+		),
+
+		std::make_pair("help",
+			"show this help description\n"
+			"Example:\n"
+			"help\n"
+		),
 	};
 
 	std::string CliHandlers::loginHandler(const std::vector<std::string>& tokens)
@@ -127,7 +201,11 @@ namespace efs {
 
 	std::string CliHandlers::permHandler(const std::vector<std::string>& tokens)
 	{
-		if (tokens.size() != 5) {
+		bool recursive = false;
+		if (tokens.size() == 5 && tokens[4] == "r") {
+			recursive = true;
+		}
+		else if (tokens.size() < 4 || tokens.size() > 5) {
 			return wrongParas();
 		}
 
@@ -237,9 +315,20 @@ namespace efs {
 	std::string CliHandlers::helpHandler(const std::vector<std::string>& tokens)
 	{
 		std::string res;
-		for (auto it = helpTexts.begin(); it != helpTexts.end(); it++) {
-			res += it->first + "\n";
-			res += it->second + "\n";
+		if (tokens.size() <= 1) {
+			for (auto it = helpTexts.begin(); it != helpTexts.end(); it++) {
+				res += it->first + "\n";
+				res += it->second + "\n";
+			}
+		}
+		else {
+			std::string cmd = tokens[1];
+			if (helpTexts.count(cmd)) {
+				res += helpTexts[cmd];
+			}
+			else {
+				res += "unknown command\n";
+			}
 		}
 		return res;
 	}

@@ -48,13 +48,13 @@ int main(int argc, char* argv[])
 
 		std::string cmd = tokens[0];
 		if (cmd == "login") {
-			std::cout << efs::CliHandlers::loginHandler(tokens);
+			std::cout << efs::CliHandlers::loginHandler(tokens) << std::endl;
 		}
 		else if (cmd == "help") {
-			std::cout << efs::CliHandlers::helpHandler(tokens);
+			std::cout << efs::CliHandlers::helpHandler(tokens) << std::endl;
 		}
 		else if (cmd == "info") {
-			std::cout << efs::CliHandlers::infoHandler(tokens);
+			std::cout << efs::CliHandlers::infoHandler(tokens) << std::endl;
 		}
 		else if (cmd == "clear") {
 			std::cout << efs::CliHandlers::clearHandler(tokens) << std::endl;
