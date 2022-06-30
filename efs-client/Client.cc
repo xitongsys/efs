@@ -357,18 +357,23 @@ namespace efs {
 			return E_FILE_NOT_FOUND;
 		}
 
+		ErrorCode ec2 = ErrorCode::NONE;
+		fdescs.clear();
+		bool get_some = false;
 		for (auto& p_conn : p_conns) {
 			std::vector<FileDesc> cur_fdescs;
-			if ((ec = p_conn->ls(path, cur_fdescs))) {
-				return ec;
+			if ((ec2 = p_conn->ls(path, cur_fdescs))) {
+				ec = ec2;
+				continue;
 			}
 
+			get_some = true;
 			for (auto& fdesc : cur_fdescs) {
 				fdescs.push_back(fdesc);
 			}
 		}
 
-		return ErrorCode::NONE;
+		return get_some ? ErrorCode::NONE : ec;
 	}
 
 	ErrorCode Client::cpRecursive(const std::string& from_path, const std::string& to_path)
