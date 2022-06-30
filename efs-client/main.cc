@@ -31,7 +31,9 @@ int main(int argc, char* argv[])
 
 	std::cout << icon << std::endl;
 
-	efs::CliHandlers::infoHandler({});
+	std::cout << efs::CliHandlers::infoHandler({}) << std::endl;
+	std::cout << efs::CliHandlers::loginHandler({}) << std::endl;
+	std::cout << efs::CliHandlers::mountHandler({}) << std::endl;
 
 	while (1) {
 		std::cout << efs::Global::config.user << "@efs " << efs::Global::pwd << std::endl;
@@ -53,6 +55,9 @@ int main(int argc, char* argv[])
 		}
 		else if (cmd == "info") {
 			std::cout << efs::CliHandlers::infoHandler(tokens);
+		}
+		else if (cmd == "clear") {
+			std::cout << efs::CliHandlers::clearHandler(tokens) << std::endl;
 		}
 		else if (cmd == "exit") {
 			exit(0);

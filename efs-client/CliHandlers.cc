@@ -2,6 +2,8 @@
 #include <string>
 #include <format>
 #include <thread>
+#include <cstdlib>
+#include <cstdio>
 
 #include "CliHandlers.h"
 #include "Global.h"
@@ -30,9 +32,6 @@ namespace efs {
 			Global::config.namenode_port = std::stoi(tokens[2]);
 			Global::config.user = tokens[3];
 			Global::config.password = tokens[4];
-		}
-		else if (tokens.size() != 1) {
-			return wrongParas();
 		}
 
 		Global::p_client = std::make_shared<efs::Client>(Global::config);
@@ -242,6 +241,12 @@ namespace efs {
 			res += it->second + "\n";
 		}
 		return res;
+	}
+
+	std::string CliHandlers::clearHandler(const std::vector<std::string>& tokens)
+	{
+		if (system("CLS")) system("clear");
+		return "";
 	}
 
 	std::string CliHandlers::absolutePath(const std::string& path)

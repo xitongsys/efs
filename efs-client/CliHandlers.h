@@ -27,6 +27,7 @@ namespace efs {
 		static std::string mountHandler(const std::vector<std::string>& tokens);
 		static std::string infoHandler(const std::vector<std::string>& tokens);
 		static std::string helpHandler(const std::vector<std::string>& tokens);
+		static std::string clearHandler(const std::vector<std::string>& tokens);
 
 	public:
 		static std::string absolutePath(const std::string& path);
