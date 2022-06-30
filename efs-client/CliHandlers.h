@@ -14,22 +14,24 @@ namespace efs {
 		static std::map<std::string, std::string> helpTexts;
 
 	public:
-		static void loginHandler(const std::vector<std::string>& tokens);
-		static void lsHandler(const std::vector<std::string>& tokens);
-		static void rmHandler(const std::vector<std::string>& tokens);
-		static void mkdirHandler(const std::vector<std::string>& tokens);
-		static void mvHandler(const std::vector<std::string>& tokens);
-		static void permHandler(const std::vector<std::string>& tokens);
-		static void cpHandler(const std::vector<std::string>& tokens);
-		static void mountHandler(const std::vector<std::string>& tokens);
-		static void unmountHandler(const std::vector<std::string>& tokens);
-		static void infoHandler(const std::vector<std::string>& tokens);
-		static void helpHandler(const std::vector<std::string>& tokens);
-		static void testHandler(const std::vector<std::string>& tokens);
+		static std::string loginHandler(const std::vector<std::string>& tokens);
+		static std::string lsHandler(const std::vector<std::string>& tokens);
+		static std::string cdHandler(const std::vector<std::string>& tokens);
+		static std::string pwdHandler(const std::vector<std::string>& tokens);
+		static std::string rmHandler(const std::vector<std::string>& tokens);
+		static std::string mkdirHandler(const std::vector<std::string>& tokens);
+		static std::string mvHandler(const std::vector<std::string>& tokens);
+		static std::string permHandler(const std::vector<std::string>& tokens);
+		static std::string chownHandler(const std::vector<std::string>& tokens);
+		static std::string cpHandler(const std::vector<std::string>& tokens);
+		static std::string mountHandler(const std::vector<std::string>& tokens);
+		static std::string infoHandler(const std::vector<std::string>& tokens);
+		static std::string helpHandler(const std::vector<std::string>& tokens);
 
 	public:
-		static void wrongParas();
-		static void errorHandler(efs::ErrorCode ec);
+		static std::string absolutePath(const std::string& path);
+		static std::string wrongParas();
+		static std::string errorHandler(efs::ErrorCode ec);
 
 	};
 

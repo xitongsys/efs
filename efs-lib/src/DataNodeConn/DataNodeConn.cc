@@ -14,6 +14,7 @@
 #include "Msg/DataNode/MsgTruncate.h"
 #include "Msg/DataNode/MsgMv.h"
 #include "Msg/DataNode/MsgPerm.h"
+#include "Msg/DataNode/MsgChown.h"
 
 namespace efs {
 	DataNodeConn::DataNodeConn(
@@ -154,6 +155,17 @@ namespace efs {
 		MsgPermResp m_perm_resp;
 		query<MsgPerm, MsgPermResp>(m_perm, m_perm_resp);
 		return ErrorCode(m_perm_resp.error_code);
+	}
+
+	ErrorCode DataNodeConn::chown(const std::string& path, const std::string& user)
+	{
+		MsgChown m_chown;
+		m_chown.path = path;
+		m_chown.user = user;
+
+		MsgChownResp m_chown_resp;
+		query<MsgChown, MsgChownResp>(m_chown, m_chown_resp);
+		return ErrorCode(m_chown_resp.error_code);
 	}
 
 	ErrorCode DataNodeConn::openOffset(const std::string& path)

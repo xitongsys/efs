@@ -20,9 +20,9 @@ DataNodeConfig::DataNodeConfig(const std::string& file)
     ip = node["ip"].as<std::string>();
     port = node["port"].as<uint16_t>();
 
-    index_path = fs::formatPath((node["index_path"]).as<std::string>());
-    root_path = fs::formatPath(node["root_path"].as<std::string>());
-    log_path = fs::formatPath(node["log_path"].as<std::string>());
+    index_path = fs::format((node["index_path"]).as<std::string>());
+    root_path = fs::format(node["root_path"].as<std::string>());
+    log_path = fs::format(node["log_path"].as<std::string>());
     disk_size = node["disk_size"].as<uint64_t>();
 
     namenode_addr = node["namenode_addr"].as<std::string>();

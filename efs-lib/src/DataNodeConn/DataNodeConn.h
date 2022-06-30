@@ -32,6 +32,7 @@ namespace efs {
 		ErrorCode close(const int32_t& fd);
 		ErrorCode ls(const std::string& path, std::vector<FileDesc>& fdescs);
 		ErrorCode perm(const std::string& path, const std::string& name, const PermType& perm_type, const Permission& perm);
+		ErrorCode chown(const std::string& path, const std::string& user);
 
 		ErrorCode openOffset(const std::string& path);
 		ErrorCode readOffset(const std::string& path, const int32_t& read_size, const int64_t& offset, std::string& data);

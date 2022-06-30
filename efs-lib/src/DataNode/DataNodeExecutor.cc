@@ -123,7 +123,7 @@ namespace efs {
 
 	ErrorCode DataNodeExecutor::absolutePath(const std::string& path, std::string& absolute_path)
 	{
-		absolute_path = fs::formatPath(config.root_path + "/" + path);
+		absolute_path = fs::format(config.root_path + "/" + path);
 		return ErrorCode::NONE;
 	}
 
@@ -131,7 +131,7 @@ namespace efs {
 	{
 		int32_t n = config.root_path.size();
 
-		relative_path = fs::formatPath(path);
+		relative_path = fs::format(path);
 		if (int32_t(relative_path.size()) < n) {
 			return ErrorCode::E_FILE_PATH;
 		}
@@ -139,14 +139,14 @@ namespace efs {
 		if (relative_path.substr(0, n) != config.root_path) {
 			return ErrorCode::E_FILE_PATH;
 		}
-		relative_path = fs::formatPath(relative_path.substr(n, relative_path.size() - n));
+		relative_path = fs::format(relative_path.substr(n, relative_path.size() - n));
 
 		return ErrorCode::NONE;
 	}
 
 	ErrorCode DataNodeExecutor::parentPath(const std::string& path, std::string& parent_path)
 	{
-		parent_path = fs::formatPath(path);
+		parent_path = fs::format(path);
 		while (parent_path.size() > 0 && (*parent_path.rbegin()) != '/') {
 			parent_path.pop_back();
 		}

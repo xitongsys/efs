@@ -53,6 +53,8 @@ namespace efs {
 		p_msgs[MsgType::RM_RESP] = std::make_shared<MsgRmResp>();
 		p_msgs[MsgType::MV] = std::make_shared<MsgMv>();
 		p_msgs[MsgType::MV_RESP] = std::make_shared<MsgMvResp>();
+		p_msgs[MsgType::CHOWN] = std::make_shared<MsgChown>();
+		p_msgs[MsgType::CHOWN_RESP] = std::make_shared<MsgChownResp>();
 		p_msgs[MsgType::CHMOD] = std::make_shared<MsgChmod>();
 		p_msgs[MsgType::CHMOD_RESP] = std::make_shared<MsgChmodResp>();
 		p_msgs[MsgType::PERM] = std::make_shared<MsgPerm>();

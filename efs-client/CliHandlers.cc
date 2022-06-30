@@ -21,7 +21,7 @@ namespace efs {
 
 	};
 
-	void CliHandlers::loginHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::loginHandler(const std::vector<std::string>& tokens)
 	{
 		ErrorCode ec = ErrorCode::NONE;
 
@@ -32,121 +32,154 @@ namespace efs {
 			Global::config.password = tokens[4];
 		}
 		else if (tokens.size() != 1) {
-			wrongParas();
-			return;
+			return wrongParas();
 		}
 
 		Global::p_client = std::make_shared<efs::Client>(Global::config);
 
 		if ((ec = Global::p_client->connect())) {
-			CliHandlers::errorHandler(ec);
-			return;
+			return CliHandlers::errorHandler(ec);
 		}
 
 		Global::p_netdisk = std::make_shared<Netdisk>(Global::p_client);
+		return "";
 	}
 
-	void CliHandlers::lsHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::lsHandler(const std::vector<std::string>& tokens)
 	{
-		if (tokens.size() != 2) {
-			CliHandlers::wrongParas();
-			return;
+		ErrorCode ec = ErrorCode::NONE;
+		std::string path = Global::pwd;
+		if (tokens.size() > 1) {
+			path = absolutePath(tokens[1]);
 		}
 
-		ErrorCode ec = ErrorCode::NONE;
-		std::string path = fs::formatPath(tokens[1]);
 		std::vector<FileDesc> fdescs;
 		if ((ec = Global::p_client->ls(path, fdescs))) {
-			errorHandler(ec);
-			return;
+			return errorHandler(ec);
 		}
 
+		std::string res = "";
 		for (const FileDesc& fdesc : fdescs) {
-			std::cout << fdesc.path << "," << Global::modToStr(fdesc.mod) << "," << fdesc.fsize << "," << fdesc.modified_time << std::endl;
+			res += fdesc.path + "," + Global::modToStr(fdesc.mod) + "," +
+				std::to_string(fdesc.uid) + "," + std::to_string(fdesc.gid) + "," +
+				std::to_string(fdesc.fsize) + "," + std::to_string(fdesc.modified_time) + "\n";
 		}
+		return res;
 	}
 
-	void CliHandlers::rmHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::cdHandler(const std::vector<std::string>& tokens)
 	{
 		if (tokens.size() != 2) {
-			wrongParas();
-			return;
+			return CliHandlers::wrongParas();
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = fs::formatPath(tokens[1]);
+		Global::pwd = absolutePath(tokens[1]);
+		return "";
+	}
+
+	std::string CliHandlers::pwdHandler(const std::vector<std::string>& tokens)
+	{
+		return Global::pwd;
+	}
+
+	std::string CliHandlers::rmHandler(const std::vector<std::string>& tokens)
+	{
+		if (tokens.size() != 2) {
+			return wrongParas();
+		}
+
+		ErrorCode ec = ErrorCode::NONE;
+		std::string path = absolutePath(tokens[1]);
 		if ((ec = Global::p_client->rmRecursive(path))) {
-			errorHandler(ec);
-			return;
+			return errorHandler(ec);
 		}
+		return "";
 	}
 
-	void CliHandlers::mkdirHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::mkdirHandler(const std::vector<std::string>& tokens)
 	{
 		if (tokens.size() != 2) {
-			wrongParas();
-			return;
+			return wrongParas();
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = fs::formatPath(tokens[1]);
+		std::string path = absolutePath(tokens[1]);
 		if ((ec = Global::p_client->mkdir(path))) {
-			errorHandler(ec);
-			return;
+			return errorHandler(ec);
 		}
+		return "";
 	}
 
-	void CliHandlers::mvHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::mvHandler(const std::vector<std::string>& tokens)
 	{
 		if (tokens.size() != 3) {
-			wrongParas();
-			return;
+			return wrongParas();
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string from_path = fs::formatPath(tokens[1]), to_path = fs::formatPath(tokens[2]);
+		std::string from_path = absolutePath(tokens[1]), to_path = absolutePath(tokens[2]);
 		if ((ec = Global::p_client->mv(from_path, to_path))) {
-			errorHandler(ec);
-			return;
+			return errorHandler(ec);
 		}
+		return "";
 	}
 
-	void CliHandlers::permHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::permHandler(const std::vector<std::string>& tokens)
 	{
 		if (tokens.size() != 5) {
-			wrongParas();
-			return;
+			return wrongParas();
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string path = fs::formatPath(tokens[1]);
+		std::string path = absolutePath(tokens[1]);
 		PermType perm_type = Global::strToPermType(tokens[2]);
 		std::string name = tokens[3];
 		Permission perm = Global::strToPerm(tokens[4]);
 
 		if ((ec = Global::p_client->perm(path, name, perm_type, Permission(perm), true))) {
-			errorHandler(ec);
-			return;
+			return errorHandler(ec);
 		}
+		return "";
 	}
 
-	void CliHandlers::cpHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::chownHandler(const std::vector<std::string>& tokens)
 	{
-		if (tokens.size() != 3) {
-			wrongParas();
-			return;
+		bool recursive = false;
+		if (tokens.size() == 4 && tokens[3] == "r") {
+			recursive = true;
+		}
+		else if (tokens.size() < 3 || tokens.size() > 4) {
+			return wrongParas();
 		}
 
 		ErrorCode ec = ErrorCode::NONE;
-		std::string from_path = fs::formatPath(tokens[1]), to_path = fs::formatPath(tokens[2]);
+		std::string path = absolutePath(tokens[1]);
+		std::string user = tokens[2];
 
-		if ((ec = Global::p_client->cpRecursive(from_path, to_path))) {
-			errorHandler(ec);
-			return;
+		if ((ec = Global::p_client->chown(path, user, recursive))) {
+			return errorHandler(ec);
 		}
+		return "";
 	}
 
-	void CliHandlers::mountHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::cpHandler(const std::vector<std::string>& tokens)
+	{
+		if (tokens.size() != 3) {
+			return wrongParas();
+		}
+
+		ErrorCode ec = ErrorCode::NONE;
+		std::string from_path = absolutePath(tokens[1]), to_path = absolutePath(tokens[2]);
+
+		if ((ec = Global::p_client->cpRecursive(from_path, to_path))) {
+			return errorHandler(ec);
+		}
+
+		return "";
+	}
+
+	std::string CliHandlers::mountHandler(const std::vector<std::string>& tokens)
 	{
 		ErrorCode ec = ErrorCode::NONE;
 		if (Global::argv[0] == nullptr) {
@@ -158,73 +191,97 @@ namespace efs {
 			Global::p_mount_thread = std::make_shared<std::thread>(std::bind(&Netdisk::mount, Global::p_netdisk, Global::argc, Global::argv));
 			Global::p_mount_thread->detach();
 		}
+		return "";
 	}
 
-	void CliHandlers::unmountHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::infoHandler(const std::vector<std::string>& tokens)
 	{
-	}
-
-	void CliHandlers::infoHandler(const std::vector<std::string>& tokens)
-	{
-		std::cout << "--- account ---" << std::endl;
-		std::cout << "namenode_ip: " << Global::config.namenode_addr << std::endl;
-		std::cout << "namdenode_port: " << Global::config.namenode_port << std::endl;
-		std::cout << "user: " << Global::config.user << std::endl;
-		std::cout << "password: " << Global::config.password << std::endl;
-		std::cout << "---------------" << std::endl;
+		std::string res = "";
+		res += "---------- account  ----------\n";
+		res += " namenode_addr: " + Global::config.namenode_addr + "\n";
+		res += " namenode_port: " + std::to_string(Global::config.namenode_port) + "\n";
+		res += " user: " + Global::config.user + "\n";
+		res += " password: " + Global::config.password + "\n";
+		res += "\n";
 
 		if (Global::p_client == nullptr) {
-			return;
+			return res;
 		}
 
-		std::cout << "--- datanodes ---" << std::endl;
+		res += "---------- datanode ----------\n";
 		for (const HostDesc& hdesc : Global::p_client->hosts) {
-			std::cout << hdesc.name << "," << hdesc.ip << "," << hdesc.port << "," << hdesc.timestamp << std::endl;
+			res += " " + hdesc.name + "," + hdesc.ip + "," + std::to_string(hdesc.port) + "," + std::to_string(hdesc.timestamp) + "\n";
 			for (const std::string& path : hdesc.paths) {
-				std::cout << path << std::endl;
+				res += path + "\n";
 			}
 		}
-		std::cout << "-----------------" << std::endl;
+		res += "\n";
 
-		std::cout << "--- users ---" << std::endl;
+
+		res += "------------ user ------------\n";
 		for (const UserDesc& udesc : Global::p_client->users) {
-			std::cout << udesc.user << "," << udesc.uid << "," << udesc.gid << "," << udesc.root_path << std::endl;
+			res += " " + udesc.user + "," + std::to_string(udesc.uid) + "," + std::to_string(udesc.gid) + "\n";
 		}
-		std::cout << "-------------" << std::endl;
+		res += "\n";
 
-		std::cout << "--- groups ---" << std::endl;
+
+		res += "----------- groups -----------\n";
 		for (const GroupDesc& gdesc : Global::p_client->groups) {
-			std::cout << gdesc.group << "," << gdesc.gid << std::endl;
+			res += " " + gdesc.group + "," + std::to_string(gdesc.gid) + "\n";
 		}
-		std::cout << "--------------" << std::endl;
+		res += "\n";
+
+		return res;
 	}
 
-	void CliHandlers::helpHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::helpHandler(const std::vector<std::string>& tokens)
 	{
+		std::string res;
 		for (auto it = helpTexts.begin(); it != helpTexts.end(); it++) {
-			std::cout << it->first << std::endl << it->second << std::endl;
+			res += it->first + "\n";
+			res += it->second + "\n";
 		}
+		return res;
 	}
 
-	void CliHandlers::testHandler(const std::vector<std::string>& tokens)
+	std::string CliHandlers::absolutePath(const std::string& path)
 	{
-		std::string data(EFS_MAX_READ_SIZE, 'a');
-		Global::p_client->openOffset("/zxt/a.txt");
-		for (int64_t i = 0; i < 1024; i++) {
-			int64_t rs = 0;
-			Global::p_client->writeOffset("/zxt/a.txt", data.c_str(), data.size(), i * data.size(), rs);
+		std::vector<std::string> ps = fs::split(path);
+		if (ps.size() == 0) {
+			return Global::pwd;
 		}
-		
+
+		if (ps[0] == "/") {
+			return fs::format(path);
+		}
+
+		std::string cur_path = Global::pwd;
+		for (std::string& p : ps) {
+			if (p == ".") {
+				continue;
+			}
+			else if (p == "..") {
+				cur_path = fs::parent(cur_path);
+			}
+			else {
+				cur_path += "/" + p;
+			}
+		}
+
+		return fs::format(cur_path);
 	}
 
-	void CliHandlers::wrongParas()
+	std::string CliHandlers::wrongParas()
 	{
-		std::cout << "wrong parameters" << std::endl;
+		return "wrong command\n";
 	}
 
-	void CliHandlers::errorHandler(efs::ErrorCode ec)
+	std::string CliHandlers::errorHandler(efs::ErrorCode ec)
 	{
-		std::cout << "error: " << int(ec) << std::endl;
+		std::string res = "error: ";
+		res += std::to_string(int(ec));
+		res += "\n";
+		return res;
 	}
 
 }

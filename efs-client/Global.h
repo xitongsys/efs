@@ -18,6 +18,8 @@ namespace efs {
 		static int argc;
 		static char* argv[];
 
+		static std::string pwd;
+
 
 
 

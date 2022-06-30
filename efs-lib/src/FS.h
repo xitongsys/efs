@@ -31,24 +31,7 @@ namespace efs {
 			return ErrorCode::NONE;
 		}
 
-		inline std::string basename(const std::string& path)
-		{
-			int n = path.size();
-			std::string res;
-			int i = n - 1;
-			while (i >= 0 && path[i] == '/') {
-				i--;
-			}
-			while (i >= 0 && path[i] != '/') {
-				res.push_back(path[i]);
-				i--;
-			}
-
-			reverse(res.begin(), res.end());
-			return res;
-		}
-
-		inline std::string formatPath(const std::string& path)
+		inline std::string format(const std::string& path)
 		{
 			int n = path.size();
 			std::string res;
@@ -77,6 +60,73 @@ namespace efs {
 
 			return res;
 		}
+
+		inline std::string basename(const std::string& path)
+		{
+			int n = path.size();
+			std::string res;
+			int i = n - 1;
+			while (i >= 0 && path[i] == '/') {
+				i--;
+			}
+			while (i >= 0 && path[i] != '/') {
+				res.push_back(path[i]);
+				i--;
+			}
+
+			reverse(res.begin(), res.end());
+			return res;
+		}
+
+		inline std::string parent(const std::string& path) {
+			std::string cur_path = fs::format(path);
+			while (cur_path.size() && (*cur_path.rbegin())!='/') {
+				cur_path.pop_back();
+			}
+			if (cur_path.size() > 1) {
+				cur_path.pop_back();
+			}
+			return cur_path;
+		}
+
+		inline std::vector<std::string> split(const std::string& path) {
+			std::string cur_path = fs::format(path);
+			std::vector<std::string> res;
+			int n = cur_path.size();
+			if (cur_path.size() == 0) {
+				return res;
+			}
+
+			if (cur_path[0] == '/') {
+				res.push_back("/");
+				cur_path = cur_path.substr(1, n - 1);
+			}
+
+			int i = 0;
+			while (i < n) {
+				int j = i;
+				while (j < n && cur_path[j] != '/') {
+					j++;
+				}
+				res.push_back(cur_path.substr(i, j - i));
+				i = j + 1;
+			}
+			return res;
+		}
+
+		inline std::string join(const std::vector<std::string>& paths) {
+			if (paths.size() == 0) {
+				return "";
+			}
+
+			std::string res = paths[0];
+			for (int i = 1; i < paths.size(); i++) {
+				res += "/" + paths[i];
+			}
+			return res;
+		}
+
+
 
 		inline bool exists(const std::string& path)
 		{

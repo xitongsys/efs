@@ -10,6 +10,8 @@ namespace efs {
 	int Global::argc = 1;
 	char* Global::argv[] = { nullptr };
 
+	std::string Global::pwd = "/";
+
 	std::string Global::permToStr(Permission p)
 	{
 		std::string res = "rwx";
