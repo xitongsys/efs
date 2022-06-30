@@ -24,13 +24,16 @@
     <ClCompile Include="Client.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Netdisk.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CliHandlers.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Global.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetdiskWin.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetdiskLinux.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,9 +44,6 @@
     <ClInclude Include="ClientConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Netdisk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CliHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,6 +51,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LineParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetdiskWin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Netdisk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetdiskLinux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
