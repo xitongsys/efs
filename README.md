@@ -45,6 +45,12 @@ The client connects to NameNode and get the DataNode infos. Then it will only co
 
 So it is not a full functional distributed filesystem. It has no replica and distributed blobs. But it is very suitable for small company to handle their different server storage resources and provide an uniform entrance to users.
 
+## Build
+
+* For windows use Visual Studio 2022
+
+* For linux use CMake
+
 ## Example
 
 ### Start NameNode
