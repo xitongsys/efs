@@ -21,11 +21,15 @@ EFS is a simple "distributed" file system. It's very suitable for small company 
 
 One *NameNode* and several *DataNode*s.
 
-NameNode has the users' configs and DataNode configs. Not like HDFS, it won't store the file metadata. So it can avoid the [small file issue](https://www.sciencedirect.com/science/article/pii/S1319157821002585) of HDFS.
+NameNode has the users' configs and DataNode infos. Not like HDFS, it won't store the file metadata. So it can avoid the [small file issue](https://www.sciencedirect.com/science/article/pii/S1319157821002585) of HDFS.
 
-DataNode store the file metadata in [RocksDB](https://github.com/facebook/rocksdb) and store the file in its local disk. Actually RocksDB is used in [Facebook for metadata store](https://www.usenix.org/system/files/fast21-pan.pdf). DataNode reports its status to NameNode periodically.
+DataNode store the file metadata in [RocksDB](https://github.com/facebook/rocksdb) and store the file in its local disk. Actually RocksDB is used in [Facebook for metadata store](https://www.usenix.org/system/files/fast21-pan.pdf) and shows a good performance. 
 
-The structure and permission of the filesystem is consistent with the Linux file system. The root directory is `/`. Every datanode handles different folders. 
+DataNode reports its status to NameNode periodically. So new DataNode can be added without stopping the service.
+
+The structure and permission of the filesystem is consistent with the [Linux file system](https://linuxize.com/post/understanding-linux-file-permissions/). For more, EFS supports to specify permission of any user/group to any file/directory. You can use `perm` command in the efs-client.
+
+The root directory is `/`. Every DataNode handles different folders. No matter the DataNode is Windows or Linux, EFS unify the path format.
 
 For example, 
 
@@ -35,11 +39,11 @@ For example,
 |datanode02|10.0.0.3| /volume02, /data/data02, /users |
 
 
-So `/volume01, /data/data01` are on `datanode01(10.0.0.2)` and `/volume02,/data/data02,/users` are on datanode02.
+So `/volume01, /data/data01` are on `datanode01(10.0.0.2)` and `/volume02,/data/data02,/users` are on datanode02. But for the users, only one root directory `/`.
 
-The client connects to NameNode and get the DataNode configs and then it will only communicates with the DataNodes to read/write files.
+The client connects to NameNode and get the DataNode infos. Then it will only communicates with the DataNodes to read/write files.
 
-So it is not a real distributed filesystem: it has no replica and something  like distributed blobs. But it is very suitable for small company to handle their different server storage resources.
+So it is not a full functional distributed filesystem. It has no replica and distributed blobs. But it is very suitable for small company to handle their different server storage resources and provide an uniform entrance to users.
 
 ## Example
 
