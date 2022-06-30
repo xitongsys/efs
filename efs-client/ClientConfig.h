@@ -19,6 +19,7 @@ namespace efs {
 	public:
 		ClientConfig();
 		ClientConfig(const std::string& config_file);
+		ClientConfig(const ClientConfig& config);
 	};
 }
 

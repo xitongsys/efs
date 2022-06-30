@@ -19,4 +19,12 @@ namespace efs {
 		namenode_addr = node["namenode_addr"].as<std::string>();
 		namenode_port = node["namenode_port"].as<uint16_t>();
 	}
+
+	ClientConfig::ClientConfig(const ClientConfig& config)
+	{
+		user = config.user;
+		password = config.password;
+		namenode_addr = config.namenode_addr;
+		namenode_port = config.namenode_port;
+	}
 }

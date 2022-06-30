@@ -9,6 +9,7 @@
 #include "CliHandlers.h"
 #include "Global.h"
 #include "LineParser.h"
+#include "FS.h"
 
 int main(int argc, char* argv[])
 {
@@ -17,9 +18,9 @@ int main(int argc, char* argv[])
 		config_file = std::string(argv[1]);
 	}
 
-	efs::Global::config = efs::ClientConfig(config_file);
-
-
+	if (efs::fs::exists(config_file)) {
+		efs::Global::config = efs::ClientConfig(config_file);
+	}
 
 	std::cout << efs::Global::logo << std::endl;
 
