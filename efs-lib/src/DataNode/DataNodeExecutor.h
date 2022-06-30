@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <mutex>
+#include <thread>
 
 #include "DBBase.h"
 #include "DataNode/DataNodeConfig.h"

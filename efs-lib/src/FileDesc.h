@@ -33,15 +33,15 @@ namespace efs {
 	};
 
 	enum OpenFlag : uint32_t {
-		O_RDONLY = 0,
-		O_WRONLY = 1,
-		O_RDWR = 2,
-		O_ACCMODE = 3,
+		OF_RDONLY = 0,
+		OF_WRONLY = 1,
+		OF_RDWR = 2,
+		OF_ACCMODE = 3,
 	};
 
 	inline std::string openFlagToMode(const OpenFlag& flag)
 	{
-		if ((flag & OpenFlag::O_ACCMODE) == 0) {
+		if ((flag & OpenFlag::OF_ACCMODE) == 0) {
 			return "rb";
 		}
 		return "rb+";

@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include "FS.h"
 #include "Limit.h"
@@ -42,7 +42,7 @@ namespace efs {
 		p_out_msg->error_code = ErrorCode::NONE;
 
 		do {
-			if (ec = fs::checkPath(p_in_msg->path)) {
+			if ((ec = fs::checkPath(p_in_msg->path))) {
 				p_out_msg->error_code = ec;
 				break;
 			}
@@ -477,7 +477,7 @@ namespace efs {
 					break;
 				}
 
-				if((flag & OpenFlag::O_ACCMODE) == 0) {
+				if((flag & OpenFlag::OF_ACCMODE) == 0) {
 					p_out_msg->error_code = ErrorCode::E_FILE_NOT_FOUND;
 					break;
 				}
@@ -553,15 +553,15 @@ namespace efs {
 			int32_t max_read_size = std::min(p_in_msg->read_size, EFS_MAX_READ_SIZE);
 			p_out_msg->data.resize(max_read_size, 0);
 
-			int64_t pos = 0;
-			if (fgetpos(fh.fp, &pos)) {
+			int64_t pos = ftell(fh.fp);
+			if (pos < 0) {
 				p_out_msg->error_code = E_FILE_READ;
 				break;
 			}
 
 			if (pos != p_in_msg->offset) {
 				pos = p_in_msg->offset;
-				if (fsetpos(fh.fp, &pos)) {
+				if(fseek(fh.fp, pos, SEEK_SET)){
 					p_out_msg->error_code = E_FILE_READ;
 					break;
 				}
@@ -598,8 +598,8 @@ namespace efs {
 
 			OpenFileHandler& fh = this->open_files[p_in_msg->fd];
 
-			int64_t pos = 0;
-			if (fgetpos(fh.fp, &pos)) {
+			int64_t pos = ftell(fh.fp);
+			if (pos < 0) {
 				p_out_msg->error_code = E_FILE_WRITE;
 				p_out_msg->write_size = 0;
 				break;
@@ -607,7 +607,7 @@ namespace efs {
 
 			if (pos != p_in_msg->offset) {
 				pos = p_in_msg->offset;
-				if (fsetpos(fh.fp, &pos)) {
+				if(fseek(fh.fp, pos, SEEK_SET)) {
 					p_out_msg->error_code = E_FILE_WRITE;
 					p_out_msg->write_size = 0;
 					break;
@@ -719,10 +719,8 @@ namespace efs {
 			}
 
 			if (p_in_msg->offset > 0) {
-				fpos_t pos = 0;
-				fgetpos(fp, &pos);
-				pos += p_in_msg->offset;
-				if (fsetpos(fp, &pos)) {
+				int64_t pos = p_in_msg->offset;
+				if(fseek(fp, pos, SEEK_SET)) {
 					p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
 					break;
 				}
@@ -786,11 +784,9 @@ namespace efs {
 				p_out_msg->error_code = ErrorCode::E_FILE_OPEN;
 				break;
 			}
-			fpos_t pos = 0;
-			fgetpos(fp, &pos);
-			pos += p_in_msg->offset;
+			int64_t pos = p_in_msg->offset;
 			if (p_in_msg->offset > 0) {
-				if (fsetpos(fp, &pos)) {
+				if(fseek(fp, pos, SEEK_SET)) {
 					p_out_msg->error_code = ErrorCode::E_FILE_SEEK;
 					break;
 				}
@@ -800,7 +796,7 @@ namespace efs {
 
 			p_out_msg->write_size = write_size;
 
-			if (write_size != p_in_msg->data.size()) {
+			if (write_size != int(p_in_msg->data.size())) {
 				p_out_msg->error_code = ErrorCode::E_FILE_WRITE;
 			}
 
@@ -850,9 +846,9 @@ namespace efs {
 				break;
 			}
 
-			boost::system::error_code bec;
-			boost::filesystem::resize_file(absolute_path, p_in_msg->offset, bec);
-			if (bec) {
+			std::error_code s_ec;
+			std::filesystem::resize_file(absolute_path, p_in_msg->offset, s_ec);
+			if (s_ec) {
 				p_out_msg->error_code = ErrorCode::E_FILE_TRUNCATE;
 				break;
 			}

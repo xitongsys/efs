@@ -120,7 +120,7 @@ namespace efs {
 			}
 
 			std::string res = paths[0];
-			for (int i = 1; i < paths.size(); i++) {
+			for (int i = 1; i < int(paths.size()); i++) {
 				res += "/" + paths[i];
 			}
 			return res;
