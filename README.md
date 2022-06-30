@@ -59,23 +59,25 @@ So it is not a real distributed filesystem: it has no replica and something  lik
 This is a command line tool to connect and mount EFS. It provide internal command to manipulate the EFS.
 
 ```
-./efs-client
+./efs-client.exe
+  ______     ______   ______
+ /\  ___\   /\  ___\ /\  ___\
+ \ \  __\   \ \  __\ \ \___  \
+  \ \_____\  \ \_\    \/\_____\
+   \/_____/   \/_/     \/_____/
 
-       / _|
-   ___| |_ ___
-  / _   _/ __|
- |  __/ | __
-  ___|_| |___/  Elephas File System
 
+---------- account  ----------
+ namenode_addr: 192.168.0.179
+ namenode_port: 20000
+ user: guest
+ password: guest
 
---- account ---
-namenode_ip: 192.168.0.141
-namdenode_port: 20000
-user: guest
-password: guest
----------------
-> login
-> mount
+zxt@efs /
+> The service efs-client has been started.
+
+zxt@efs /
+> 
 ```
 
 `login` will login the EFS and `mount` will mount the EFS to your local disk 
