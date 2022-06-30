@@ -26,6 +26,7 @@ namespace efs {
 		static std::string cpHandler(const std::vector<std::string>& tokens);
 		static std::string mountHandler(const std::vector<std::string>& tokens);
 		static std::string infoHandler(const std::vector<std::string>& tokens);
+		static std::string logoHandler(const std::vector<std::string>& tokens);
 		static std::string helpHandler(const std::vector<std::string>& tokens);
 		static std::string clearHandler(const std::vector<std::string>& tokens);
 

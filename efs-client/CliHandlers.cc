@@ -91,6 +91,12 @@ namespace efs {
 			"clear\n"
 		),
 
+		std::make_pair("logo",
+			"show EFS logo\n"
+			"Example:\n"
+			"logo\n"
+		),
+
 		std::make_pair("help",
 			"show this help description\n"
 			"Example:\n"
@@ -310,6 +316,11 @@ namespace efs {
 		res += "\n";
 
 		return res;
+	}
+
+	std::string CliHandlers::logoHandler(const std::vector<std::string>& tokens)
+	{
+		return Global::logo;
 	}
 
 	std::string CliHandlers::helpHandler(const std::vector<std::string>& tokens)

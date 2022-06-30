@@ -19,16 +19,9 @@ int main(int argc, char* argv[])
 
 	efs::Global::config = efs::ClientConfig(config_file);
 
-	std::string icon =
-		"  ______     ______   ______     \n"
-		" /\\  ___\\   /\\  ___\\ /\\  ___\\    \n"
-		" \\ \\  __\\   \\ \\  __\\ \\ \\___  \\   \n"
-		"  \\ \\_____\\  \\ \\_\\    \\/\\_____\\  \n"
-		"   \\/_____/   \\/_/     \\/_____/  \n"
-		"\n"
-		;
 
-	std::cout << icon << std::endl;
+
+	std::cout << efs::Global::logo << std::endl;
 
 	std::cout << efs::CliHandlers::infoHandler({}) << std::endl;
 	std::cout << efs::CliHandlers::loginHandler({}) << std::endl;
@@ -57,6 +50,9 @@ int main(int argc, char* argv[])
 		}
 		else if (cmd == "clear") {
 			std::cout << efs::CliHandlers::clearHandler(tokens) << std::endl;
+		}
+		else if (cmd == "logo") {
+			std::cout << efs::CliHandlers::logoHandler(tokens) << std::endl;
 		}
 		else if (cmd == "exit") {
 			exit(0);

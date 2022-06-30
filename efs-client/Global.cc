@@ -12,6 +12,15 @@ namespace efs {
 
 	std::string Global::pwd = "/";
 
+	std::string Global::logo = 
+		"  ______     ______   ______     \n"
+		" /\\  ___\\   /\\  ___\\ /\\  ___\\    \n"
+		" \\ \\  __\\   \\ \\  __\\ \\ \\___  \\   \n"
+		"  \\ \\_____\\  \\ \\_\\    \\/\\_____\\  \n"
+		"   \\/_____/   \\/_/     \\/_____/  \n"
+		"\n"
+		;
+
 	std::string Global::permToStr(Permission p)
 	{
 		std::string res = "rwx";
