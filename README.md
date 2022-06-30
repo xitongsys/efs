@@ -74,10 +74,10 @@ This is a command line tool to connect and mount EFS. It provide internal comman
  user: guest
  password: guest
 
-zxt@efs /
+guest@efs /
 > The service efs-client has been started.
 
-zxt@efs /
+guest@efs /
 > 
 ```
 
