@@ -39,11 +39,11 @@ For example,
 |datanode02|10.0.0.3| /volume02, /data/data02, /users |
 
 
-So `/volume01, /data/data01` are on `datanode01(10.0.0.2)` and `/volume02,/data/data02,/users` are on datanode02. But for the users, only one root directory `/`.
+`/volume01, /data/data01` are on `datanode01(10.0.0.2)` and `/volume02,/data/data02,/users` are on datanode02. But for the users, only one root directory `/`.
 
 The client connects to NameNode and get the DataNode infos. Then it will only communicates with the DataNodes to read/write files.
 
-So it is not a full functional distributed filesystem. It has no replica and distributed blobs. But it is very suitable for small company to handle their different server storage resources and provide an uniform entrance to users.
+EFS is not a full functional distributed filesystem. It has no replica and distributed blobs. But it is very suitable for small company to handle their different server storage resources and provide an uniform entrance to users.
 
 ## Build
 
