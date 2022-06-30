@@ -8,6 +8,7 @@
 #include "CliHandlers.h"
 #include "Global.h"
 #include "FS.h"
+#include "Error.h"
 
 namespace efs {
 
@@ -283,8 +284,8 @@ namespace efs {
 
 	std::string CliHandlers::errorHandler(efs::ErrorCode ec)
 	{
-		std::string res = "error: ";
-		res += std::to_string(int(ec));
+		std::string res = "Error";
+		res += "(" + std::to_string(int(ec)) + "): " + ErrorCodeStrMap[ec];
 		res += "\n";
 		return res;
 	}

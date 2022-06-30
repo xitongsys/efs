@@ -20,9 +20,6 @@ namespace efs {
 
 		static std::string pwd;
 
-
-
-
 	public:
 		static std::string permToStr(Permission p);
 		static Permission strToPerm(const std::string& perm_str);

@@ -74,6 +74,9 @@ int main(int argc, char* argv[])
 			else if (cmd == "cd") {
 				std::cout << efs::CliHandlers::cdHandler(tokens) << std::endl;
 			}
+			else if (cmd == "pwd") {
+				std::cout << efs::CliHandlers::pwdHandler(tokens) << std::endl;
+			}
 			else if (cmd == "mkdir") {
 				std::cout << efs::CliHandlers::mkdirHandler(tokens) << std::endl;
 			}

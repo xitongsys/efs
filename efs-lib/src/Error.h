@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <unordered_map>
+
 namespace efs {
 enum ErrorCode : int8_t {
     NONE = 0,
@@ -49,4 +52,7 @@ enum ErrorCode : int8_t {
     E_TOKEN_ERROR,
     E_CONFIG_ERROR,
 };
+
+extern std::unordered_map<ErrorCode, std::string> ErrorCodeStrMap;
+
 }

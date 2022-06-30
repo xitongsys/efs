@@ -156,6 +156,7 @@
     <ClCompile Include="src\DataNode\DataNodeSession.cc" />
     <ClCompile Include="src\DataNode\DataNodeSessionHandlers.cc" />
     <ClCompile Include="src\DBBase.cc" />
+    <ClCompile Include="src\Error.cc" />
     <ClCompile Include="src\FileDesc.cc" />
     <ClCompile Include="src\FS.cc" />
     <ClCompile Include="src\GroupDesc.cc" />
