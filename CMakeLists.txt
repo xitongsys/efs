@@ -12,8 +12,8 @@ FILE(GLOB_RECURSE EFS_SERVER_SRCS "efs-server/*.cc" "efs-lib/src/*.cc")
 FILE(GLOB_RECURSE EFS_CLIENT_SRCS "efs-client/*.cc" "efs-lib/src/*.cc")
 
 ADD_EXECUTABLE(efs-server.out ${EFS_SERVER_SRCS})
-# ADD_EXECUTABLE(efs-client ${EFS_CLIENT_SRCS})
+ADD_EXECUTABLE(efs-client.out ${EFS_CLIENT_SRCS})
 
 TARGET_LINK_LIBRARIES(efs-server.out pthread rocksdb yaml-cpp)
-# TARGET_LINK_LIBRARIES(efs-client pthread rocksdb yaml-cpp readline)
+TARGET_LINK_LIBRARIES(efs-client.out pthread rocksdb yaml-cpp readline)
 

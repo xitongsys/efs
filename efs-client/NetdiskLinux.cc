@@ -17,4 +17,9 @@ namespace efs {
 	{
 		delete[] buffer;
 	}
+
+	int NetdiskLinux::mount(int argc, char* argv[])
+	{
+		return -1;
+	}
 }

@@ -1,3 +1,5 @@
+#ifdef _MSC_VER
+
 #include <stack>
 #include <string>
 #include <tuple>
@@ -448,3 +450,5 @@ namespace efs {
 		return 0;
 	}
 }
+
+#endif

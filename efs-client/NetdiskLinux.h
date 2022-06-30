@@ -16,6 +16,9 @@ namespace efs {
 		char* buffer;
 
 	public:
+		int mount(int argc, char* argv[]);
+
+	public:
 		NetdiskLinux(std::shared_ptr<Client>& p_client);
 		~NetdiskLinux();
 	};
