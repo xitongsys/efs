@@ -15,7 +15,7 @@ EFS is a simple "distributed" file system. It's very suitable for small company 
 
 1. collect storage resources from different servers (win/linux) and provide a common entrance to users
 
-2. uniform permission management system
+2. permission management system
 
 ## Architecture
 
