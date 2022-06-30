@@ -88,7 +88,11 @@ guest@efs /
 > The service efs-client has been started.
 
 guest@efs /
-> 
+> ls
+/share,drwxrwxrwx,1,1,0,1656571586672
+/users,drwxr-xr-x,1,1,0,1656485114789
+/data,drwxr-xr-x,1,1,0,1656578150277
+
 ```
 
 `login` will login the EFS and `mount` will mount the EFS to your local disk 
