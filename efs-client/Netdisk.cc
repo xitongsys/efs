@@ -92,6 +92,8 @@ namespace efs {
 
 	int Netdisk::getattr(const char* path, fuse_stat* stbuf, fuse_file_info* fi)
 	{
+		//std::cout << "getattr " << path << std::endl;
+
 		auto self = getself();
 		//std::lock_guard<std::mutex> lock(self->mutex);
 
@@ -409,6 +411,10 @@ namespace efs {
 
 		ErrorCode ec = ErrorCode::NONE;
 		std::vector<FileDesc> fdescs;
+
+		//std::cout << "readdir " << path << std::endl;
+
+		//std::cout << "=========" << int(self == nullptr) << std::endl<< int(self->p_client == nullptr) << std::endl;
 
 		if ((ec = self->p_client->ls(path, fdescs))) {
 			return -EIO;

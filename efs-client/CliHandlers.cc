@@ -106,6 +106,7 @@ namespace efs {
 	std::string CliHandlers::loginHandler(const std::vector<std::string>& tokens)
 	{
 		ErrorCode ec = ErrorCode::NONE;
+		std::string res = "";
 
 		if (tokens.size() == 5) {
 			Global::config.namenode_addr = tokens[1];
@@ -117,11 +118,11 @@ namespace efs {
 		Global::p_client = std::make_shared<efs::Client>(Global::config);
 
 		if ((ec = Global::p_client->connect())) {
-			return CliHandlers::errorHandler(ec);
+			res = CliHandlers::errorHandler(ec);
 		}
 
 		Global::p_netdisk = std::make_shared<Netdisk>(Global::p_client);
-		return "";
+		return res;
 	}
 
 	std::string CliHandlers::lsHandler(const std::vector<std::string>& tokens)

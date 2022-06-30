@@ -58,11 +58,14 @@ namespace efs {
 				hosts[i].ip, hosts[i].port,
 				config.user, config.password);
 
-			if ((ec = p_conn->openConn())) {
+			ErrorCode ec2 = ErrorCode::NONE;
+			if ((ec2 = p_conn->openConn())) {
+				ec = ec2;
 				continue;
 			}
 
-			if ((ec = p_conn->login())) {
+			if ((ec2 = p_conn->login())) {
+				ec = ec2;
 				continue;
 			}
 
@@ -75,6 +78,7 @@ namespace efs {
 				p_conns.push_back({ path, i, p_conn });
 			}
 		}
+
 
 		std::sort(p_conns.begin(), p_conns.end(), [&](const auto& a, const auto& b) {
 			return std::get<0>(a).size() > std::get<0>(b).size();
@@ -127,12 +131,14 @@ namespace efs {
 	ErrorCode Client::getFileDesc(const std::string& path, FileDesc& fdesc)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
+
 		if ((ec = getDataNodeConn(path, p_conn))) {
 			return ec;
 		}
-
+		
 		if ((ec = p_conn->getFileDesc(path, fdesc))) {
 			return ec;
 		}
@@ -144,6 +150,7 @@ namespace efs {
 	ErrorCode Client::mkdir(const std::string& path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 
@@ -161,6 +168,7 @@ namespace efs {
 	ErrorCode Client::rm(const std::string& path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 
@@ -178,6 +186,7 @@ namespace efs {
 	ErrorCode Client::rmRecursive(const std::string& path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::shared_ptr<DataNodeConn> p_conn = nullptr;
 
@@ -236,6 +245,7 @@ namespace efs {
 	ErrorCode Client::mv(const std::string& from_path, const std::string& to_path)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		if (from_path == to_path) {
 			return ErrorCode::NONE;
@@ -326,8 +336,10 @@ namespace efs {
 	ErrorCode Client::ls(const std::string& path, std::vector<FileDesc>& fdescs)
 	{
 		std::lock_guard<std::mutex> lock(mutex);
+
 		ErrorCode ec = ErrorCode::NONE;
 		std::vector<std::shared_ptr<DataNodeConn>> p_conns;
+
 		if (path == "/") {
 			if ((ec = getAllDataNodeConns(p_conns))) {
 				return ec;
