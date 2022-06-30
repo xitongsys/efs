@@ -90,7 +90,7 @@ guest@efs /
 ![mount](doc/disk.png)
 
 * For windows, please install [winfsp](https://github.com/winfsp/winfsp)
-* For Linux, not support yet but it easy to migrate to [libfuse](https://github.com/libfuse/libfuse)
+* For Linux, not support mount disk yet. But it easy to migrate to [libfuse](https://github.com/libfuse/libfuse)
 
 ### efs-client-python
 
